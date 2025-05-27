@@ -1,0 +1,110 @@
+/* src/pages/Resume/coverletter.css */
+
+.coverletter-container {
+    padding: 60px 20px;
+    background: #f9f9f9;
+    min-height: 100vh;
+}
+
+.coverletter-hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.coverletter-hero h1 {
+    font-size: 3rem;
+    color: #0b06a0;
+    margin-bottom: 10px;
+}
+
+.coverletter-hero p {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Grid layout */
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+/* Template card */
+.template-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.template-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.template-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.use-template-button {
+    margin-top: 10px;
+    padding: 10px 25px;
+    background-color: #0b06a0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.use-template-button:hover {
+    background-color: #06070d;
+}
+
+.use-template-link {
+    text-decoration: none;
+}
+
+/* Filter buttons (reused) */
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background-color: #e5e7eb;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: #333;
+}
+
+.filter-btn:hover {
+    background-color: #d1d5db;
+}
+
+.filter-btn.active {
+    background-color: #0b06a0;
+    color: white;
+}
+
+
