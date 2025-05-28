@@ -32,27 +32,27 @@ const Hero = () => {
               </p>
               <div className="flex flex-wrap items-center gap-6">
                 <img
-                  src="/api/placeholder/130/40"
+                  src="https://upload.wikimedia.org/wikipedia/commons/5/53/JPMorgan_Chase_Logo.svg"
                   alt="JPMorgan Chase"
                   className="h-8 opacity-70"
                 />
                 <img
-                  src="/api/placeholder/100/40"
+                  src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Salesforce_logo.svg"
                   alt="Salesforce"
                   className="h-8 opacity-70"
                 />
                 <img
-                  src="/api/placeholder/80/40"
+                  src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg"
                   alt="AWS"
                   className="h-6 opacity-70"
                 />
                 <img
-                  src="/api/placeholder/80/40"
+                  src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
                   alt="Apple"
                   className="h-8 opacity-70"
                 />
                 <img
-                  src="/api/placeholder/80/40"
+                  src="https://upload.wikimedia.org/wikipedia/commons/0/0e/PwC_Logo.svg"
                   alt="PWC"
                   className="h-8 opacity-70"
                 />
