@@ -34,15 +34,13 @@ function ResumeUpload() {
     jobCardsContainerRef.current.innerHTML = "";
     matchedCompaniesDivRef.current.style.display = "none";
 
-    const API_URL = "https://careercraft-6ybz.onrender.com/api";
-
     try {
       // const response = await fetch("http://127.0.0.1:8000/api/upload_resume/", {
       //   method: "POST",
       //   body: formData,
       // });
 
-      const response = await fetch(`${API_URL}/upload_resume/`, {
+      const response = await fetch("https://careercraft-6ybz.onrender.com/api/upload_resume/", {
         method: "POST",
         body: formData,
       });
