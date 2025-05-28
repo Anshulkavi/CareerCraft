@@ -138,7 +138,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # ✅ This is needed for local frontend
+    "https://careercraft-6ybz.onrender.com",  # ✅ Your live domain
+]
 
 
 # Path where files are stored
