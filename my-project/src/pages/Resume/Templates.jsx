@@ -4,7 +4,7 @@ import creativeImg from "../../assets/creative.png";
 import modernImg from "../../assets/modern.png"; 
 import elegentImg from "../../assets/Elegent.png";
 import timelineImg from "../../assets/Timeline.png";
-import ProfessionalImg from "../../assets/Prof.png";
+import ProfessionalImg from "../../assets/prof.png";
 import simpleImg from "../../assets/simple.png";
 import './templates.css'; // Import the css file
 
