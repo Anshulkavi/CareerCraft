@@ -34,7 +34,7 @@ function ResumeUpload() {
     jobCardsContainerRef.current.innerHTML = "";
     matchedCompaniesDivRef.current.style.display = "none";
 
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = "https://careercraft-6ybz.onrender.com/api";
 
     try {
       // const response = await fetch("http://127.0.0.1:8000/api/upload_resume/", {
