@@ -20,7 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from core import views
 urlpatterns = [
-    path('', views.home),  # your app's URL pattern
+    path('', views.root_view),  # your app's URL pattern
     path('admin/', admin.site.urls),
     path('api/', include('core.urls')),  # your app's URL pattern
 ]

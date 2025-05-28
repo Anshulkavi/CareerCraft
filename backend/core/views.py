@@ -111,5 +111,5 @@ def upload_resume(request):
 
     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
-def home(request):
+def root_view(request):
     return JsonResponse({"message": "CareerCraft API is running"})
