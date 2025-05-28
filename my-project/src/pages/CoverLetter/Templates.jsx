@@ -1,9 +1,9 @@
 // src/pages/Resume/CoverLetterTemplates.jsx
 import BasicImg from "../../assets/Basic.png";
-import classicImg from "../../assets/Classic.png";
+import classicImg from "../../assets/classic.png";
 import modernsImg from "../../assets/Moderns.png";
 import minimalImg from "../../assets/minimal.png";
-import highperformerImg from "../../assets/High_performer.png";
+import highperformerImg from "../../assets/High_Performer.png";
 import timeImg from "../../assets/time.png";
 
 import React, { useState } from "react";
