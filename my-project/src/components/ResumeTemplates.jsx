@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import creativeImg from "../assets/creative.png";
 import modernImg from "../assets/modern.png";
-import ProfessionalImg from "../assets/Prof.png";
+import ProfessionalImg from "../assets/prof.png";
 import simpleImg from "../assets/simple.png";
 
 const featuredTemplates = [
