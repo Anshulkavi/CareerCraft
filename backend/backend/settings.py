@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-z9zd+&95%(j2#8-+npkd&e&^8*bk09owu8407h(sv3zxbjf#4@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['careercraft-backend-c89o.onrender.com']
 
 
 
