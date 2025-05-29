@@ -9,7 +9,7 @@ const Hero = () => {
           {/* Left side - Text content */}
           <div className="w-full md:w-1/2 z-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-              <span>Enhancv's </span>
+              <span>CareerCraft's </span>
               <span className="text-indigo-600">Resume Builder</span>
               <br />
               <span>helps you get hired at top</span>
