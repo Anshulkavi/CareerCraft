@@ -10,7 +10,7 @@ const Hero = () => {
           <div className="w-full md:w-1/2 z-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-gray-100 mb-6">
               <span>CareerCraft's </span>
-              <span className="text-indigo-600">Resume Builder</span>
+              <span className="text-indigo-600">Resume Job Finder</span>
               <br />
               <span>helps you get hired at top</span>
               <br />
@@ -30,7 +30,7 @@ const Hero = () => {
               <p className="text-gray-700 dark:text-gray-100 font-medium mb-4">
                 Loved by interviewers at
               </p>
-              <div className="flex flex-wrap items-center gap-6">
+              {/* <div className="flex flex-wrap items-center gap-6">
                 <img
                   src="https://upload.wikimedia.org/wikipedia/commons/5/53/JPMorgan_Chase_Logo.svg"
                   alt="JPMorgan Chase"
@@ -55,6 +55,33 @@ const Hero = () => {
                   src="https://upload.wikimedia.org/wikipedia/commons/0/0e/PwC_Logo.svg"
                   alt="PWC"
                   className="h-8 opacity-70"
+                />
+              </div> */}
+              <div className="flex flex-wrap items-center gap-6">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/f/fd/JPMorgan_Chase_Tower_Houston.jpg"
+                  alt="JPMorgan Chase Office"
+                  className="h-20 rounded shadow-md object-cover"
+                />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/a/a3/Salesforce_Tower_Indianapolis_2021.jpg"
+                  alt="Salesforce Tower"
+                  className="h-20 rounded shadow-md object-cover"
+                />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Amazon_Spheres_Seattle.jpg"
+                  alt="AWS / Amazon Spheres"
+                  className="h-20 rounded shadow-md object-cover"
+                />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Apple_Headquarters_in_Cupertino.jpg"
+                  alt="Apple Headquarters"
+                  className="h-20 rounded shadow-md object-cover"
+                />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/c/c1/PwC_Sydney_Headquarters.jpg"
+                  alt="PWC Office"
+                  className="h-20 rounded shadow-md object-cover"
                 />
               </div>
             </div>
@@ -112,7 +139,7 @@ const Hero = () => {
 
         <div className="mt-16 ">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:!text-gray-100">
-            Pick a resume template and build your resume in minutes!
+            Upload your resume and find dream jobs in minutes!
           </h2>
         </div>
       </div>
