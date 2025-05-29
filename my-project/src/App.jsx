@@ -53,7 +53,7 @@ function App() {
       <Darkmode />
       <Navbar />
       <ScrollToTop />
-      <div className="pt-[70px] bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
         <Routes>
           {/* Home Page */}
           <Route
