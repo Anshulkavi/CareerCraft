@@ -8,4 +8,5 @@ requests==2.32.3
 PyMuPDF==1.25.5
 pymongo==4.3.3
 djangorestframework==3.14.0
+django-cors-headers==3.18.0
 gunicorn
