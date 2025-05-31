@@ -116,7 +116,7 @@ def extract_name(text):
     return "Unknown"
 
 def extract_skills(text):
-    skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React']
+    skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React', 'Node.js', 'Django', 'Flask', 'C++', 'C#', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'Go', 'TypeScript']
     print(f"[DEBUG] Extracted skills from resume: {skills_list}")
     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
