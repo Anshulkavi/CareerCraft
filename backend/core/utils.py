@@ -115,10 +115,30 @@ def extract_name(text):
                 return " ".join(words[:2])
     return "Unknown"
 
+# def extract_skills(text):
+#     skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React', 'Node.js', 'Django', 'Flask', 'C++', 'C#', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'Go', 'TypeScript']
+#     print(f"[DEBUG] Extracted skills from resume: {skills_list}")
+#     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
+
 def extract_skills(text):
-    skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React', 'Node.js', 'Django', 'Flask', 'C++', 'C#', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'Go', 'TypeScript']
-    print(f"[DEBUG] Extracted skills from resume: {skills_list}")
-    return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
+    # Normalize and flatten the text
+    text = text.lower()
+    text = re.sub(r'[\n\r\t]', ' ', text)           # remove line breaks
+    text = re.sub(r'[^a-z0-9+#. ]', ' ', text)       # remove special chars
+    text = re.sub(r'\s+', ' ', text)                 # collapse spaces
 
+    skills_list = [
+        'python', 'java', 'html', 'css', 'javascript', 'sql',
+        'mongodb', 'react', 'node.js', 'django', 'flask',
+        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+    ]
 
+    found_skills = []
+    for skill in skills_list:
+        skill_lower = skill.lower()
+        if skill_lower in text:
+            found_skills.append(skill.capitalize() if skill.islower() else skill)
+
+    print("[DEBUG] Extracted skills from resume:", found_skills)
+    return found_skills
 
