@@ -63,9 +63,7 @@ def upload_resume(request):
         experience = extract_experience(text)
 
         if email and not validate_email(email):
-            return JsonResponse({'error': 'Invalid email address'}, status=400)
-
-
+            email = "Not specified"
         if not skills:
             return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
 
