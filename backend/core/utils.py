@@ -115,27 +115,27 @@ def extract_name(text):
                 return " ".join(words[:2])
     return "Unknown"
 
-# def extract_skills(text):
-#     skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React']
-#     print(f"[DEBUG] Extracted skills from resume: {skills_list}")
-#     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
-
 def extract_skills(text):
-    # Normalize text: replace punctuation with space, condense whitespace
-    text = re.sub(r'[^a-zA-Z0-9\s\+\#]', ' ', text)
-    text = re.sub(r'\s+', ' ', text)
+    skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React']
+    print(f"[DEBUG] Extracted skills from resume: {skills_list}")
+    return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
-    skills_list = [
-        'Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React',
-        'C', 'C++', 'R', 'Bootstrap', 'Tailwind CSS', 'Git', 'GitHub'
-    ]
+# def extract_skills(text):
+#     # Normalize text: replace punctuation with space, condense whitespace
+#     text = re.sub(r'[^a-zA-Z0-9\s\+\#]', ' ', text)
+#     text = re.sub(r'\s+', ' ', text)
 
-    found_skills = []
-    for skill in skills_list:
-        pattern = re.compile(r'\b' + re.escape(skill) + r'\b', re.IGNORECASE)
-        if pattern.search(text):
-            found_skills.append(skill)
+#     skills_list = [
+#         'Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React',
+#         'C', 'C++', 'R', 'Bootstrap', 'Tailwind CSS', 'Git', 'GitHub'
+#     ]
 
-    print(f"[DEBUG] Extracted skills from resume: {found_skills}")
-    return found_skills
+#     found_skills = []
+#     for skill in skills_list:
+#         pattern = re.compile(r'\b' + re.escape(skill) + r'\b', re.IGNORECASE)
+#         if pattern.search(text):
+#             found_skills.append(skill)
+
+#     print(f"[DEBUG] Extracted skills from resume: {found_skills}")
+#     return found_skills
 
