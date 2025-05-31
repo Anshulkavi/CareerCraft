@@ -134,27 +134,28 @@ pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
 # -------- TEXT EXTRACTION --------
 def extract_text_from_pdf(file):
     text = ""
-    file.seek(0)
-    with pdfplumber.open(file) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text() or ""
-            text += page_text
+    try:
+        with pdfplumber.open(file) as pdf:
+            for page in pdf.pages:
+                text += page.extract_text() or ""
 
-    # Fallback to OCR if pdfplumber extracted too little
-    if len(text.strip()) < 50:
+        if len(text.strip()) < 50:
+            try:
+                file.seek(0)
+                doc = fitz.open(stream=file.read(), filetype="pdf")
+                for page_num in range(len(doc)):
+                    page = doc.load_page(page_num)
+                    pix = page.get_pixmap(dpi=300)
+                    img_data = pix.tobytes("png")
+                    page_text = pytesseract.image_to_string(img_data)
+                    text += page_text + "\n"
+            except Exception as ocr_error:
+                print("OCR failed:", ocr_error)
+                pass  # silently skip OCR if it fails
+
+    except Exception as pdf_error:
+        print("PDF extraction failed:", pdf_error)
         text = ""
-        file.seek(0)  # Reset file pointer
-        pdf_bytes = file.read()
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-        for page_num in range(len(doc)):
-            page = doc.load_page(page_num)
-            pix = page.get_pixmap(dpi=300)
-            img_bytes = pix.tobytes("png")
-
-            # Convert bytes to image object
-            img = Image.open(io.BytesIO(img_bytes))
-            page_text = pytesseract.image_to_string(img)
-            text += page_text + "\n"
 
     return text
 
