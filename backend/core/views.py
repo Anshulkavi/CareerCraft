@@ -68,22 +68,12 @@ def upload_resume(request):
             return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
         
         # Save extracted data
-        # ResumeData.objects.create(
-        #     name=name or "Not specified",
-        #     email=email or "Not specified",
-        #     phone=phone or "Not specified",
-        #     skills=skills,
-        #     experience=experience or "Not specified"
-        # )
-
-        skills_str = ", ".join(skills)
-
         ResumeData.objects.create(
-        name=name or "Not specified",
-        email=email or "Not specified",
-        phone=phone or "Not specified",
-        skills=skills_str,
-        experience=experience or "Not specified"
+            name=name or "Not specified",
+            email=email or "Not specified",
+            phone=phone or "Not specified",
+            skills=skills,
+            experience=experience or "Not specified"
         )
 
         # Fetch and match Internshala jobs
