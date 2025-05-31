@@ -164,30 +164,31 @@ import re
 from datetime import datetime
 from dateutil import parser
 
-def match_skills_with_jobs(resume_skills, jobs):
+def match_skills_with_jobs(resume_skills, jobs, min_skill_match=2):
+    """
+    Match jobs based on number of overlapping skills from resume.
+    Only return jobs where at least `min_skill_match` skills match.
+    """
     matching_jobs = []
-    important_skills = {'python', 'java', 'c++', 'sql', 'mongodb', 'react'}
 
     for job in jobs:
         job_title = job.get('title', '').lower()
         job_description = job.get('description', '').lower()
         combined_text = job_title + " " + job_description
 
-        matching_score = 0
-        for skill in resume_skills:
-            skill_lower = skill.lower()
-            pattern = re.compile(r'\b' + re.escape(skill_lower) + r'\b', re.IGNORECASE)
-            if pattern.search(combined_text):
-                if skill_lower in important_skills:
-                    matching_score += 2
-                else:
-                    matching_score += 1
+        # Count matching skills
+        matched_skills = [
+            skill for skill in resume_skills
+            if re.search(r'\b' + re.escape(skill.lower()) + r'\b', combined_text)
+        ]
 
-        if matching_score > 0:
-            job['matching_score'] = matching_score
+        if len(matched_skills) >= min_skill_match:
+            job['matched_skills'] = matched_skills
+            job['matching_skills_count'] = len(matched_skills)
             matching_jobs.append(job)
 
-    matching_jobs.sort(key=lambda x: x['matching_score'], reverse=True)
+    # Sort descending by number of matching skills
+    matching_jobs.sort(key=lambda x: x['matching_skills_count'], reverse=True)
     return matching_jobs
 
 def extract_experience(text):
@@ -207,16 +208,11 @@ def extract_experience(text):
     if matches:
         return matches[0][0] + " years"
 
-    irrelevant_keywords = ["degree", "education", "certificate", "project"]
-    if any(keyword in experience_text.lower() for keyword in irrelevant_keywords):
-        return "Not specified"
-
     date_pattern = re.compile(
         r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\s*[-–to]+\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|present)', re.IGNORECASE
     )
 
     total_months = 0
-
     for match in date_pattern.findall(experience_text):
         start_str, end_str = match
         try:
@@ -251,17 +247,12 @@ def extract_email(text):
     return ""
 
 def extract_phone(text):
-    phone_pattern = re.compile(
-        r'(?:\+?\d{1,3}[-\s]?)?(?:0)?(?:\d{2,5}[-\s]?){2,4}\d{2,5}'
-    )
-    
+    phone_pattern = re.compile(r'(?:\+?\d{1,3}[-\s]?)?(?:0)?(?:\d{2,5}[-\s]?){2,4}\d{2,5}')
     matches = phone_pattern.findall(text)
-    
     for number in matches:
         digits_only = re.sub(r'\D', '', number)
         if len(digits_only) >= 10 and digits_only[-10:].isdigit():
             return digits_only[-10:]
-    
     return ""
 
 def extract_name(text):
@@ -302,11 +293,10 @@ def extract_skills(text):
     }
 
     found_skills = set()
-    
     for raw_skill in skills_map:
         pattern = re.compile(r'\b' + re.escape(raw_skill).replace(r'\ ', r'[\s\-]*') + r'\b', re.IGNORECASE)
         if pattern.search(text):
             found_skills.add(skills_map[raw_skill])
-
+    
     print(f"[DEBUG] Extracted skills from resume: {sorted(found_skills)}")
     return sorted(found_skills)
