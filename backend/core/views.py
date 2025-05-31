@@ -62,19 +62,20 @@ def upload_resume(request):
         skills = extract_skills(text)
         experience = extract_experience(text)
 
-        if not email or not validate_email(email):
-            return JsonResponse({'error': 'Invalid or missing email address'}, status=400)
+        if email and not validate_email(email):
+            return JsonResponse({'error': 'Invalid email address'}, status=400)
+
 
         if not skills:
             return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
 
         # Save extracted data
         ResumeData.objects.create(
-            name=name,
-            email=email,
-            phone=phone,
+            name=name or "Not specified",
+            email=email or "Not specified",
+            phone=phone or "Not specified",
             skills=skills,
-            experience=experience
+            experience=experience or "Not specified"
         )
 
         # Fetch and match Internshala jobs
@@ -101,11 +102,11 @@ def upload_resume(request):
             'message': 'Resume processed successfully!',
             'matches': top_matches,
             'extracted': {
-                'name': name,
-                'email': email,
-                'phone': phone,
+                'name': name if name else "Not specified",
+                'email': email if email else "Not specified",
+                'phone': phone if phone else "Not specified",
                 'skills': skills,
-                'experience': experience
+                'experience': experience if experience else "Not specified"
             }
         })
 
