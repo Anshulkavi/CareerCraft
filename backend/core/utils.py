@@ -151,6 +151,17 @@ def extract_name(text):
 
 #     print("[DEBUG] Extracted skills:", found_skills)
 #     return found_skills
+def extract_skills(text):
+    skill_keywords = [
+        'python', 'java', 'c++', 'html', 'css', 'javascript', 'sql', 'node.js',
+        'react', 'angular', 'django', 'flask', 'machine learning', 'deep learning',
+        'nlp', 'data analysis', 'excel', 'power bi', 'aws', 'git', 'linux'
+    ]
+    found_skills = []
+    for skill in skill_keywords:
+        if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE):
+            found_skills.append(skill)
+    return sorted(set(found_skills), key=str.lower)
 
 # Set path to Tesseract executable here (update as per your system)
 pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
