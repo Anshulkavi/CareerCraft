@@ -164,132 +164,16 @@ import re
 from datetime import datetime
 from dateutil import parser
 
-def match_skills_with_jobs(resume_skills, jobs, min_skill_match=2):
-    """
-    Match jobs based on number of overlapping skills from resume.
-    Only return jobs where at least `min_skill_match` skills match.
-    """
-    matching_jobs = []
-
-    for job in jobs:
-        job_title = job.get('title', '').lower()
-        job_description = job.get('description', '').lower()
-        combined_text = job_title + " " + job_description
-
-        # Count matching skills
-        matched_skills = [
-            skill for skill in resume_skills
-            if re.search(r'\b' + re.escape(skill.lower()) + r'\b', combined_text)
-        ]
-
-        if len(matched_skills) >= min_skill_match:
-            job['matched_skills'] = matched_skills
-            job['matching_skills_count'] = len(matched_skills)
-            matching_jobs.append(job)
-
-    # Sort descending by number of matching skills
-    matching_jobs.sort(key=lambda x: x['matching_skills_count'], reverse=True)
-    return matching_jobs
-
-def extract_experience(text):
-    experience_section_keywords = [
-        "experience", "work experience", "professional experience", "internship", "work history"
-    ]
-    experience_section_pattern = re.compile(r'(?i)(' + '|'.join(experience_section_keywords) + r')')
-
-    experience_section_match = experience_section_pattern.search(text)
-    if not experience_section_match:
-        return "Not specified"
-
-    experience_text = text[experience_section_match.end():]
-
-    experience_pattern = re.compile(r'(\d{1,2})\+?\s+(years?|yrs?)\s+(of\s+)?(experience|exp)', re.IGNORECASE)
-    matches = experience_pattern.findall(experience_text)
-    if matches:
-        return matches[0][0] + " years"
-
-    date_pattern = re.compile(
-        r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\s*[-–to]+\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|present)', re.IGNORECASE
-    )
-
-    total_months = 0
-    for match in date_pattern.findall(experience_text):
-        start_str, end_str = match
-        try:
-            start_date = parser.parse(start_str, dayfirst=True)
-            end_date = parser.parse(end_str, dayfirst=True) if "present" not in end_str.lower() else datetime.now()
-
-            months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
-            if months > 0:
-                total_months += months
-        except Exception:
-            continue
-
-    if total_months:
-        years = total_months // 12
-        months = total_months % 12
-
-        if years and months:
-            return f"{years} years {months} months"
-        elif years:
-            return f"{years} years"
-        else:
-            return f"{months} months"
-
-    return "Not specified"
-
-def extract_email(text):
-    match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
-    if match:
-        email = match.group(0)
-        if "reallygreatsite" not in email.lower():
-            return email
-    return ""
-
-def extract_phone(text):
-    phone_pattern = re.compile(r'(?:\+?\d{1,3}[-\s]?)?(?:0)?(?:\d{2,5}[-\s]?){2,4}\d{2,5}')
-    matches = phone_pattern.findall(text)
-    for number in matches:
-        digits_only = re.sub(r'\D', '', number)
-        if len(digits_only) >= 10 and digits_only[-10:].isdigit():
-            return digits_only[-10:]
-    return ""
-
-def extract_name(text):
-    lines = text.split("\n")
-    ignore_keywords = ['resume', 'contact', 'profile', 'curriculum', 'vitae']
-    for line in lines:
-        line_clean = line.strip()
-        if line_clean and line_clean.lower() not in ignore_keywords:
-            words = line_clean.split()
-            if len(words) >= 2 and all(word[0].isupper() for word in words[:2]):
-                return " ".join(words[:2])
-    return "Unknown"
-
 def extract_skills(text):
-    text = text.lower()
-    text = text.replace("-", " ").replace(".", " ").replace("/", " ")
+    text = text.lower().replace("-", " ").replace(".", " ").replace("/", " ")
     text = re.sub(r'\s+', ' ', text)
 
     skills_map = {
-        'python': 'Python',
-        'java': 'Java',
-        'html': 'HTML',
-        'css': 'CSS',
-        'javascript': 'JavaScript',
-        'sql': 'SQL',
-        'mongodb': 'MongoDB',
-        'react': 'React',
-        'reactjs': 'React',
-        'react js': 'React',
-        'react.js': 'React',
-        'c': 'C',
-        'c++': 'C++',
-        'r': 'R',
-        'bootstrap': 'Bootstrap',
-        'tailwind css': 'Tailwind CSS',
-        'git': 'Git',
-        'github': 'GitHub',
+        'python': 'Python', 'java': 'Java', 'html': 'HTML', 'css': 'CSS',
+        'javascript': 'JavaScript', 'sql': 'SQL', 'mongodb': 'MongoDB',
+        'react': 'React', 'reactjs': 'React', 'react js': 'React', 'react.js': 'React',
+        'c': 'C', 'c++': 'C++', 'r': 'R', 'bootstrap': 'Bootstrap',
+        'tailwind css': 'Tailwind CSS', 'git': 'Git', 'github': 'GitHub'
     }
 
     found_skills = set()
@@ -297,6 +181,40 @@ def extract_skills(text):
         pattern = re.compile(r'\b' + re.escape(raw_skill).replace(r'\ ', r'[\s\-]*') + r'\b', re.IGNORECASE)
         if pattern.search(text):
             found_skills.add(skills_map[raw_skill])
-    
-    print(f"[DEBUG] Extracted skills from resume: {sorted(found_skills)}")
     return sorted(found_skills)
+
+def extract_summary_keywords(summary_text):
+    # Simple noun/adjective filtering (can be enhanced with NLP)
+    keywords = re.findall(r'\b[a-zA-Z]{3,}\b', summary_text.lower())
+    stop_words = set([
+        "the", "and", "with", "that", "for", "your", "this", "from", "like", "able", "also", 
+        "very", "good", "strong", "have", "has", "are", "but", "can", "who", "which", "able",
+        "their", "such", "our", "you", "your", "them", "they", "will", "into"
+    ])
+    filtered_keywords = set(k for k in keywords if k not in stop_words)
+    return list(filtered_keywords)
+
+def match_jobs_with_skills_and_summary(resume_skills, summary_keywords, jobs):
+    matching_jobs = []
+
+    for job in jobs:
+        title = job.get('title', '').lower()
+        description = job.get('description', '').lower()
+
+        # Count exact skill matches (weighted higher)
+        skill_match_count = sum(2 for skill in resume_skills if skill.lower() in title or skill.lower() in description)
+
+        # Count summary keyword matches (weighted less)
+        summary_match_count = sum(1 for keyword in summary_keywords if keyword in title or keyword in description)
+
+        total_score = skill_match_count + summary_match_count
+
+        if total_score > 0:
+            job['matching_score'] = total_score
+            job['skill_matches'] = skill_match_count
+            job['summary_matches'] = summary_match_count
+            matching_jobs.append(job)
+
+    # Sort by total score descending
+    matching_jobs.sort(key=lambda j: j['matching_score'], reverse=True)
+    return matching_jobs
