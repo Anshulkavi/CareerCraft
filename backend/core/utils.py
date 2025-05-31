@@ -115,27 +115,46 @@ def extract_name(text):
                 return " ".join(words[:2])
     return "Unknown"
 
-def extract_skills(text):
-    skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React']
-    print(f"[DEBUG] Extracted skills from resume: {skills_list}")
-    return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
-
 # def extract_skills(text):
-#     # Normalize text: replace punctuation with space, condense whitespace
-#     text = re.sub(r'[^a-zA-Z0-9\s\+\#]', ' ', text)
-#     text = re.sub(r'\s+', ' ', text)
+#     skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React']
+#     print(f"[DEBUG] Extracted skills from resume: {skills_list}")
+#     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
-#     skills_list = [
-#         'Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React',
-#         'C', 'C++', 'R', 'Bootstrap', 'Tailwind CSS', 'Git', 'GitHub'
-#     ]
+def extract_skills(text):
+    # Normalize the text
+    text = text.lower()
+    text = text.replace("-", " ").replace(".", " ").replace("/", " ")
+    text = re.sub(r'\s+', ' ', text)
 
-#     found_skills = []
-#     for skill in skills_list:
-#         pattern = re.compile(r'\b' + re.escape(skill) + r'\b', re.IGNORECASE)
-#         if pattern.search(text):
-#             found_skills.append(skill)
+    # Extended and normalized skill mapping
+    skills_map = {
+        'python': 'Python',
+        'java': 'Java',
+        'html': 'HTML',
+        'css': 'CSS',
+        'javascript': 'JavaScript',
+        'sql': 'SQL',
+        'mongodb': 'MongoDB',
+        'react': 'React',
+        'reactjs': 'React',
+        'react js': 'React',
+        'react.js': 'React',
+        'c': 'C',
+        'c++': 'C++',
+        'r': 'R',
+        'bootstrap': 'Bootstrap',
+        'tailwind css': 'Tailwind CSS',
+        'git': 'Git',
+        'github': 'GitHub',
+    }
 
-#     print(f"[DEBUG] Extracted skills from resume: {found_skills}")
-#     return found_skills
+    found_skills = set()
+    
+    for raw_skill in skills_map:
+        # Create regex to match flexible skill formats (e.g. "react.js", "react js")
+        pattern = re.compile(r'\b' + re.escape(raw_skill).replace(r'\ ', r'[\s\-]*') + r'\b', re.IGNORECASE)
+        if pattern.search(text):
+            found_skills.add(skills_map[raw_skill])  # add normalized name
 
+    print(f"[DEBUG] Extracted skills from resume: {sorted(found_skills)}")
+    return sorted(found_skills)
