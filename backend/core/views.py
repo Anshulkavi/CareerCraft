@@ -121,13 +121,39 @@ import docx
 import pdfplumber
 import re
 import traceback
-import pdfplumber
+import fitz  # PyMuPDF
+import pytesseract
+
+# Set Tesseract path (update this to your Tesseract installation path)
+pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
+
+
 # ---------------- TEXT EXTRACTORS ----------------
+# def extract_text_from_pdf(file):
+#     text = ""
+#     with pdfplumber.open(file) as pdf:
+#         for page in pdf.pages:
+#             text += page.extract_text() or ""
+#     return text
+
 def extract_text_from_pdf(file):
     text = ""
     with pdfplumber.open(file) as pdf:
         for page in pdf.pages:
-            text += page.extract_text() or ""
+            page_text = page.extract_text() or ""
+            text += page_text
+
+    if len(text.strip()) < 50:
+        text = ""
+        file.seek(0)
+        doc = fitz.open(stream=file.read(), filetype="pdf")
+        for page_num in range(len(doc)):
+            page = doc.load_page(page_num)
+            pix = page.get_pixmap(dpi=300)
+            img_data = pix.tobytes("png")
+            page_text = pytesseract.image_to_string(img_data)
+            text += page_text + "\n"
+
     return text
 
 def extract_text_from_docx(file):

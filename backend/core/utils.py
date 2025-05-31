@@ -2,7 +2,9 @@
 import re
 from datetime import datetime
 from dateutil import parser
-
+import fitz  # PyMuPDF
+import pytesseract
+import re
 # views.py or a separate utility file
 def match_skills_with_jobs(resume_skills, jobs):
     matching_jobs = []
@@ -150,42 +152,48 @@ def extract_name(text):
 #     print("[DEBUG] Extracted skills:", found_skills)
 #     return found_skills
 
+# Set path to Tesseract executable here (update as per your system)
+pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
 
-def extract_skills(text):
-    # Normalize text
-    text = text.lower()
-    text = re.sub(r'[^\w+.#:, ]', '', text)
-    text = re.sub(r'\s+', ' ', text)
+def extract_skills_from_scanned_pdf(pdf_path):
+    """
+    Extract skills from scanned/image PDF resume using OCR (Tesseract).
 
-    # Extract all comma-separated skill-like words from skill sections
-    possible_skills = re.findall(r'(skills|tools|libraries|technologies|programming)[^:]*:\s*([^.\n]+)', text)
-    
-    # Combine all detected skill phrases
-    skills_raw_text = ""
-    for _, skill_line in possible_skills:
-        skills_raw_text += skill_line + ","
+    Args:
+        pdf_path (str): Path to the scanned PDF file.
 
-    # Split by comma, strip, and normalize
-    tokens = set(token.strip().lower().replace('.', '') for token in skills_raw_text.split(',') if token.strip())
+    Returns:
+        list: Extracted skill keywords found in the resume.
+    """
 
-    # Define known skills (can be extended)
-    known_skills = {
-        'python', 'java', 'c', 'c++', 'c#', 'html', 'css', 'javascript',
-        'typescript', 'react', 'nodejs', 'expressjs', 'mongodb', 'django', 'flask',
-        'git', 'sql', 'rest apis', 'postman', 'matplotlib', 'pandas',
-        'adobe photoshop', 'indesign', 'teamwork', 'leadership', 'project management',
-        'problem solving', 'business analysis', 'communication'
-    }
+    # Open PDF
+    doc = fitz.open(pdf_path)
 
-    # Normalize known skills (for fuzzy match)
-    normalized_known = {s.replace('.', '').replace(' ', ''): s for s in known_skills}
+    all_text = ""
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)
+        pix = page.get_pixmap(dpi=300)
+        img_data = pix.tobytes("png")
 
-    # Match tokens to known skills
-    found = []
-    for token in tokens:
-        key = token.replace('.', '').replace(' ', '')
-        if key in normalized_known:
-            found.append(normalized_known[key])
+        # OCR image to string
+        page_text = pytesseract.image_to_string(img_data)
+        all_text += page_text + "\n"
 
-    print("[DEBUG] Extracted skills:", sorted(found))
-    return sorted(found)
+    # Define your skill keywords here (can be extended)
+    skill_keywords = [
+        'python', 'java', 'c++', 'html', 'css', 'javascript', 'sql', 'node.js',
+        'react', 'angular', 'django', 'flask', 'machine learning', 'deep learning',
+        'nlp', 'data analysis', 'excel', 'power bi', 'aws', 'git', 'linux'
+    ]
+
+    # Find skills mentioned in text
+    found_skills = []
+    for skill in skill_keywords:
+        if re.search(r'\b' + re.escape(skill) + r'\b', all_text, re.IGNORECASE):
+            found_skills.append(skill)
+
+    # Remove duplicates and sort alphabetically
+    unique_skills = sorted(set(found_skills), key=str.lower)
+
+    return unique_skills
+
