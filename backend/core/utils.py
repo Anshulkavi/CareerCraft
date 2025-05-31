@@ -120,25 +120,34 @@ def extract_name(text):
 #     print(f"[DEBUG] Extracted skills from resume: {skills_list}")
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
-def extract_skills(text):
-    # Normalize and flatten the text
-    text = text.lower()
-    text = re.sub(r'[\n\r\t]', ' ', text)           # remove line breaks
-    text = re.sub(r'[^a-z0-9+#. ]', ' ', text)       # remove special chars
-    text = re.sub(r'\s+', ' ', text)                 # collapse spaces
 
+def extract_skills(text):
+    # Normalize text
+    text = text.lower()
+    text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
+    text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+    text = re.sub(r'\s+', ' ', text)
+
+    # Break all comma-separated items into tokens
+    tokens = set()
+    for part in text.split(','):
+        tokens.update(part.strip().split())
+
+    # Normalize tokens
+    normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
+
+    # Define known skill keywords
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
         'mongodb', 'react', 'node.js', 'django', 'flask',
         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
     ]
 
-    found_skills = []
-    for skill in skills_list:
-        skill_lower = skill.lower()
-        if skill_lower in text:
-            found_skills.append(skill.capitalize() if skill.islower() else skill)
+    found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
+        t.replace('.', '') for t in normalized_tokens
+    }]
 
-    print("[DEBUG] Extracted skills from resume:", found_skills)
+    print("[DEBUG] Extracted skills:", found_skills)
     return found_skills
+
 
