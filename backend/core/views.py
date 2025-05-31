@@ -114,7 +114,8 @@
 import re
 import traceback
 from datetime import datetime
-
+from PIL import Image
+import io
 import docx
 import fitz  # PyMuPDF
 import pdfplumber
@@ -132,27 +133,29 @@ pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
 
 # -------- TEXT EXTRACTION --------
 def extract_text_from_pdf(file):
-    """
-    Extract text from PDF. Uses pdfplumber first,
-    if text is very sparse, falls back to OCR with PyMuPDF + pytesseract.
-    """
     text = ""
+    file.seek(0)
     with pdfplumber.open(file) as pdf:
         for page in pdf.pages:
             page_text = page.extract_text() or ""
             text += page_text
 
-    # If extracted text is too short, try OCR
+    # Fallback to OCR if pdfplumber extracted too little
     if len(text.strip()) < 50:
         text = ""
-        file.seek(0)
-        doc = fitz.open(stream=file.read(), filetype="pdf")
+        file.seek(0)  # Reset file pointer
+        pdf_bytes = file.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         for page_num in range(len(doc)):
             page = doc.load_page(page_num)
             pix = page.get_pixmap(dpi=300)
-            img_data = pix.tobytes("png")
-            page_text = pytesseract.image_to_string(img_data)
+            img_bytes = pix.tobytes("png")
+
+            # Convert bytes to image object
+            img = Image.open(io.BytesIO(img_bytes))
+            page_text = pytesseract.image_to_string(img)
             text += page_text + "\n"
+
     return text
 
 
