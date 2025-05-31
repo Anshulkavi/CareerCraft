@@ -121,33 +121,71 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
+# def extract_skills(text):
+#     # Normalize text
+#     text = text.lower()
+#     text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
+#     text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+#     text = re.sub(r'\s+', ' ', text)
+
+#     # Break all comma-separated items into tokens
+#     tokens = set()
+#     for part in text.split(','):
+#         tokens.update(part.strip().split())
+
+#     # Normalize tokens
+#     normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
+
+#     # Define known skill keywords
+#     skills_list = [
+#         'python', 'java', 'html', 'css', 'javascript', 'sql',
+#         'mongodb', 'react', 'node.js', 'django', 'flask',
+#         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+#     ]
+
+#     found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
+#         t.replace('.', '') for t in normalized_tokens
+#     }]
+
+#     print("[DEBUG] Extracted skills:", found_skills)
+#     return found_skills
+
+
 def extract_skills(text):
     # Normalize text
     text = text.lower()
-    text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
-    text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+    text = re.sub(r'[^\w+.#:, ]', '', text)
     text = re.sub(r'\s+', ' ', text)
 
-    # Break all comma-separated items into tokens
-    tokens = set()
-    for part in text.split(','):
-        tokens.update(part.strip().split())
+    # Extract all comma-separated skill-like words from skill sections
+    possible_skills = re.findall(r'(skills|tools|libraries|technologies|programming)[^:]*:\s*([^.\n]+)', text)
+    
+    # Combine all detected skill phrases
+    skills_raw_text = ""
+    for _, skill_line in possible_skills:
+        skills_raw_text += skill_line + ","
 
-    # Normalize tokens
-    normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
+    # Split by comma, strip, and normalize
+    tokens = set(token.strip().lower().replace('.', '') for token in skills_raw_text.split(',') if token.strip())
 
-    # Define known skill keywords
-    skills_list = [
-        'python', 'java', 'html', 'css', 'javascript', 'sql',
-        'mongodb', 'react', 'node.js', 'django', 'flask',
-        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
-    ]
+    # Define known skills (can be extended)
+    known_skills = {
+        'python', 'java', 'c', 'c++', 'c#', 'html', 'css', 'javascript',
+        'typescript', 'react', 'nodejs', 'expressjs', 'mongodb', 'django', 'flask',
+        'git', 'sql', 'rest apis', 'postman', 'matplotlib', 'pandas',
+        'adobe photoshop', 'indesign', 'teamwork', 'leadership', 'project management',
+        'problem solving', 'business analysis', 'communication'
+    }
 
-    found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
-        t.replace('.', '') for t in normalized_tokens
-    }]
+    # Normalize known skills (for fuzzy match)
+    normalized_known = {s.replace('.', '').replace(' ', ''): s for s in known_skills}
 
-    print("[DEBUG] Extracted skills:", found_skills)
-    return found_skills
+    # Match tokens to known skills
+    found = []
+    for token in tokens:
+        key = token.replace('.', '').replace(' ', '')
+        if key in normalized_known:
+            found.append(normalized_known[key])
 
-
+    print("[DEBUG] Extracted skills:", sorted(found))
+    return sorted(found)
