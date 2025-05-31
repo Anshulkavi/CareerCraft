@@ -62,15 +62,15 @@ def upload_resume(request):
         skills = extract_skills(text)
         experience = extract_experience(text)
 
-        if email and not validate_email(email):
-            email = "Not specified"
+        if not email or '@' not in email or '.' not in email:
+            email = None 
         if not skills:
             return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
         
         # Save extracted data
         ResumeData.objects.create(
             name=name or "Not specified",
-            email=email or "Not specified",
+            email=email,
             phone=phone or "Not specified",
             skills=skills,
             experience=experience or "Not specified"
