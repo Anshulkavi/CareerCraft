@@ -121,7 +121,7 @@ import docx
 import pdfplumber
 import re
 import traceback
-
+import pdfplumber
 # ---------------- TEXT EXTRACTORS ----------------
 def extract_text_from_pdf(file):
     text = ""
