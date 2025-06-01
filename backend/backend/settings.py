@@ -26,9 +26,6 @@ SECRET_KEY = 'django-insecure-z9zd+&95%(j2#8-+npkd&e&^8*bk09owu8407h(sv3zxbjf#4@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['careercraft-5kzo.onrender.com']
-
-
 
 # Application definition
 
@@ -142,8 +139,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# For compatibility with credentials and preflight requests
-CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = ['careercraft-5kzo.onrender.com', 'localhost', '127.0.0.1']
+
 
 CORS_ALLOW_HEADERS = [
     'accept',
