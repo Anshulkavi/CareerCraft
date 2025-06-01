@@ -277,88 +277,89 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
+def extract_skills(text):
+    # Normalize text
+    text = text.lower()
+    text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
+    text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+    text = re.sub(r'\s+', ' ', text)
+
+    # Break all comma-separated items into tokens
+    tokens = set()
+    for part in text.split(','):
+        tokens.update(part.strip().split())
+
+    # Normalize tokens
+    normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
+
+    # Define known skill keywords
+    skills_list = [
+        'python', 'java', 'html', 'css', 'javascript', 'sql',
+        'mongodb', 'react', 'node.js', 'django', 'flask',
+        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+    ]
+
+    found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
+        t.replace('.', '') for t in normalized_tokens
+    }]
+
+    print("[DEBUG] Extracted skills:", found_skills)
+    return found_skills
+
 # def extract_skills(text):
-#     # Normalize text
-#     text = text.lower()
-#     text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
-#     text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
-#     text = re.sub(r'\s+', ' ', text)
+#     skill_keywords = [
+#         'python', 'java', 'c++', 'html', 'css', 'javascript', 'sql', 'node.js',
+#         'react', 'angular', 'django', 'flask', 'machine learning', 'deep learning',
+#         'nlp', 'data analysis', 'excel', 'power bi', 'aws', 'git', 'linux'
+#     ]
+#     found_skills = []
+#     for skill in skill_keywords:
+#         if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE):
+#             found_skills.append(skill)
+#     return sorted(set(found_skills), key=str.lower)
 
-#     # Break all comma-separated items into tokens
-#     tokens = set()
-#     for part in text.split(','):
-#         tokens.update(part.strip().split())
+# # Set path to Tesseract executable here (update as per your system)
+# pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
 
-#     # Normalize tokens
-#     normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
+# def extract_skills_from_scanned_pdf(pdf_path):
+#     """
+#     Extract skills from scanned/image PDF resume using OCR (Tesseract).
 
-#     # Define known skill keywords
-#     skills_list = [
-#         'python', 'java', 'html', 'css', 'javascript', 'sql',
-#         'mongodb', 'react', 'node.js', 'django', 'flask',
-#         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+#     Args:
+#         pdf_path (str): Path to the scanned PDF file.
+
+#     Returns:
+#         list: Extracted skill keywords found in the resume.
+#     """
+
+#     # Open PDF
+#     doc = fitz.open(pdf_path)
+
+#     all_text = ""
+#     for page_num in range(len(doc)):
+#         page = doc.load_page(page_num)
+#         pix = page.get_pixmap(dpi=300)
+#         img_data = pix.tobytes("png")
+
+#         # OCR image to string
+#         page_text = pytesseract.image_to_string(img_data)
+#         all_text += page_text + "\n"
+
+#     # Define your skill keywords here (can be extended)
+#     skill_keywords = [
+#         'python', 'java', 'c++', 'html', 'css', 'javascript', 'sql', 'node.js',
+#         'react', 'angular', 'django', 'flask', 'machine learning', 'deep learning',
+#         'nlp', 'data analysis', 'excel', 'power bi', 'aws', 'git', 'linux'
 #     ]
 
-#     found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
-#         t.replace('.', '') for t in normalized_tokens
-#     }]
+#     # Find skills mentioned in text
+#     found_skills = []
+#     for skill in skill_keywords:
+#         if re.search(r'\b' + re.escape(skill) + r'\b', all_text, re.IGNORECASE):
+#             found_skills.append(skill)
 
-#     print("[DEBUG] Extracted skills:", found_skills)
-#     return found_skills
-def extract_skills(text):
-    skill_keywords = [
-        'python', 'java', 'c++', 'html', 'css', 'javascript', 'sql', 'node.js',
-        'react', 'angular', 'django', 'flask', 'machine learning', 'deep learning',
-        'nlp', 'data analysis', 'excel', 'power bi', 'aws', 'git', 'linux'
-    ]
-    found_skills = []
-    for skill in skill_keywords:
-        if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE):
-            found_skills.append(skill)
-    return sorted(set(found_skills), key=str.lower)
+#     # Remove duplicates and sort alphabetically
+#     unique_skills = sorted(set(found_skills), key=str.lower)
 
-# Set path to Tesseract executable here (update as per your system)
-pytesseract.pytesseract.tesseract_cmd = r"E:\tesseract\tesseract.exe"
-
-def extract_skills_from_scanned_pdf(pdf_path):
-    """
-    Extract skills from scanned/image PDF resume using OCR (Tesseract).
-
-    Args:
-        pdf_path (str): Path to the scanned PDF file.
-
-    Returns:
-        list: Extracted skill keywords found in the resume.
-    """
-
-    # Open PDF
-    doc = fitz.open(pdf_path)
-
-    all_text = ""
-    for page_num in range(len(doc)):
-        page = doc.load_page(page_num)
-        pix = page.get_pixmap(dpi=300)
-        img_data = pix.tobytes("png")
-
-        # OCR image to string
-        page_text = pytesseract.image_to_string(img_data)
-        all_text += page_text + "\n"
-
-    # Define your skill keywords here (can be extended)
-    skill_keywords = [
-        'python', 'java', 'c++', 'html', 'css', 'javascript', 'sql', 'node.js',
-        'react', 'angular', 'django', 'flask', 'machine learning', 'deep learning',
-        'nlp', 'data analysis', 'excel', 'power bi', 'aws', 'git', 'linux'
-    ]
-
-    # Find skills mentioned in text
-    found_skills = []
-    for skill in skill_keywords:
-        if re.search(r'\b' + re.escape(skill) + r'\b', all_text, re.IGNORECASE):
-            found_skills.append(skill)
-
-    # Remove duplicates and sort alphabetically
-    unique_skills = sorted(set(found_skills), key=str.lower)
-
-    return unique_skills
+#     return unique_skills
 

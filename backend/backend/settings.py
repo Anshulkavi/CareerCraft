@@ -138,8 +138,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# For compatibility with credentials and preflight requests
-CORS_ALLOW_CREDENTIALS = True
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'content-disposition',
+]
 
 CORS_ALLOW_HEADERS = [
     'accept',
