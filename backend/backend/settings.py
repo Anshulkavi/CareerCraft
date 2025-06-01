@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-z9zd+&95%(j2#8-+npkd&e&^8*bk09owu8407h(sv3zxbjf#4@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['careercraft-backend-c89o.onrender.com']
+ALLOWED_HOSTS = ['careercraft-5kzo.onrender.com']
 
 
 
@@ -135,7 +135,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # For development
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
