@@ -9,3 +9,6 @@ __pycache__/
 
 # Ignore personal PDFs or test files
 *.pdf
+
+node_modules
+dist
