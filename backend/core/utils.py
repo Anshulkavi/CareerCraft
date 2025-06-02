@@ -122,95 +122,95 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
-# def extract_skills(text):
-#     # Normalize text
-#     text = text.lower()
-#     text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
-#     text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
-#     text = re.sub(r'\s+', ' ', text)
-
-#     # Break all comma-separated items into tokens
-#     tokens = set()
-#     for part in text.split(','):
-#         tokens.update(part.strip().split())
-
-#     # Normalize tokens
-#     normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
-
-#     # Define known skill keywords
-#     skills_list = [
-#         'python', 'java', 'html', 'css', 'javascript', 'sql',
-#         'mongodb', 'react', 'node.js', 'django', 'flask',
-#         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
-#     ]
-
-#     found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
-#         t.replace('.', '') for t in normalized_tokens
-#     }]
-
-#     print("[DEBUG] Extracted skills:", found_skills)
-#     return found_skills
-
-def extract_text_from_file(file_path):
-    if file_path.endswith('.pdf'):
-        text = ""
-        with pdfplumber.open(file_path) as pdf:
-            for page in pdf.pages:
-                text += page.extract_text() or ''
-        return text
-    elif file_path.endswith('.docx'):
-        doc = Document(file_path)
-        text = "\n".join(para.text for para in doc.paragraphs)
-        return text
-    else:
-        raise ValueError("Unsupported file format. Use .pdf or .docx")
-
 def extract_skills(text):
+    # Normalize text
     text = text.lower()
+    text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
+    text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+    text = re.sub(r'\s+', ' ', text)
 
-    # Dictionary mapping normalized skill names to regex patterns for matching
-    skills_dict = {
-        'c': [r'\bc\b'],
-        'cpp': [r'c\+\+'],
-        'python': [r'\bpython\b'],
-        'java': [r'\bjava\b'],
-        'javascript': [r'\bjavascript\b'],
-        'r': [r'\br\b'],
-        'html': [r'\bhtml\b'],
-        'css': [r'\bcss\b'],
-        'react': [r'\breact\.?js\b'],
-        'bootstrap': [r'\bbootstrap\b'],
-        'tailwind': [r'\btailwind(\s+css)?\b'],
-        'git': [r'\bgit\b'],
-        'github': [r'\bgithub\b'],
-        'sql': [r'\bsql\b'],
-        'mysql': [r'\bmysql\b'],
-        'mongodb': [r'\bmongodb\b'],
-        'node': [r'\bnode\.?js\b'],
-        'django': [r'\bdjango\b'],
-        'flask': [r'\bflask\b'],
-        'typescript': [r'\btypescript\b'],
-        'php': [r'\bphp\b'],
-        'ruby': [r'\bruby\b'],
-        'swift': [r'\bswift\b'],
-        'kotlin': [r'\bkotlin\b'],
-        'go': [r'\bgo\b'],
-        'vue': [r'\bvue(\.js)?\b'],
-        'angular': [r'\bangular\b'],
-        'docker': [r'\bdocker\b'],
-        'linux': [r'\blinux\b'],
-        'bash': [r'\bbash\b'],
-        'express': [r'\bexpress(\.js)?\b'],
-        'csharp': [r'c#']
-    }
+    # Break all comma-separated items into tokens
+    tokens = set()
+    for part in text.split(','):
+        tokens.update(part.strip().split())
 
-    found_skills = []
+    # Normalize tokens
+    normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
 
-    for normalized_skill, patterns in skills_dict.items():
-        for pattern in patterns:
-            if re.search(pattern, text):
-                found_skills.append(normalized_skill)
-                break
+    # Define known skill keywords
+    skills_list = [
+        'python', 'java', 'html', 'css', 'javascript', 'sql',
+        'mongodb', 'react', 'node.js', 'django', 'flask',
+        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+    ]
+
+    found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
+        t.replace('.', '') for t in normalized_tokens
+    }]
 
     print("[DEBUG] Extracted skills:", found_skills)
     return found_skills
+
+# def extract_text_from_file(file_path):
+#     if file_path.endswith('.pdf'):
+#         text = ""
+#         with pdfplumber.open(file_path) as pdf:
+#             for page in pdf.pages:
+#                 text += page.extract_text() or ''
+#         return text
+#     elif file_path.endswith('.docx'):
+#         doc = Document(file_path)
+#         text = "\n".join(para.text for para in doc.paragraphs)
+#         return text
+#     else:
+#         raise ValueError("Unsupported file format. Use .pdf or .docx")
+
+# def extract_skills(text):
+#     text = text.lower()
+
+#     # Dictionary mapping normalized skill names to regex patterns for matching
+#     skills_dict = {
+#         'c': [r'\bc\b'],
+#         'cpp': [r'c\+\+'],
+#         'python': [r'\bpython\b'],
+#         'java': [r'\bjava\b'],
+#         'javascript': [r'\bjavascript\b'],
+#         'r': [r'\br\b'],
+#         'html': [r'\bhtml\b'],
+#         'css': [r'\bcss\b'],
+#         'react': [r'\breact\.?js\b'],
+#         'bootstrap': [r'\bbootstrap\b'],
+#         'tailwind': [r'\btailwind(\s+css)?\b'],
+#         'git': [r'\bgit\b'],
+#         'github': [r'\bgithub\b'],
+#         'sql': [r'\bsql\b'],
+#         'mysql': [r'\bmysql\b'],
+#         'mongodb': [r'\bmongodb\b'],
+#         'node': [r'\bnode\.?js\b'],
+#         'django': [r'\bdjango\b'],
+#         'flask': [r'\bflask\b'],
+#         'typescript': [r'\btypescript\b'],
+#         'php': [r'\bphp\b'],
+#         'ruby': [r'\bruby\b'],
+#         'swift': [r'\bswift\b'],
+#         'kotlin': [r'\bkotlin\b'],
+#         'go': [r'\bgo\b'],
+#         'vue': [r'\bvue(\.js)?\b'],
+#         'angular': [r'\bangular\b'],
+#         'docker': [r'\bdocker\b'],
+#         'linux': [r'\blinux\b'],
+#         'bash': [r'\bbash\b'],
+#         'express': [r'\bexpress(\.js)?\b'],
+#         'csharp': [r'c#']
+#     }
+
+#     found_skills = []
+
+#     for normalized_skill, patterns in skills_dict.items():
+#         for pattern in patterns:
+#             if re.search(pattern, text):
+#                 found_skills.append(normalized_skill)
+#                 break
+
+#     print("[DEBUG] Extracted skills:", found_skills)
+#     return found_skills
