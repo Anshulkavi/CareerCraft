@@ -152,44 +152,56 @@ def extract_name(text):
 #     print("[DEBUG] Extracted skills:", found_skills)
 #     return found_skills
 
-import re
-
 def extract_skills(text):
     # Normalize text
     text = text.lower()
-    text = re.sub(r'[\n\r\t]', ' ', text)
-    text = re.sub(r'[^\w#+.(),&/-]', ' ', text)  # retain characters in tech names
-    text = re.sub(r'\s+', ' ', text)
 
-    # Expanded list of skills
-    skills_list = [
-        'python', 'java', 'html', 'css', 'javascript', 'sql', 'mysql', 'mongodb',
-        'react', 'react.js', 'node.js', 'django', 'flask', 'bootstrap', 'tailwind css',
-        'c', 'c++', 'c#', 'r', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript',
-        'git', 'github', 'docker', 'linux', 'bash', 'express.js', 'vue', 'angular'
-    ]
-
-    # Mapping alternate names/aliases to a unified form
-    aliases = {
-        'react.js': 'react',
-        'node.js': 'node',
-        'tailwind css': 'tailwind',
-        'c++': 'cpp',
-        'c#': 'csharp',
-        'express.js': 'express'
+    # Skills dictionary: normalized -> all aliases
+    skills_dict = {
+        'c': [r'\bc\b'],
+        'cpp': [r'c\+\+'],
+        'python': [r'\bpython\b'],
+        'java': [r'\bjava\b'],
+        'javascript': [r'\bjavascript\b'],
+        'r': [r'\br\b'],
+        'html': [r'\bhtml\b'],
+        'css': [r'\bcss\b'],
+        'react': [r'\breact\.?js\b'],
+        'bootstrap': [r'\bbootstrap\b'],
+        'tailwind': [r'\btailwind(\s+css)?\b'],
+        'git': [r'\bgit\b'],
+        'github': [r'\bgithub\b'],
+        'sql': [r'\bsql\b'],
+        'mysql': [r'\bmysql\b'],
+        'mongodb': [r'\bmongodb\b'],
+        'node': [r'\bnode\.?js\b'],
+        'django': [r'\bdjango\b'],
+        'flask': [r'\bflask\b'],
+        'typescript': [r'\btypescript\b'],
+        'php': [r'\bphp\b'],
+        'ruby': [r'\bruby\b'],
+        'swift': [r'\bswift\b'],
+        'kotlin': [r'\bkotlin\b'],
+        'go': [r'\bgo\b'],
+        'vue': [r'\bvue(\.js)?\b'],
+        'angular': [r'\bangular\b'],
+        'docker': [r'\bdocker\b'],
+        'linux': [r'\blinux\b'],
+        'bash': [r'\bbash\b'],
+        'express': [r'\bexpress(\.js)?\b'],
+        'csharp': [r'c#']
     }
 
-    found_skills = set()
+    found_skills = []
 
-    for skill in skills_list:
-        # Use word boundaries for exact skill match
-        pattern = r'\b' + re.escape(skill) + r'\b'
-        if re.search(pattern, text):
-            normalized = aliases.get(skill, skill)
-            found_skills.add(normalized)
+    for normalized, patterns in skills_dict.items():
+        for pattern in patterns:
+            if re.search(pattern, text):
+                found_skills.append(normalized)
+                break  # avoid duplicate matches for same skill
 
     print("[DEBUG] Extracted skills:", found_skills)
-    return list(found_skills)
+    return found_skills
 
 
 # import re
