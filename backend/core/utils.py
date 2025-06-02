@@ -323,28 +323,3 @@ def extract_skills(text):
 
     return sorted(found_skills)
 
-if __name__ == "__main__":
-    file_path = "D:/project/CareerCraft/backend/core/CV.pdf"  # Change as needed
-
-    if not os.path.exists(file_path):
-        print("❌ Resume file not found:", file_path)
-    else:
-        print(f"✅ Reading resume from: {file_path}")
-        resume_text = extract_text_from_file(file_path)
-
-        print("---- Resume Text Preview ----")
-        print(resume_text[:500])
-        print("-----------------------------")
-
-        name = extract_name(resume_text)
-        email = extract_email(resume_text)
-        phone = extract_phone(resume_text)
-        experience = extract_experience(resume_text)
-        skills = extract_skills(resume_text)
-
-        print("\n🎯 Final Extracted Data:")
-        print("Name:", name)
-        print("Email:", email)
-        print("Phone:", phone)
-        print("Experience:", experience)
-        print("Skills:", skills)
