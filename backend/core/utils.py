@@ -123,34 +123,73 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
+# def extract_skills(text):
+#     # Normalize text
+#     text = text.lower()
+#     text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
+#     text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+#     text = re.sub(r'\s+', ' ', text)
+
+#     # Break all comma-separated items into tokens
+#     tokens = set()
+#     for part in text.split(','):
+#         tokens.update(part.strip().split())
+
+#     # Normalize tokens
+#     normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
+
+#     # Define known skill keywords
+#     skills_list = [
+#         'python', 'java', 'html', 'css', 'javascript', 'sql',
+#         'mongodb', 'react', 'node.js', 'django', 'flask',
+#         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+#     ]
+
+#     found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
+#         t.replace('.', '') for t in normalized_tokens
+#     }]
+
+#     print("[DEBUG] Extracted skills:", found_skills)
+#     return found_skills
+
+import re
+
 def extract_skills(text):
     # Normalize text
     text = text.lower()
-    text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
-    text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
+    text = re.sub(r'[\n\r\t]', ' ', text)
+    text = re.sub(r'[^\w#+.(),&/-]', ' ', text)  # retain characters in tech names
     text = re.sub(r'\s+', ' ', text)
 
-    # Break all comma-separated items into tokens
-    tokens = set()
-    for part in text.split(','):
-        tokens.update(part.strip().split())
-
-    # Normalize tokens
-    normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
-
-    # Define known skill keywords
+    # Expanded list of skills
     skills_list = [
-        'python', 'java', 'html', 'css', 'javascript', 'sql',
-        'mongodb', 'react', 'node.js', 'django', 'flask',
-        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+        'python', 'java', 'html', 'css', 'javascript', 'sql', 'mysql', 'mongodb',
+        'react', 'react.js', 'node.js', 'django', 'flask', 'bootstrap', 'tailwind css',
+        'c', 'c++', 'c#', 'r', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript',
+        'git', 'github', 'docker', 'linux', 'bash', 'express.js', 'vue', 'angular'
     ]
 
-    found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
-        t.replace('.', '') for t in normalized_tokens
-    }]
+    # Mapping alternate names/aliases to a unified form
+    aliases = {
+        'react.js': 'react',
+        'node.js': 'node',
+        'tailwind css': 'tailwind',
+        'c++': 'cpp',
+        'c#': 'csharp',
+        'express.js': 'express'
+    }
+
+    found_skills = set()
+
+    for skill in skills_list:
+        # Use word boundaries for exact skill match
+        pattern = r'\b' + re.escape(skill) + r'\b'
+        if re.search(pattern, text):
+            normalized = aliases.get(skill, skill)
+            found_skills.add(normalized)
 
     print("[DEBUG] Extracted skills:", found_skills)
-    return found_skills
+    return list(found_skills)
 
 
 # import re
