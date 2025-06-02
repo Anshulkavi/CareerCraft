@@ -20,6 +20,15 @@ def match_skills_with_jobs(resume_skills, jobs):
 
     return matching_jobs
 
+def extract_text_from_file(file_path):
+    text = ""
+    with pdfplumber.open(file_path) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+    return text
+
 def extract_experience(text):
     # Match only experience section
     experience_section_keywords = [
@@ -102,19 +111,25 @@ def extract_phone(text):
     
     return ""
 
+# def extract_name(text):
+#     lines = text.split("\n")
+#     # Skip common heading terms
+#     ignore_keywords = ['resume', 'contact', 'profile', 'curriculum', 'vitae']
+#     for line in lines:
+#         line_clean = line.strip()
+#         if line_clean and line_clean.lower() not in ignore_keywords:
+#             # Accept line with 2+ capitalized words assuming it's a name
+#             words = line_clean.split()
+#             if len(words) >= 2 and all(word[0].isupper() for word in words[:2]):
+#                 # Return the first two words as the name
+#                 return " ".join(words[:2])
+#     return "Unknown"
 def extract_name(text):
-    lines = text.split("\n")
-    # Skip common heading terms
-    ignore_keywords = ['resume', 'contact', 'profile', 'curriculum', 'vitae']
+    lines = text.strip().split('\n')
     for line in lines:
-        line_clean = line.strip()
-        if line_clean and line_clean.lower() not in ignore_keywords:
-            # Accept line with 2+ capitalized words assuming it's a name
-            words = line_clean.split()
-            if len(words) >= 2 and all(word[0].isupper() for word in words[:2]):
-                # Return the first two words as the name
-                return " ".join(words[:2])
-    return "Unknown"
+        if line.strip() and len(line.strip()) <= 40 and not any(char.isdigit() for char in line):
+            return line.strip()
+    return "Not specified"
 
 # def extract_skills(text):
 #     skills_list = ['Python', 'Java', 'HTML', 'CSS', 'JavaScript', 'SQL', 'MongoDB', 'React', 'Node.js', 'Django', 'Flask', 'C++', 'C#', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'Go', 'TypeScript']
@@ -151,67 +166,29 @@ def extract_name(text):
 #     print("[DEBUG] Extracted skills:", found_skills)
 #     return found_skills
 
-def extract_text_from_file(file_path):
-    if file_path.endswith('.pdf'):
-        text = ""
-        with pdfplumber.open(file_path) as pdf:
-            for page in pdf.pages:
-                text += page.extract_text() or ''
-        return text
-    elif file_path.endswith('.docx'):
-        doc = Document(file_path)
-        text = "\n".join(para.text for para in doc.paragraphs)
-        return text
-    else:
-        raise ValueError("Unsupported file format. Use .pdf or .docx")
+MASTER_SKILLS = [
+    'Python', 'Java', 'JavaScript', 'React', 'React.js', 'C', 'C++', 'HTML', 'CSS',
+    'AWS', 'Git', 'GitHub', 'Bootstrap', 'R', 'Tailwind CSS'
+]
 
+# Normalize similar names
+SKILL_NORMALIZATION = {
+    'react.js': 'React',
+    'tailwind css': 'Tailwind CSS',
+    'github': 'GitHub'
+}
 
 def extract_skills(text):
-    text = text.lower()
+    text_lower = text.lower()
+    found_skills = set()
 
-    # Dictionary mapping normalized skill names to regex patterns for matching
-    skills_dict = {
-        'c': [r'\bc\b'],
-        'cpp': [r'c\+\+'],
-        'python': [r'\bpython\b'],
-        'java': [r'\bjava\b'],
-        'javascript': [r'\bjavascript\b'],
-        'r': [r'\br\b'],
-        'html': [r'\bhtml\b'],
-        'css': [r'\bcss\b'],
-        'react': [r'\breact\.?js\b'],
-        'bootstrap': [r'\bbootstrap\b'],
-        'tailwind': [r'\btailwind(\s+css)?\b'],
-        'git': [r'\bgit\b'],
-        'github': [r'\bgithub\b'],
-        'sql': [r'\bsql\b'],
-        'mysql': [r'\bmysql\b'],
-        'mongodb': [r'\bmongodb\b'],
-        'node': [r'\bnode\.?js\b'],
-        'django': [r'\bdjango\b'],
-        'flask': [r'\bflask\b'],
-        'typescript': [r'\btypescript\b'],
-        'php': [r'\bphp\b'],
-        'ruby': [r'\bruby\b'],
-        'swift': [r'\bswift\b'],
-        'kotlin': [r'\bkotlin\b'],
-        'go': [r'\bgo\b'],
-        'vue': [r'\bvue(\.js)?\b'],
-        'angular': [r'\bangular\b'],
-        'docker': [r'\bdocker\b'],
-        'linux': [r'\blinux\b'],
-        'bash': [r'\bbash\b'],
-        'express': [r'\bexpress(\.js)?\b'],
-        'csharp': [r'c#']
-    }
+    for skill in MASTER_SKILLS:
+        skill_lower = skill.lower()
+        # Word boundary regex ensures exact matches (e.g., no partial 'java' in 'javascript')
+        pattern = r'\b' + re.escape(skill_lower) + r'\b'
+        if re.search(pattern, text_lower):
+            # Normalize skill name for consistency
+            normalized_skill = SKILL_NORMALIZATION.get(skill_lower, skill)
+            found_skills.add(normalized_skill)
 
-    found_skills = []
-
-    for normalized_skill, patterns in skills_dict.items():
-        for pattern in patterns:
-            if re.search(pattern, text):
-                found_skills.append(normalized_skill)
-                break
-
-    print("[DEBUG] Extracted skills:", found_skills)
-    return found_skills
+    return sorted(found_skills)
