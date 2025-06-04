@@ -144,28 +144,31 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
-import re
 
-def normalize_text(text):
+def normalize_resume_text(text):
+    # Lowercase everything
     text = text.lower()
 
-    # Split camelCase words (e.g., TailwindCSS → Tailwind CSS)
+    # Fix common merged words (can expand as needed)
+    text = text.replace("tailwindcss", "tailwind css")
+    text = text.replace("reactjs", "react js")
+    text = text.replace("nodejs", "node js")
+
+    # Split camelCase → add space
     text = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text)
 
-    # Replace hyphens/underscores with space
+    # Replace dashes/underscores with space
     text = re.sub(r'[-_]', ' ', text)
 
-    # Normalize common run-ons like 'tailwindcss' → 'tailwind css'
-    text = re.sub(r'tailwindcss', 'tailwind css', text)
-    text = re.sub(r'reactjs', 'react js', text)
-    text = re.sub(r'nodejs', 'node js', text)
+    # Remove unwanted symbols but preserve + and #
+    text = re.sub(r'[^\w\s+#]', '', text)
 
     return text
 
 def extract_skills(text):
-    text = normalize_text(text)
+    text = normalize_resume_text(text)
 
-    # Skill keywords (add or adjust as needed)
+    # Predefined known skills
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
         'mongodb', 'react', 'react js', 'node js', 'django', 'flask',
@@ -175,10 +178,9 @@ def extract_skills(text):
 
     found_skills = []
     for skill in skills_list:
-        # Smart boundary check
-        pattern = r'(?<!\w)' + re.escape(skill) + r'(?!\w)'
+        pattern = r'\b' + re.escape(skill) + r'\b'
         if re.search(pattern, text):
             found_skills.append(skill)
 
-    print("[DEBUG] Extracted skills:", sorted(set(found_skills)))
+    print("[DEBUG] Extracted skills from text:", sorted(set(found_skills)))
     return sorted(set(found_skills))
