@@ -144,34 +144,34 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
-
-def normalize_resume_text(text):
-    # Lowercase everything
+def extract_skills(text):
     text = text.lower()
 
-    # Fix common merged words (can expand as needed)
-    text = text.replace("tailwindcss", "tailwind css")
-    text = text.replace("reactjs", "react js")
-    text = text.replace("nodejs", "node js")
+    # Match multiple headings and capture until the next section (or end)
+    section_pattern = re.compile(
+        r'(languages|skills|technical skills|technologies|frontend technologies|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
+        re.IGNORECASE | re.DOTALL
+    )
 
-    # Split camelCase → add space
-    text = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text)
+    matches = section_pattern.findall(text)
+    if not matches:
+        print("[DEBUG] No recognizable skills section found.")
+        # Fall back to scanning the entire text
+        text_to_scan = text
+    else:
+        # Combine all matched sections
+        extracted_section = " ".join([m[1] for m in matches])
+        print("[DEBUG] Skills-like Section Found:", extracted_section)
+        text_to_scan = extracted_section
 
-    # Replace dashes/underscores with space
-    text = re.sub(r'[-_]', ' ', text)
+    # Cleanup: remove symbols and reduce multiple spaces
+    text_to_scan = re.sub(r'[^\w+#.,/ ]', '', text_to_scan)
+    text_to_scan = re.sub(r'\s+', ' ', text_to_scan)
 
-    # Remove unwanted symbols but preserve + and #
-    text = re.sub(r'[^\w\s+#]', '', text)
-
-    return text
-
-def extract_skills(text):
-    text = normalize_resume_text(text)
-
-    # Predefined known skills
+    # Define known skills
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
-        'mongodb', 'react', 'react js', 'node js', 'django', 'flask',
+        'mongodb', 'react', 'react.js', 'node.js', 'django', 'flask',
         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript',
         'r', 'bootstrap', 'tailwind css', 'git', 'github', 'c'
     ]
@@ -179,8 +179,12 @@ def extract_skills(text):
     found_skills = []
     for skill in skills_list:
         pattern = r'\b' + re.escape(skill) + r'\b'
-        if re.search(pattern, text):
+        if re.search(pattern, text_to_scan):
             found_skills.append(skill)
 
-    print("[DEBUG] Extracted skills from text:", sorted(set(found_skills)))
-    return sorted(set(found_skills))
+    if not found_skills:
+        print("[DEBUG] No known skills matched in text.")
+        return []
+
+    print("[DEBUG] Extracted Skills:", found_skills)
+    return sorted(found_skills)
