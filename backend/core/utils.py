@@ -5,6 +5,26 @@ from dateutil import parser
 import pdfplumber
 from docx import Document
 # views.py or a separate utility file
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    try:
+        with pdfplumber.open(pdf_path) as pdf:
+            for page in pdf.pages:
+                text += page.extract_text() + "\n"
+    except Exception as e:
+        print(f"Error reading PDF: {e}")
+    return text.strip()
+def extract_text_from_docx(docx_path):
+    text = ""
+    try:
+        doc = Document(docx_path)
+        for para in doc.paragraphs:
+            text += para.text + "\n"
+    except Exception as e:
+        print(f"Error reading DOCX: {e}")
+    return text.strip()
+
+
 def match_skills_with_jobs(resume_skills, jobs):
     matching_jobs = []
     for job in jobs:
@@ -124,31 +144,22 @@ def extract_name(text):
 
 
 def extract_skills(text):
-    # Normalize text
-    text = text.lower()
-    text = re.sub(r'[\n\r\t]', ' ', text)  # line breaks -> space
-    text = re.sub(r'[^\w+#., ]', '', text)  # remove unwanted symbols
-    text = re.sub(r'\s+', ' ', text)
+    # Normalize resume text
+    text_lower = text.lower()
 
-    # Break all comma-separated items into tokens
-    tokens = set()
-    for part in text.split(','):
-        tokens.update(part.strip().split())
-
-    # Normalize tokens
-    normalized_tokens = set(tok.strip().lower() for tok in tokens if len(tok) >= 2)
-
-    # Define known skill keywords
+    # Define known skill keywords (normalized lowercase)
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
-        'mongodb', 'react', 'node.js', 'django', 'flask',
-        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript'
+        'mongodb', 'react', 'react.js', 'node.js', 'django', 'flask',
+        'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript',
+        'r', 'bootstrap', 'tailwind css', 'git', 'github', 'c'
     ]
 
-    found_skills = [skill for skill in skills_list if skill.lower().replace('.', '') in {
-        t.replace('.', '') for t in normalized_tokens
-    }]
+    found_skills = set()
+    for skill in skills_list:
+        pattern = r'\b' + re.escape(skill) + r'\b'
+        if re.search(pattern, text_lower):
+            found_skills.add(skill)
 
-    print("[DEBUG] Extracted skills:", found_skills)
-    return found_skills
-
+    print("[DEBUG] Extracted skills:", sorted(found_skills))
+    return sorted(found_skills)
