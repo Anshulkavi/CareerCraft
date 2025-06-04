@@ -147,27 +147,31 @@ def extract_name(text):
 def extract_skills(text):
     text = text.lower()
 
-    # Match multiple headings, including your resume format
+    # Match multiple headings and capture until the next section (or end)
     section_pattern = re.compile(
-        r'(skills|technical skills|languages|technologies|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
+        r'(languages|skills|technical skills|technologies|frontend technologies|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
         re.IGNORECASE | re.DOTALL
     )
-    
+
     matches = section_pattern.findall(text)
     if not matches:
         print("[DEBUG] No recognizable skills section found.")
-        return []
+        # Fall back to scanning the entire text
+        text_to_scan = text
+    else:
+        # Combine all matched sections
+        extracted_section = " ".join([m[1] for m in matches])
+        print("[DEBUG] Skills-like Section Found:", extracted_section)
+        text_to_scan = extracted_section
 
-    extracted_section = " ".join([m[1] for m in matches])
-    print("[DEBUG] Skills Section Extracted:", extracted_section)
+    # Cleanup: remove symbols and reduce multiple spaces
+    text_to_scan = re.sub(r'[^\w+#.,/ ]', '', text_to_scan)
+    text_to_scan = re.sub(r'\s+', ' ', text_to_scan)
 
-    # Clean it
-    extracted_section = re.sub(r'[^a-z0-9+#.,/ ]', '', extracted_section)
-    extracted_section = re.sub(r'\s+', ' ', extracted_section)
-
+    # Define known skills
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
-        'mongodb', 'react', 'node.js', 'react.js', 'django', 'flask',
+        'mongodb', 'react', 'react.js', 'node.js', 'django', 'flask',
         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript',
         'r', 'bootstrap', 'tailwind css', 'git', 'github', 'c'
     ]
@@ -175,8 +179,12 @@ def extract_skills(text):
     found_skills = []
     for skill in skills_list:
         pattern = r'\b' + re.escape(skill) + r'\b'
-        if re.search(pattern, extracted_section):
+        if re.search(pattern, text_to_scan):
             found_skills.append(skill)
 
-    print("[DEBUG] Filtered Skills:", sorted(found_skills))
+    if not found_skills:
+        print("[DEBUG] No known skills matched in text.")
+        return []
+
+    print("[DEBUG] Extracted Skills:", found_skills)
     return sorted(found_skills)
