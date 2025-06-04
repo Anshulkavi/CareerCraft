@@ -144,47 +144,41 @@ def extract_name(text):
 #     return [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', text, re.IGNORECASE)]
 
 
-def extract_skills(text):
+import re
+
+def normalize_text(text):
     text = text.lower()
 
-    # Match multiple headings and capture until the next section (or end)
-    section_pattern = re.compile(
-        r'(languages|skills|technical skills|technologies|frontend technologies|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
-        re.IGNORECASE | re.DOTALL
-    )
+    # Split camelCase words (e.g., TailwindCSS → Tailwind CSS)
+    text = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', text)
 
-    matches = section_pattern.findall(text)
-    if not matches:
-        print("[DEBUG] No recognizable skills section found.")
-        # Fall back to scanning the entire text
-        text_to_scan = text
-    else:
-        # Combine all matched sections
-        extracted_section = " ".join([m[1] for m in matches])
-        print("[DEBUG] Skills-like Section Found:", extracted_section)
-        text_to_scan = extracted_section
+    # Replace hyphens/underscores with space
+    text = re.sub(r'[-_]', ' ', text)
 
-    # Cleanup: remove symbols and reduce multiple spaces
-    text_to_scan = re.sub(r'[^\w+#.,/ ]', '', text_to_scan)
-    text_to_scan = re.sub(r'\s+', ' ', text_to_scan)
+    # Normalize common run-ons like 'tailwindcss' → 'tailwind css'
+    text = re.sub(r'tailwindcss', 'tailwind css', text)
+    text = re.sub(r'reactjs', 'react js', text)
+    text = re.sub(r'nodejs', 'node js', text)
 
-    # Define known skills
+    return text
+
+def extract_skills(text):
+    text = normalize_text(text)
+
+    # Skill keywords (add or adjust as needed)
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
-        'mongodb', 'react', 'react.js', 'node.js', 'django', 'flask',
+        'mongodb', 'react', 'react js', 'node js', 'django', 'flask',
         'c++', 'c#', 'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript',
         'r', 'bootstrap', 'tailwind css', 'git', 'github', 'c'
     ]
 
     found_skills = []
     for skill in skills_list:
+        # Smart boundary check
         pattern = r'(?<!\w)' + re.escape(skill) + r'(?!\w)'
-        if re.search(pattern, text_to_scan):
+        if re.search(pattern, text):
             found_skills.append(skill)
 
-    if not found_skills:
-        print("[DEBUG] No known skills matched in text.")
-        return []
-
-    print("[DEBUG] Extracted Skills:", found_skills)
-    return sorted(found_skills)
+    print("[DEBUG] Extracted skills:", sorted(set(found_skills)))
+    return sorted(set(found_skills))
