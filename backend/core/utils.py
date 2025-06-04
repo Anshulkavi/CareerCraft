@@ -147,25 +147,24 @@ def extract_name(text):
 def extract_skills(text):
     text = text.lower()
 
-    # Extract only the "Skills" section using keywords
+    # Match multiple headings, including your resume format
     section_pattern = re.compile(
-        r'(skills|technical skills|tools & technologies|technologies)\s*[:\-]?\s*(.*?)(?=\n[A-Z][a-z]|$)',
+        r'(skills|technical skills|languages|technologies|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
         re.IGNORECASE | re.DOTALL
     )
     
     matches = section_pattern.findall(text)
     if not matches:
-        print("[DEBUG] No dedicated skills section found.")
+        print("[DEBUG] No recognizable skills section found.")
         return []
 
     extracted_section = " ".join([m[1] for m in matches])
     print("[DEBUG] Skills Section Extracted:", extracted_section)
 
-    # Normalize text
+    # Clean it
     extracted_section = re.sub(r'[^a-z0-9+#.,/ ]', '', extracted_section)
     extracted_section = re.sub(r'\s+', ' ', extracted_section)
 
-    # Define normalized skill keywords (you can expand this)
     skills_list = [
         'python', 'java', 'html', 'css', 'javascript', 'sql',
         'mongodb', 'react', 'node.js', 'react.js', 'django', 'flask',
@@ -175,7 +174,7 @@ def extract_skills(text):
 
     found_skills = []
     for skill in skills_list:
-        pattern = r'\b' + re.escape(skill.lower()) + r'\b'
+        pattern = r'\b' + re.escape(skill) + r'\b'
         if re.search(pattern, extracted_section):
             found_skills.append(skill)
 
