@@ -178,7 +178,7 @@ def extract_skills(text):
 
     found_skills = []
     for skill in skills_list:
-        pattern = r'\b' + re.escape(skill) + r'\b'
+        pattern = r'(?<!\w)' + re.escape(skill) + r'(?!\w)'
         if re.search(pattern, text_to_scan):
             found_skills.append(skill)
 
