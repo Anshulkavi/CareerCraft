@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: careercraft-backend
+    env: docker
+    plan: free
+    repo: https://github.com/Anshulkavi/CareerCraft
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.settings
+      
