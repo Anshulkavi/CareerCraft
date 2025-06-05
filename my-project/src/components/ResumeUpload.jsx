@@ -40,7 +40,7 @@ function ResumeUpload() {
       //   body: formData,
       // });
 
-      const response = await fetch("https://careercraft-backend-qvn1.onrender.com/api/upload_resume/", {
+      const response = await fetch("https://careercraft-5kzo.onrender.com/api/upload_resume/", {
         method: "POST",
         body: formData,
       });
