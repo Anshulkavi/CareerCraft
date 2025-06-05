@@ -5,8 +5,10 @@ services:
     plan: free
     repo: https://github.com/Anshulkavi/CareerCraft
     branch: main
+    dockerfilePath: backend/Dockerfile
     autoDeploy: true
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: backend.settings
-      
+      - key: PORT
+        value: "8000"
