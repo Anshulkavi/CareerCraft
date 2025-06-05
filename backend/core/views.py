@@ -183,3 +183,6 @@ def upload_resume(request):
         })
 
     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
