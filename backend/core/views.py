@@ -229,26 +229,27 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
+@csrf_exempt  # If you have CSRF issues, add this for testing only
 def upload_resume(request):
     if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST allowed'}, status=400)
+        return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
-    if 'resume' not in request.FILES:
-        return JsonResponse({'error': 'No resume file uploaded'}, status=400)
+    resume_file = request.FILES.get('resume')
+    if not resume_file:
+        return JsonResponse({'error': 'No resume file provided'}, status=400)
 
-    f = request.FILES['resume']
-    if f.size > 10 * 1024 * 1024:  # 10MB limit
-        return JsonResponse({'error': 'File too large'}, status=400)
+    try:
+        # Your parsing/extraction logic here
+        extracted_data = {
+            'name': 'John Doe',
+            'email': 'john@example.com',
+            'phone': '1234567890',
+            'skills': ['Python', 'Django'],
+            'experience': '3 years',
+        }
+        matches = []  # example empty list of job matches
 
-    # Fake text extraction (always empty)
-    text = ""
+        return JsonResponse({'extracted': extracted_data, 'matches': matches})
 
-    # Simulate skills extraction returning empty list => cause 400
-    skills = []
-
-    if not skills:
-        return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
-
-    # If you want, return success if no errors:
-    return JsonResponse({'message': 'Success'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
