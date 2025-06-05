@@ -4,6 +4,4 @@ from . import views
 
 urlpatterns = [
     path('upload_resume/', upload_resume, name='upload_resume'),
-    path('api/health/', views.health_check)
-
 ]
