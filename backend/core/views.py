@@ -42,7 +42,7 @@ def upload_resume(request):
             ext = f.name.split('.')[-1].lower()
 
             if f.size > 10 * 1024 * 1024:
-                return JsonResponse({'error': 'File too large. Max size is 10MB.'}, status=400)
+                return JsonResponse({'error': 'File too large. Maximum size is 10MB.'}, status=400)
 
             text = ""
             if ext == 'pdf':
@@ -52,9 +52,8 @@ def upload_resume(request):
             elif ext == 'docx':
                 text = extract_text_from_docx(f)
             else:
-                return JsonResponse({'error': 'Only PDF or DOCX allowed.'}, status=400)
+                return JsonResponse({'error': 'Only PDF or DOCX files are allowed.'}, status=400)
 
-            # Run extractions (safe block)
             name = extract_name(text)
             email = extract_email(text)
             phone = extract_phone(text)
@@ -64,8 +63,9 @@ def upload_resume(request):
             if not email or '@' not in email or '.' not in email:
                 email = None 
             if not skills:
-                return JsonResponse({'error': 'No skills found in resume.'}, status=400)
+                return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
 
+            # Save extracted data
             ResumeData.objects.create(
                 name=name or "Not specified",
                 email=email,
@@ -74,33 +74,35 @@ def upload_resume(request):
                 experience=experience or "Not specified"
             )
 
+            # Fetch jobs
             all_jobs = []
             for skill in skills:
                 all_jobs += scrape_internshala_jobs([skill])
 
+            # Count matches
             for job in all_jobs:
                 job["matching_skills"] = count_matching_skills(job, skills)
 
             unique_jobs = {(job['title'], job.get('company_name', 'Unknown')): job for job in all_jobs}
-            sorted_jobs = sorted(unique_jobs.values(), key=lambda x: -x.get("matching_skills", 0))
+            all_jobs = list(unique_jobs.values())
+            sorted_jobs = sorted(all_jobs, key=lambda x: -x.get("matching_skills", 0))
             top_matches = sorted_jobs[:5]
 
             return JsonResponse({
                 'message': 'Resume processed successfully!',
                 'matches': top_matches,
                 'extracted': {
-                    'name': name if name else "Not specified",
-                    'email': email if email else "Not specified",
-                    'phone': phone if phone else "Not specified",
+                    'name': name or "Not specified",
+                    'email': email or "Not specified",
+                    'phone': phone or "Not specified",
                     'skills': skills,
-                    'experience': experience if experience else "Not specified"
+                    'experience': experience or "Not specified"
                 }
             })
-        
+
         except Exception as e:
-            import traceback
-            print("[ERROR]", traceback.format_exc())
-            return JsonResponse({'error': f'Server error: {str(e)}'}, status=500)
+            # Critical: Catch unhandled exceptions to return proper JSON
+            return JsonResponse({'error': f'Internal server error: {str(e)}'}, status=500)
 
     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
