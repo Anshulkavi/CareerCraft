@@ -243,7 +243,17 @@ function ResumeUpload() {
         }
       );
 
-      const data = await response.json();
+      //const data = await response.json();
+      const text = await response.text();
+      try {
+        const data = JSON.parse(text);
+        // continue...
+      } catch {
+        console.error("❌ HTML Error Response:\n", text);
+        throw new Error(
+          "❌ Server returned HTML instead of JSON. See console."
+        );
+      }
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
 
       const { extracted, matches } = data;
