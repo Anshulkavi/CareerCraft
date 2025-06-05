@@ -107,6 +107,7 @@
 #     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
 
+import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import ResumeData
@@ -114,7 +115,8 @@ from .utils import extract_text_from_file, extract_email, extract_phone, extract
 from .job_finder import scrape_internshala_jobs
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
-from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 def validate_email(email):
     validator = EmailValidator()
@@ -131,16 +133,23 @@ def count_matching_skills(job, skills):
 
 @csrf_exempt
 def upload_resume(request):
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"FILES keys: {list(request.FILES.keys())}")
+
     if request.method == 'POST' and request.FILES.get('resume'):
         resume = request.FILES['resume']
         ext = resume.name.split('.')[-1].lower()
 
-        if resume.size > 10 * 1024 * 1024:
+        logger.info(f"Received file: {resume.name}, size: {resume.size}")
+
+        if resume.size > 10 * 1024 * 1024:  # 10MB limit
+            logger.warning("File too large")
             return JsonResponse({'error': 'File too large. Max 10MB.'}, status=400)
 
         try:
             text = extract_text_from_file(resume, ext)
         except Exception as e:
+            logger.error(f"Failed to extract text: {str(e)}")
             return JsonResponse({'error': f'Failed to extract text: {str(e)}'}, status=500)
 
         name = extract_name(text)
@@ -150,8 +159,10 @@ def upload_resume(request):
         experience = extract_experience(text)
 
         if not skills:
+            logger.warning("No skills found in resume")
             return JsonResponse({'error': 'No skills found in resume.'}, status=400)
 
+        # Save to DB
         ResumeData.objects.create(
             name=name or "Not specified",
             email=email if validate_email(email) else "Not specified",
@@ -167,6 +178,7 @@ def upload_resume(request):
         for job in all_jobs:
             job["matching_skills"] = count_matching_skills(job, skills)
 
+        # Remove duplicates by (title, company)
         unique_jobs = {(job['title'], job.get('company_name', 'Unknown')): job for job in all_jobs}
         top_matches = sorted(unique_jobs.values(), key=lambda x: -x.get("matching_skills", 0))[:5]
 
@@ -182,6 +194,7 @@ def upload_resume(request):
             }
         })
 
+    logger.warning("Invalid request: Missing resume file or wrong method")
     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
 def health_check(request):
