@@ -245,9 +245,10 @@ function ResumeUpload() {
 
       //const data = await response.json();
       const text = await response.text();
+      let data;
+
       try {
-        const data = JSON.parse(text);
-        // continue...
+        data = JSON.parse(text);
       } catch {
         console.error("❌ HTML Error Response:\n", text);
         throw new Error(
