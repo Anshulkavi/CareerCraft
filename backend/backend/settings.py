@@ -191,3 +191,17 @@ FILE_UPLOAD_HANDLERS = [
 
 
 # SITE_URL = 'http://127.0.0.1:8000'  # Replace with your base URL
+
+import ssl
+
+# Upstash Redis URL (rediss)
+UPSTASH_REDIS_URL = "rediss://default:AXkdAAIjcDFlNWYxNjQ1YWQ3M2M0ZGJmYTMwZThhMDkyZmIwYjg2YnAxMA@free-hyena-31005.upstash.io:6379"
+
+CELERY_BROKER_URL = UPSTASH_REDIS_URL
+
+CELERY_RESULT_BACKEND = UPSTASH_REDIS_URL
+
+# Required to fix: ValueError: rediss:// URL must have parameter ssl_cert_reqs
+CELERY_REDIS_BACKEND_USE_SSL = {
+    'ssl_cert_reqs': ssl.CERT_NONE  # Or CERT_REQUIRED / CERT_OPTIONAL if you want stricter
+}
