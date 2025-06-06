@@ -7,7 +7,7 @@ from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 import PyPDF2
 import docx
-from datetime import datetime
+
 
 # ---------------- EMAIL VALIDATOR ----------------
 def validate_email(email):
