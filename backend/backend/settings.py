@@ -165,7 +165,7 @@ CORS_ALLOW_METHODS = [
 
 ALLOWED_HOSTS = ['*']
 
-
+CORS_ALLOW_CREDENTIALS = True
 # Path where files are stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
