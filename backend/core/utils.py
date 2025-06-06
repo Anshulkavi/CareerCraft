@@ -201,6 +201,7 @@ import pytesseract
 # Explicitly set Tesseract cmd path for Docker (Debian)
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
+
 def extract_text_from_pdf(pdf_path):
     text = ""
     try:
@@ -213,6 +214,7 @@ def extract_text_from_pdf(pdf_path):
         print(f"Error reading PDF: {e}")
     return text.strip()
 
+
 def extract_text_from_docx(docx_path):
     text = ""
     try:
@@ -223,6 +225,7 @@ def extract_text_from_docx(docx_path):
         print(f"Error reading DOCX: {e}")
     return text.strip()
 
+
 def extract_text_from_image(image_path):
     try:
         text = pytesseract.image_to_string(Image.open(image_path))
@@ -230,6 +233,7 @@ def extract_text_from_image(image_path):
     except Exception as e:
         print(f"OCR error: {e}")
         return ""
+
 
 def extract_text_from_file(file_path):
     ext = file_path.split('.')[-1].lower()
@@ -243,8 +247,9 @@ def extract_text_from_file(file_path):
         print(f"Unsupported file extension: {ext}")
         return ""
 
+
 def extract_experience(text):
-    # Match only experience section
+    # Keywords for experience section
     experience_section_keywords = [
         "experience", "work experience", "professional experience", "internship", "work history"
     ]
@@ -299,6 +304,7 @@ def extract_experience(text):
 
     return "Not specified"
 
+
 def extract_email(text):
     match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
     if match:
@@ -306,6 +312,7 @@ def extract_email(text):
         if "reallygreatsite" not in email.lower():
             return email
     return ""
+
 
 def extract_phone(text):
     phone_pattern = re.compile(
@@ -318,6 +325,7 @@ def extract_phone(text):
             return digits_only[-10:]
     return ""
 
+
 def extract_name(text):
     lines = text.split("\n")
     ignore_keywords = ['resume', 'contact', 'profile', 'curriculum', 'vitae']
@@ -328,6 +336,7 @@ def extract_name(text):
             if len(words) >= 2 and all(word[0].isupper() for word in words[:2]):
                 return " ".join(words[:2])
     return "Unknown"
+
 
 def extract_skills(text):
     text = text.lower()
