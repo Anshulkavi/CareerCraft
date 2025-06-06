@@ -1,4 +1,3 @@
-# Use official Python base image
 FROM python:3.11-slim
 
 # Install system dependencies for Tesseract, PDF, image, and docx support
@@ -12,6 +11,14 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     && apt-get clean
 
+# Debug: List tessdata directories and installed languages
+RUN echo "Listing /usr/share/tesseract-ocr/4.00/tessdata:" && ls -l /usr/share/tesseract-ocr/4.00/tessdata || echo "Directory not found"
+RUN echo "Listing /usr/share/tesseract-ocr/tessdata:" && ls -l /usr/share/tesseract-ocr/tessdata || echo "Directory not found"
+RUN echo "Tesseract available languages:" && tesseract --list-langs
+
+# Set TESSDATA_PREFIX (try the more common path)
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/tessdata
+
 # Set working directory
 WORKDIR /app
 
@@ -21,12 +28,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
-
-# Set Tesseract path (if needed by pytesseract, optional on Linux)
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
-
-# Collect static files if needed (optional)
-# RUN python backend/manage.py collectstatic --noinput
 
 # Expose port (Render expects web services to run on 0.0.0.0:$PORT)
 EXPOSE 8000
