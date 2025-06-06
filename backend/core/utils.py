@@ -243,7 +243,62 @@ def extract_text_from_file(file_path):
         print(f"Unsupported file extension: {ext}")
         return ""
 
-# Example extractors - name, email, phone, skills (from your code)
+def extract_experience(text):
+    # Match only experience section
+    experience_section_keywords = [
+        "experience", "work experience", "professional experience", "internship", "work history"
+    ]
+    experience_section_pattern = re.compile(r'(?i)(' + '|'.join(experience_section_keywords) + r')')
+
+    experience_section_match = experience_section_pattern.search(text)
+    if not experience_section_match:
+        return "Not specified"
+
+    experience_text = text[experience_section_match.end():]
+
+    # Direct match for "X years of experience"
+    experience_pattern = re.compile(r'(\d{1,2})\+?\s+(years?|yrs?)\s+(of\s+)?(experience|exp)', re.IGNORECASE)
+    matches = experience_pattern.findall(experience_text)
+    if matches:
+        return matches[0][0] + " years"
+
+    # Skip if irrelevant sections
+    irrelevant_keywords = ["degree", "education", "certificate", "project"]
+    if any(keyword in experience_text.lower() for keyword in irrelevant_keywords):
+        return "Not specified"
+
+    # Match date ranges (DD/MM/YYYY or similar)
+    date_pattern = re.compile(
+        r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\s*[-–to]+\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|present)', re.IGNORECASE
+    )
+
+    total_months = 0
+
+    for match in date_pattern.findall(experience_text):
+        start_str, end_str = match
+        try:
+            start_date = parser.parse(start_str, dayfirst=True)
+            end_date = parser.parse(end_str, dayfirst=True) if "present" not in end_str.lower() else datetime.now()
+
+            months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
+            if months > 0:
+                total_months += months
+        except Exception:
+            continue
+
+    if total_months:
+        years = total_months // 12
+        months = total_months % 12
+
+        if years and months:
+            return f"{years} years {months} months"
+        elif years:
+            return f"{years} years"
+        else:
+            return f"{months} months"
+
+    return "Not specified"
+
 def extract_email(text):
     match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
     if match:
