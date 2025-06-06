@@ -163,6 +163,7 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
+ALLOWED_HOSTS = ['*']
 
 
 # Path where files are stored
