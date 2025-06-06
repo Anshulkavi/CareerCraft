@@ -31,4 +31,5 @@ ENV PATH="/usr/bin:$PATH"
 EXPOSE 8000
 
 # Start the app with gunicorn
-CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120"]
+
