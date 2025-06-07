@@ -226,11 +226,11 @@ function ResumeUpload() {
       return;
     }
 
-    setStatusVisible(true);
     setLoading(true);
     setUploadStatus("⏳ Uploading and analyzing resume...");
-    setJobMatches([]);
+    setStatusVisible(true);
     setExtractedInfo(null);
+    setJobMatches([]);
 
     const formData = new FormData();
     formData.append("resume", file);
@@ -262,8 +262,8 @@ function ResumeUpload() {
       setExtractedInfo(extracted || null);
       setJobMatches(Array.isArray(matches) ? matches : []);
       setUploadStatus(message || "✅ Resume successfully processed.");
-      setLoading(false);
       setStatusVisible(true);
+      setLoading(false);
 
       resumeUploadFormRef.current.reset();
       setFileName("");
@@ -271,26 +271,25 @@ function ResumeUpload() {
     } catch (error) {
       console.error("❌ Upload error:", error);
       setUploadStatus(`❌ Upload error: ${error.message}`);
-      setLoading(false);
       setStatusVisible(true);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fileInput = resumeFileRef.current;
-    if (!fileInput) return;
-
-    fileInput.addEventListener("change", handleFileChange);
-    return () => {
-      fileInput.removeEventListener("change", handleFileChange);
-    };
+    const input = resumeFileRef.current;
+    if (!input) return;
+    input.addEventListener("change", handleFileChange);
+    return () => input.removeEventListener("change", handleFileChange);
   }, []);
 
   return (
     <section className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-center py-12 px-5">
-      <h2 className="text-2xl font-bold !text-indigo-600 mb-4">Upload Your Resume</h2>
-      <p className="text-gray-600 dark:text-gray-200 mb-6">
-        Let our AI analyze your resume and match you with the perfect job opportunities.
+      <h2 className="text-3xl font-bold text-indigo-600 mb-4">
+        Upload Your Resume
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-6">
+        Let our AI analyze your resume and match you with job opportunities.
       </p>
 
       <form
@@ -311,22 +310,21 @@ function ResumeUpload() {
           />
           <label
             htmlFor="resumeFile"
-            className="cursor-pointer inline-flex items-center bg-blue-400 text-gray-900 dark:text-gray-100 px-5 py-2 rounded-md hover:bg-blue-500 transition"
+            className="cursor-pointer inline-flex items-center bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition"
           >
             <i className="fas fa-cloud-upload-alt mr-2"></i>
             <span>{fileName || "Choose a file"}</span>
           </label>
-
           {previewSrc && (
             <img
               src={previewSrc}
-              alt="Preview"
-              className="mt-4 mx-auto max-h-40 rounded-md border border-gray-300"
+              alt="Resume preview"
+              className="mt-4 max-h-40 rounded border border-gray-300 mx-auto"
             />
           )}
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-300">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Supported formats: PDF, DOCX, JPEG, PNG (Max 10MB)
         </p>
 
@@ -366,10 +364,17 @@ function ResumeUpload() {
       </form>
 
       {statusVisible && (
-        <div className="mt-6 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-4 rounded-md text-left max-w-2xl mx-auto">
-          <p>{uploadStatus}</p>
+        <div className="mt-6 bg-gray-100 dark:bg-gray-800 p-4 rounded-md text-left max-w-2xl mx-auto">
+          <p className="font-medium text-gray-800 dark:text-gray-200">{uploadStatus}</p>
+
+          {extractedInfo?.used_ocr && (
+            <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
+              📸 OCR was used to extract text from an image-based resume.
+            </p>
+          )}
+
           {extractedInfo && (
-            <div className="mt-3 text-sm space-y-1">
+            <div className="mt-3 text-sm space-y-1 text-gray-800 dark:text-gray-200">
               <p>✅ <strong>Name:</strong> {extractedInfo.name || "N/A"}</p>
               <p>📧 <strong>Email:</strong> {extractedInfo.email || "N/A"}</p>
               <p>📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}</p>
@@ -381,17 +386,17 @@ function ResumeUpload() {
       )}
 
       {Array.isArray(jobMatches) && jobMatches.length > 0 && (
-        <div className="mt-10">
+        <div className="mt-10 px-2">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
             Matching Job Opportunities
           </h3>
-          <div className="grid gap-4 max-w-3xl mx-auto overflow-x-auto">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto">
             {jobMatches.map((job, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-4 mb-4 text-left"
+                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md p-4 text-left"
               >
-                <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400 mb-1">
+                <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
                   {job.title}
                 </h4>
                 <p className="text-sm"><strong>Company:</strong> {job.company_name || "Unknown"}</p>
@@ -409,6 +414,12 @@ function ResumeUpload() {
             ))}
           </div>
         </div>
+      )}
+
+      {!loading && extractedInfo && jobMatches.length === 0 && (
+        <p className="mt-6 text-gray-600 dark:text-gray-300">
+          ❌ No matching jobs found based on your resume.
+        </p>
       )}
     </section>
   );
