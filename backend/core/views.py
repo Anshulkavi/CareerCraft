@@ -106,9 +106,13 @@ def upload_resume(request):
 
     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
+@csrf_exempt
+def test_cors(request):
+    return JsonResponse({"status": "ok"})
 
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
+
 
 # from django.http import JsonResponse
 # from django.views.decorators.csrf import csrf_exempt
