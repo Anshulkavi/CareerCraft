@@ -251,16 +251,14 @@ function ResumeUpload() {
         data = JSON.parse(text);
       } catch {
         console.error("❌ HTML Error Response:\n", text);
-        throw new Error(
-          "❌ Server returned HTML instead of JSON. See console."
-        );
+        throw new Error("❌ Server returned HTML instead of JSON. See console.");
       }
 
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
 
       const { extracted, matches } = data;
       setExtractedInfo(extracted);
-      setJobMatches(matches);
+      setJobMatches(Array.isArray(matches) ? matches : []);
       setUploadStatus("✅ Resume successfully processed.");
     } catch (error) {
       console.error("❌ Upload error:", error);
@@ -289,8 +287,7 @@ function ResumeUpload() {
         Upload Your Resume
       </h2>
       <p className="text-gray-600 dark:text-gray-200 mb-6">
-        Let our AI analyze your resume and match you with the perfect job
-        opportunities.
+        Let our AI analyze your resume and match you with the perfect job opportunities.
       </p>
 
       <form
@@ -370,17 +367,16 @@ function ResumeUpload() {
           {extractedInfo && (
             <div className="mt-3 text-sm space-y-1">
               <p>
-                ✅ <strong>Name:</strong> {extractedInfo.name}
+                ✅ <strong>Name:</strong> {extractedInfo.name || "N/A"}
               </p>
               <p>
-                📧 <strong>Email:</strong> {extractedInfo.email}
+                📧 <strong>Email:</strong> {extractedInfo.email || "N/A"}
               </p>
               <p>
                 📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}
               </p>
               <p>
-                💼 <strong>Experience:</strong>{" "}
-                {extractedInfo.experience || "N/A"}
+                💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}
               </p>
               <p>
                 🛠️ <strong>Skills:</strong>{" "}
@@ -393,7 +389,7 @@ function ResumeUpload() {
         </div>
       )}
 
-      {jobMatches.length > 0 && (
+      {Array.isArray(jobMatches) && jobMatches.length > 0 && (
         <div className="mt-10">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
             Matching Job Opportunities
