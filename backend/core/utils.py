@@ -195,12 +195,6 @@ from datetime import datetime
 from dateutil import parser
 import pdfplumber
 from docx import Document
-from PIL import Image
-import pytesseract
-
-# Explicitly set Tesseract cmd path for Docker (Debian)
-pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
-
 
 def extract_text_from_pdf(pdf_path):
     text = ""
@@ -214,7 +208,6 @@ def extract_text_from_pdf(pdf_path):
         print(f"Error reading PDF: {e}")
     return text.strip()
 
-
 def extract_text_from_docx(docx_path):
     text = ""
     try:
@@ -225,16 +218,6 @@ def extract_text_from_docx(docx_path):
         print(f"Error reading DOCX: {e}")
     return text.strip()
 
-
-def extract_text_from_image(image_path):
-    try:
-        text = pytesseract.image_to_string(Image.open(image_path))
-        return text
-    except Exception as e:
-        print(f"OCR error: {e}")
-        return ""
-
-
 def extract_text_from_file(file_path):
     ext = file_path.split('.')[-1].lower()
     if ext == 'pdf':
@@ -242,11 +225,14 @@ def extract_text_from_file(file_path):
     elif ext == 'docx':
         return extract_text_from_docx(file_path)
     elif ext in ['png', 'jpg', 'jpeg']:
-        return extract_text_from_image(file_path)
+        # OCR removed: return error or empty string
+        print("Image files not supported without OCR.")
+        return ""
     else:
         print(f"Unsupported file extension: {ext}")
         return ""
 
+# The rest of your extraction functions (email, phone, name, skills, experience) remain unchanged
 
 def extract_experience(text):
     # Keywords for experience section
