@@ -110,72 +110,113 @@
 # def health_check(request):
 #     return JsonResponse({'status': 'ok'}, status=200)
 
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from celery.result import AsyncResult
-import os
-import tempfile
+from django.http import JsonResponse
+import os, uuid
 
-from .tasks import parse_resume_and_match_jobs  # Your celery task
+from .utils import extract_email, extract_phone, extract_name, extract_skills, extract_experience
+from .job_finder import scrape_internshala_jobs
+from .models import ResumeData
 
+import PyPDF2, docx, pdfplumber, pytesseract
+from PIL import Image
 
 @csrf_exempt
 def upload_resume(request):
     if request.method == 'POST' and request.FILES.get('resume'):
+        resume_file = request.FILES['resume']
+        file_ext = os.path.splitext(resume_file.name)[1].lower()
+        temp_filename = f"temp_{uuid.uuid4().hex}{file_ext}"
+        temp_path = os.path.join("media", temp_filename)
+
+        with open(temp_path, 'wb+') as destination:
+            for chunk in resume_file.chunks():
+                destination.write(chunk)
+
         try:
-            f = request.FILES['resume']
+            text = ""
+            if file_ext == '.pdf':
+                with open(temp_path, 'rb') as f:
+                    reader = PyPDF2.PdfReader(f)
+                    for page in reader.pages:
+                        text += page.extract_text() or ""
 
-            if f.size > 10 * 1024 * 1024:
-                return JsonResponse({'error': 'File too large. Maximum size is 10MB.'}, status=400)
+                if len(text.strip()) < 30:
+                    with pdfplumber.open(temp_path) as pdf:
+                        for page in pdf.pages:
+                            image = page.to_image(resolution=300)
+                            pil_img = image.original.convert("L")
+                            text += pytesseract.image_to_string(pil_img)
 
-            # Save the uploaded file temporarily
-            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(f.name)[1]) as temp_file:
-                for chunk in f.chunks():
-                    temp_file.write(chunk)
-                temp_path = temp_file.name
+            elif file_ext == '.docx':
+                doc = docx.Document(temp_path)
+                text = "\n".join(para.text for para in doc.paragraphs)
 
-            # Trigger async Celery task with path of saved resume file
-            task = parse_resume_and_match_jobs.delay(temp_path)
+            elif file_ext in ['.png', '.jpg', '.jpeg']:
+                img = Image.open(temp_path)
+                text = pytesseract.image_to_string(img)
+            else:
+                return JsonResponse({'error': 'Unsupported file type.'}, status=400)
+
+            # Extract details
+            name = extract_name(text)
+            email = extract_email(text)
+            phone = extract_phone(text)
+            skills = extract_skills(text)
+            experience = extract_experience(text)
+
+            if not skills:
+                return JsonResponse({'error': 'No skills found in resume'}, status=400)
+
+            # Save to DB
+            ResumeData.objects.create(
+                name=name or "Not specified",
+                email=email or "Not specified",
+                phone=phone or "Not specified",
+                skills=skills,
+                experience=experience or "Not specified"
+            )
+
+            # Scrape jobs for each skill
+            all_jobs = []
+            for skill in skills:
+                all_jobs += scrape_internshala_jobs([skill])
+
+            # Remove duplicates
+            unique_jobs = {(j['title'], j.get('company_name', '')): j for j in all_jobs}
+            job_list = list(unique_jobs.values())
+
+            def count_matching(job):
+                combined = f"{job.get('title', '')} {job.get('location', '')} {job.get('salary', '')}".lower()
+                return sum(skill.lower() in combined for skill in skills)
+
+            for job in job_list:
+                job['matching_skills'] = count_matching(job)
+
+            top_jobs = sorted(job_list, key=lambda x: -x.get('matching_skills', 0))[:5]
+
+            # Clean up temp file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
 
             return JsonResponse({
-                'message': 'Resume upload accepted. Parsing started asynchronously.',
-                'task_id': task.id
-            }, status=202)
+                "message": "Resume processed successfully!",
+                "extracted": {
+                    "name": name or "Not specified",
+                    "email": email or "Not specified",
+                    "phone": phone or "Not specified",
+                    "skills": skills,
+                    "experience": experience or "Not specified"
+                },
+                "matches": top_jobs
+            })
 
         except Exception as e:
-            return JsonResponse({'error': f'Internal server error: {str(e)}'}, status=500)
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return JsonResponse({'error': str(e)}, status=500)
 
-    return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
-
-
-def task_status(request, task_id):
-    task = AsyncResult(task_id)
-    state = task.state
-
-    if state == 'PENDING':
-        response = {'state': 'PENDING', 'result': None}
-    elif state == 'FAILURE':
-        response = {
-            'state': 'FAILURE',
-            'result': None,
-            'error': str(task.info) if task.info else 'Unknown error'
-        }
-    elif state == 'SUCCESS':
-        # Expecting result dict with 'extracted' and 'matches'
-        result = task.result if isinstance(task.result, dict) else {}
-        response = {
-            'state': 'SUCCESS',
-            'result': {
-                'extracted': result.get('extracted'),
-                'matches': result.get('matches', [])
-            }
-        }
-    else:
-        # Other states: STARTED, RETRY, etc.
-        response = {'state': state, 'result': None}
-
-    return JsonResponse(response)
-
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
