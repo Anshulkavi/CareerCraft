@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     poppler-utils \
-    build-essential \
     && apt-get clean
+
 
 # Set working directory
 WORKDIR /app
