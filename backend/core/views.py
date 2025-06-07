@@ -119,11 +119,12 @@ from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 import PyPDF2
 import docx
-import pdfplumber
-import pytesseract
-from PIL import Image
 import io
+from PIL import Image
+import easyocr
 
+# Initialize EasyOCR reader once
+reader = easyocr.Reader(['en'], gpu=False)
 
 def validate_email(email):
     validator = EmailValidator()
@@ -133,11 +134,36 @@ def validate_email(email):
     except ValidationError:
         return False
 
-
 def extract_text_from_docx(file):
     doc = docx.Document(file)
     return "\n".join(para.text for para in doc.paragraphs)
 
+def ocr_pdf_pages(file):
+    text = ""
+    # Read PDF pages as images using PyPDF2 and PIL
+    # PyPDF2 alone can’t convert pages to images, so better approach is to
+    # extract images if present, else fallback to text extraction
+    # Since we removed pdfplumber, we'll rely on PyPDF2 text extraction only here
+    reader_pdf = PyPDF2.PdfReader(file)
+    for page in reader_pdf.pages:
+        page_text = page.extract_text()
+        if page_text and len(page_text.strip()) > 20:
+            text += page_text + "\n"
+        else:
+            # If no text or too short, skip OCR fallback for now (needs extra libs)
+            # You can add pdf2image + OCR if you want full OCR PDF support without Tesseract
+            pass
+    return text
+
+def ocr_image(file):
+    # Read image bytes
+    img_bytes = file.read()
+    img = Image.open(io.BytesIO(img_bytes))
+    # EasyOCR expects numpy array
+    import numpy as np
+    img_np = np.array(img)
+    result = reader.readtext(img_np, detail=0)
+    return "\n".join(result)
 
 def count_matching_skills(job, skills):
     fields = [
@@ -148,98 +174,85 @@ def count_matching_skills(job, skills):
     combined = " ".join(fields).lower()
     return sum(1 for skill in skills if skill.lower() in combined)
 
-
 @csrf_exempt
 def upload_resume(request):
-    if request.method != 'POST' or 'resume' not in request.FILES:
-        return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
+    if request.method == 'POST' and request.FILES.get('resume'):
+        try:
+            f = request.FILES['resume']
+            ext = f.name.split('.')[-1].lower()
 
-    try:
-        f = request.FILES['resume']
-        ext = f.name.split('.')[-1].lower()
+            if f.size > 10 * 1024 * 1024:
+                return JsonResponse({'error': 'File too large. Maximum size is 10MB.'}, status=400)
 
-        if f.size > 10 * 1024 * 1024:
-            return JsonResponse({'error': 'File too large. Maximum size is 10MB.'}, status=400)
+            text = ""
 
-        text = ""
+            if ext == 'pdf':
+                # Try normal text extraction first
+                text = ocr_pdf_pages(f)
+                if len(text.strip()) < 30:
+                    # fallback: OCR PDF to images requires more setup, skipping for now
+                    return JsonResponse({'error': 'PDF OCR fallback not implemented yet, please upload text-based PDF.'}, status=400)
 
-        if ext == 'pdf':
-            reader = PyPDF2.PdfReader(f)
-            for p in reader.pages:
-                text += p.extract_text() or ""
+            elif ext == 'docx':
+                text = extract_text_from_docx(f)
 
-            if len(text.strip()) < 30:
-                f.seek(0)
-                with pdfplumber.open(f) as pdf:
-                    for page in pdf.pages:
-                        pil_img = page.to_image(resolution=300).original.convert("L")
-                        text += pytesseract.image_to_string(pil_img)
+            elif ext in ['png', 'jpg', 'jpeg']:
+                text = ocr_image(f)
 
-        elif ext == 'docx':
-            text = extract_text_from_docx(f)
+            else:
+                return JsonResponse({'error': 'Only PDF, DOCX, PNG, JPG, or JPEG files are allowed.'}, status=400)
 
-        elif ext in ['png', 'jpg', 'jpeg']:
-            img_bytes = f.read()
-            img_stream = io.BytesIO(img_bytes)
-            img = Image.open(img_stream)
-            text = pytesseract.image_to_string(img)
+            name = extract_name(text)
+            email = extract_email(text)
+            phone = extract_phone(text)
+            skills = extract_skills(text)
+            experience = extract_experience(text)
 
-        else:
-            return JsonResponse({'error': 'Only PDF, DOCX, PNG, JPG, or JPEG files are allowed.'}, status=400)
+            if not email or '@' not in email or '.' not in email:
+                email = None
+            if not skills:
+                return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
 
-        name = extract_name(text)
-        email = extract_email(text)
-        phone = extract_phone(text)
-        skills = extract_skills(text)
-        experience = extract_experience(text)
+            ResumeData.objects.create(
+                name=name or "Not specified",
+                email=email,
+                phone=phone or "Not specified",
+                skills=skills,
+                experience=experience or "Not specified"
+            )
 
-        if not email or not validate_email(email):
-            email = None
-        if not skills:
-            return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
+            all_jobs = []
+            for skill in skills:
+                all_jobs += scrape_internshala_jobs([skill])
 
-        # Save data
-        ResumeData.objects.create(
-            name=name or "Not specified",
-            email=email,
-            phone=phone or "Not specified",
-            skills=skills,
-            experience=experience or "Not specified"
-        )
+            for job in all_jobs:
+                job["matching_skills"] = count_matching_skills(job, skills)
 
-        # Job matching
-        all_jobs = []
-        for skill in skills:
-            all_jobs += scrape_internshala_jobs([skill])
+            unique_jobs = {(job['title'], job.get('company_name', 'Unknown')): job for job in all_jobs}
+            all_jobs = list(unique_jobs.values())
+            sorted_jobs = sorted(all_jobs, key=lambda x: -x.get("matching_skills", 0))
+            top_matches = sorted_jobs[:5]
 
-        for job in all_jobs:
-            job["matching_skills"] = count_matching_skills(job, skills)
+            return JsonResponse({
+                'message': 'Resume processed successfully!',
+                'matches': top_matches,
+                'extracted': {
+                    'name': name or "Not specified",
+                    'email': email or "Not specified",
+                    'phone': phone or "Not specified",
+                    'skills': skills,
+                    'experience': experience or "Not specified"
+                }
+            })
 
-        unique_jobs = {(job['title'], job.get('company_name', 'Unknown')): job for job in all_jobs}
-        all_jobs = list(unique_jobs.values())
-        sorted_jobs = sorted(all_jobs, key=lambda x: -x.get("matching_skills", 0))
-        top_matches = sorted_jobs[:5]
+        except Exception as e:
+            return JsonResponse({'error': f'Internal server error: {str(e)}'}, status=500)
 
-        return JsonResponse({
-            'message': 'Resume processed successfully!',
-            'matches': top_matches,
-            'extracted': {
-                'name': name or "Not specified",
-                'email': email or "Not specified",
-                'phone': phone or "Not specified",
-                'skills': skills,
-                'experience': experience or "Not specified"
-            }
-        })
-
-    except Exception as e:
-        return JsonResponse({'error': f'Internal server error: {str(e)}'}, status=500)
-
+    return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
 @csrf_exempt
 def test_cors(request):
     return JsonResponse({"status": "ok"})
-
 
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
