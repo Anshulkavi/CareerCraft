@@ -196,6 +196,7 @@ function ResumeUpload() {
   const [extractedInfo, setExtractedInfo] = useState(null);
   const [jobMatches, setJobMatches] = useState([]);
 
+  // Handle file input change
   const handleFileChange = () => {
     const file = resumeFileRef.current.files[0];
     setFileName(file ? file.name : "");
@@ -210,6 +211,41 @@ function ResumeUpload() {
     }
   };
 
+  // Polling function to check parsing status
+  const checkTaskStatus = async (taskId) => {
+    console.log("⏳ Checking task status for:", taskId);
+    try {
+      const response = await fetch(
+        `https://careercraft-1.onrender.com/api/task_status/${taskId}`
+      );
+      const data = await response.json();
+      console.log("📊 Task status response:", data);
+
+      if (data.status === "completed") {
+        setExtractedInfo(data.extracted);
+        setJobMatches(Array.isArray(data.matches) ? data.matches : []);
+        setUploadStatus("✅ Resume successfully processed.");
+        setLoading(false);
+        setStatusVisible(true);
+        return true; // done polling
+      } else if (data.status === "failed") {
+        setUploadStatus("❌ Parsing failed. Please try again.");
+        setLoading(false);
+        setStatusVisible(true);
+        return true; // done polling with failure
+      }
+      // still processing
+      return false;
+    } catch (error) {
+      console.error("❌ Error checking task status:", error);
+      setUploadStatus("❌ Error checking parsing status.");
+      setLoading(false);
+      setStatusVisible(true);
+      return true; // stop polling on error
+    }
+  };
+
+  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const file = resumeFileRef.current.files[0];
@@ -236,7 +272,6 @@ function ResumeUpload() {
     formData.append("resume", file);
 
     try {
-      console.log("📤 Sending file:", file.name);
       const response = await fetch(
         "https://careercraft-1.onrender.com/api/upload_resume/",
         {
@@ -250,35 +285,42 @@ function ResumeUpload() {
 
       try {
         data = JSON.parse(text);
-        console.log("✅ Parsed JSON response:", data);
       } catch {
         console.error("❌ HTML Error Response:\n", text);
-        throw new Error(
-          "❌ Server returned HTML instead of JSON. See console."
-        );
+        throw new Error("❌ Server returned HTML instead of JSON. See console.");
       }
 
-      if (!response.ok) {
-        console.error("❌ Response not OK:", data);
-        throw new Error(data.error || "Something went wrong.");
+      if (!response.ok) throw new Error(data.error || "Something went wrong.");
+
+      console.log("✅ Parsed JSON response:", data);
+
+      if (data.task_id) {
+        setUploadStatus("⏳ Resume received. Parsing in progress...");
+        // Polling interval every 3 seconds
+        const intervalId = setInterval(async () => {
+          const done = await checkTaskStatus(data.task_id);
+          if (done) {
+            clearInterval(intervalId);
+            // Reset form & preview after completion
+            resumeUploadFormRef.current.reset();
+            setFileName("");
+            setPreviewSrc(null);
+          }
+        }, 3000);
+      } else {
+        // fallback if no task_id (old behavior)
+        const { extracted, matches } = data;
+        setExtractedInfo(extracted);
+        setJobMatches(Array.isArray(matches) ? matches : []);
+        setUploadStatus("✅ Resume successfully processed.");
+        setLoading(false);
+        setStatusVisible(true);
       }
-
-      const { extracted, matches } = data;
-      console.log("🧠 Extracted Info:", extracted);
-      console.log("💼 Job Matches:", matches);
-
-      setExtractedInfo(extracted);
-      setJobMatches(Array.isArray(matches) ? matches : []);
-      setUploadStatus("✅ Resume successfully processed.");
     } catch (error) {
       console.error("❌ Upload error:", error);
-      console.log("📦 Server response JSON:", data);
       setUploadStatus(`❌ Upload error: ${error.message}`);
-    } finally {
       setLoading(false);
-      resumeUploadFormRef.current.reset();
-      setFileName("");
-      setPreviewSrc(null);
+      setStatusVisible(true);
     }
   };
 
@@ -342,6 +384,7 @@ function ResumeUpload() {
         <button
           type="submit"
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md transition"
+          disabled={loading}
         >
           {loading ? (
             <>
@@ -388,8 +431,7 @@ function ResumeUpload() {
                 📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}
               </p>
               <p>
-                💼 <strong>Experience:</strong>{" "}
-                {extractedInfo.experience || "N/A"}
+                💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}
               </p>
               <p>
                 🛠️ <strong>Skills:</strong>{" "}
