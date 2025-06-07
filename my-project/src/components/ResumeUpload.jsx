@@ -244,7 +244,6 @@ function ResumeUpload() {
         }
       );
 
-      //const data = await response.json();
       const text = await response.text();
       let data;
 
@@ -256,6 +255,7 @@ function ResumeUpload() {
           "❌ Server returned HTML instead of JSON. See console."
         );
       }
+
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
 
       const { extracted, matches } = data;
@@ -383,7 +383,10 @@ function ResumeUpload() {
                 {extractedInfo.experience || "N/A"}
               </p>
               <p>
-                🛠️ <strong>Skills:</strong> {extractedInfo.skills?.join(", ")}
+                🛠️ <strong>Skills:</strong>{" "}
+                {Array.isArray(extractedInfo.skills)
+                  ? extractedInfo.skills.join(", ")
+                  : "N/A"}
               </p>
             </div>
           )}
