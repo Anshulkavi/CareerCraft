@@ -122,6 +122,7 @@ import docx
 import io
 from PIL import Image
 import easyocr
+import numpy as np
 
 # Initialize EasyOCR reader once
 reader = easyocr.Reader(['en'], gpu=False)
@@ -138,32 +139,32 @@ def extract_text_from_docx(file):
     doc = docx.Document(file)
     return "\n".join(para.text for para in doc.paragraphs)
 
-def ocr_pdf_pages(file):
+def extract_text_from_pdf(file):
     text = ""
-    # Read PDF pages as images using PyPDF2 and PIL
-    # PyPDF2 alone can’t convert pages to images, so better approach is to
-    # extract images if present, else fallback to text extraction
-    # Since we removed pdfplumber, we'll rely on PyPDF2 text extraction only here
-    reader_pdf = PyPDF2.PdfReader(file)
-    for page in reader_pdf.pages:
-        page_text = page.extract_text()
-        if page_text and len(page_text.strip()) > 20:
-            text += page_text + "\n"
-        else:
-            # If no text or too short, skip OCR fallback for now (needs extra libs)
-            # You can add pdf2image + OCR if you want full OCR PDF support without Tesseract
-            pass
+    try:
+        reader_pdf = PyPDF2.PdfReader(file)
+        for page in reader_pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+    except Exception as e:
+        print("PDF parsing error:", e)
     return text
 
 def ocr_image(file):
-    # Read image bytes
-    img_bytes = file.read()
-    img = Image.open(io.BytesIO(img_bytes))
-    # EasyOCR expects numpy array
-    import numpy as np
-    img_np = np.array(img)
-    result = reader.readtext(img_np, detail=0)
-    return "\n".join(result)
+    try:
+        img_bytes = file.read()
+        img = Image.open(io.BytesIO(img_bytes))
+        img_np = np.array(img)
+        result = reader.readtext(img_np, detail=0)
+        return "\n".join(result)
+    except Exception as e:
+        print("OCR image error:", e)
+        return ""
+
+def ocr_pdf_with_easyocr(file):
+    # Not using pdf2image due to deploy constraints; fallback to text extract only
+    return extract_text_from_pdf(file)  # You can integrate OCR per page image in future
 
 def count_matching_skills(job, skills):
     fields = [
@@ -185,27 +186,37 @@ def upload_resume(request):
                 return JsonResponse({'error': 'File too large. Maximum size is 10MB.'}, status=400)
 
             text = ""
+            use_ocr = False
 
             if ext == 'pdf':
-                # Try normal text extraction first
-                text = ocr_pdf_pages(f)
+                text = extract_text_from_pdf(f)
                 if len(text.strip()) < 30:
-                    # fallback: OCR PDF to images requires more setup, skipping for now
-                    return JsonResponse({'error': 'PDF OCR fallback not implemented yet, please upload text-based PDF.'}, status=400)
+                    use_ocr = True
 
             elif ext == 'docx':
                 text = extract_text_from_docx(f)
 
             elif ext in ['png', 'jpg', 'jpeg']:
-                text = ocr_image(f)
+                use_ocr = True
 
             else:
                 return JsonResponse({'error': 'Only PDF, DOCX, PNG, JPG, or JPEG files are allowed.'}, status=400)
 
+            # Try extracting info before OCR
+            skills = extract_skills(text)
+            if not skills and not use_ocr and ext in ['pdf', 'docx']:
+                use_ocr = True  # fallback to OCR only if no skills found
+
+            if use_ocr:
+                if ext in ['png', 'jpg', 'jpeg']:
+                    text = ocr_image(f)
+                else:
+                    text = ocr_pdf_with_easyocr(f)
+                skills = extract_skills(text)
+
             name = extract_name(text)
             email = extract_email(text)
             phone = extract_phone(text)
-            skills = extract_skills(text)
             experience = extract_experience(text)
 
             if not email or '@' not in email or '.' not in email:
@@ -215,7 +226,7 @@ def upload_resume(request):
 
             ResumeData.objects.create(
                 name=name or "Not specified",
-                email=email,
+                email=email or "Not specified",
                 phone=phone or "Not specified",
                 skills=skills,
                 experience=experience or "Not specified"
@@ -229,8 +240,7 @@ def upload_resume(request):
                 job["matching_skills"] = count_matching_skills(job, skills)
 
             unique_jobs = {(job['title'], job.get('company_name', 'Unknown')): job for job in all_jobs}
-            all_jobs = list(unique_jobs.values())
-            sorted_jobs = sorted(all_jobs, key=lambda x: -x.get("matching_skills", 0))
+            sorted_jobs = sorted(unique_jobs.values(), key=lambda x: -x.get("matching_skills", 0))
             top_matches = sorted_jobs[:5]
 
             return JsonResponse({
