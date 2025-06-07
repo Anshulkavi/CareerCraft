@@ -236,6 +236,7 @@ function ResumeUpload() {
     formData.append("resume", file);
 
     try {
+      console.log("📤 Sending file:", file.name);
       const response = await fetch(
         "https://careercraft-1.onrender.com/api/upload_resume/",
         {
@@ -249,14 +250,23 @@ function ResumeUpload() {
 
       try {
         data = JSON.parse(text);
+        console.log("✅ Parsed JSON response:", data);
       } catch {
         console.error("❌ HTML Error Response:\n", text);
-        throw new Error("❌ Server returned HTML instead of JSON. See console.");
+        throw new Error(
+          "❌ Server returned HTML instead of JSON. See console."
+        );
       }
 
-      if (!response.ok) throw new Error(data.error || "Something went wrong.");
+      if (!response.ok) {
+        console.error("❌ Response not OK:", data);
+        throw new Error(data.error || "Something went wrong.");
+      }
 
       const { extracted, matches } = data;
+      console.log("🧠 Extracted Info:", extracted);
+      console.log("💼 Job Matches:", matches);
+
       setExtractedInfo(extracted);
       setJobMatches(Array.isArray(matches) ? matches : []);
       setUploadStatus("✅ Resume successfully processed.");
@@ -288,7 +298,8 @@ function ResumeUpload() {
         Upload Your Resume
       </h2>
       <p className="text-gray-600 dark:text-gray-200 mb-6">
-        Let our AI analyze your resume and match you with the perfect job opportunities.
+        Let our AI analyze your resume and match you with the perfect job
+        opportunities.
       </p>
 
       <form
@@ -377,7 +388,8 @@ function ResumeUpload() {
                 📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}
               </p>
               <p>
-                💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}
+                💼 <strong>Experience:</strong>{" "}
+                {extractedInfo.experience || "N/A"}
               </p>
               <p>
                 🛠️ <strong>Skills:</strong>{" "}
@@ -431,4 +443,3 @@ function ResumeUpload() {
 }
 
 export default ResumeUpload;
-
