@@ -262,6 +262,7 @@ function ResumeUpload() {
       setUploadStatus("✅ Resume successfully processed.");
     } catch (error) {
       console.error("❌ Upload error:", error);
+      console.log("📦 Server response JSON:", data);
       setUploadStatus(`❌ Upload error: ${error.message}`);
     } finally {
       setLoading(false);
