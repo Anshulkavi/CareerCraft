@@ -251,14 +251,17 @@ function ResumeUpload() {
         data = JSON.parse(text);
       } catch {
         console.error("❌ HTML Error Response:\n", text);
-        throw new Error("❌ Server returned HTML instead of JSON. See console.");
+        throw new Error("❌ Server returned HTML instead of JSON.");
       }
 
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
 
       const { extracted, matches } = data;
+      console.log("Extracted Info:", extracted);
+      console.log("Job Matches 👉", matches);
+
       setExtractedInfo(extracted);
-      setJobMatches(Array.isArray(matches) ? matches : []);
+      setJobMatches(matches || []);
       setUploadStatus("✅ Resume successfully processed.");
     } catch (error) {
       console.error("❌ Upload error:", error);
@@ -287,7 +290,8 @@ function ResumeUpload() {
         Upload Your Resume
       </h2>
       <p className="text-gray-600 dark:text-gray-200 mb-6">
-        Let our AI analyze your resume and match you with the perfect job opportunities.
+        Let our AI analyze your resume and match you with the perfect job
+        opportunities.
       </p>
 
       <form
@@ -367,16 +371,17 @@ function ResumeUpload() {
           {extractedInfo && (
             <div className="mt-3 text-sm space-y-1">
               <p>
-                ✅ <strong>Name:</strong> {extractedInfo.name || "N/A"}
+                ✅ <strong>Name:</strong> {extractedInfo.name}
               </p>
               <p>
-                📧 <strong>Email:</strong> {extractedInfo.email || "N/A"}
+                📧 <strong>Email:</strong> {extractedInfo.email}
               </p>
               <p>
                 📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}
               </p>
               <p>
-                💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}
+                💼 <strong>Experience:</strong>{" "}
+                {extractedInfo.experience || "N/A"}
               </p>
               <p>
                 🛠️ <strong>Skills:</strong>{" "}
@@ -389,42 +394,48 @@ function ResumeUpload() {
         </div>
       )}
 
-      {Array.isArray(jobMatches) && jobMatches.length > 0 && (
-        <div className="mt-10">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Matching Job Opportunities
-          </h3>
-          <div className="grid gap-4 max-w-3xl mx-auto overflow-x-auto">
-            {jobMatches.map((job, index) => (
-              <div
-                key={index}
-                className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-4 mb-4 text-left"
-              >
-                <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400 mb-1">
-                  {job.title}
-                </h4>
-                <p className="text-sm">
-                  <strong>Company:</strong> {job.company_name || "Unknown"}
-                </p>
-                <p className="text-sm">
-                  <strong>Location:</strong> {job.location || "N/A"}
-                </p>
-                <p className="text-sm">
-                  <strong>Salary:</strong> {job.salary || "N/A"}
-                </p>
-                <a
-                  href={job.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium text-sm mt-2 inline-block"
+      {Array.isArray(jobMatches) ? (
+        jobMatches.length > 0 ? (
+          <div className="mt-10">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              Matching Job Opportunities
+            </h3>
+            <div className="grid gap-4 max-w-3xl mx-auto overflow-x-auto">
+              {jobMatches.map((job, index) => (
+                <div
+                  key={index}
+                  className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-4 mb-4 text-left"
                 >
-                  Apply Now
-                </a>
-              </div>
-            ))}
+                  <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400 mb-1">
+                    {job.title}
+                  </h4>
+                  <p className="text-sm">
+                    <strong>Company:</strong> {job.company_name || "Unknown"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Location:</strong> {job.location || "N/A"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Salary:</strong> {job.salary || "N/A"}
+                  </p>
+                  <a
+                    href={job.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium text-sm mt-2 inline-block"
+                  >
+                    Apply Now
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="mt-8 text-gray-600 dark:text-gray-300">
+            ❌ No matching job opportunities found.
+          </div>
+        )
+      ) : null}
     </section>
   );
 }
