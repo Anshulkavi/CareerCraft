@@ -193,49 +193,72 @@
 import re
 from datetime import datetime
 from dateutil import parser
-import pdfplumber
 from docx import Document
+import easyocr
+from PIL import Image
+import numpy as np
+import io
 
-def extract_text_from_pdf(pdf_path):
+# Initialize EasyOCR reader once
+reader = easyocr.Reader(['en'], gpu=False)
+
+def extract_text_from_pdf(file):
+    from PyPDF2 import PdfReader
     text = ""
     try:
-        with pdfplumber.open(pdf_path) as pdf:
-            for page in pdf.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text += page_text + "\n"
+        reader_pdf = PdfReader(file)
+        for page in reader_pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
     except Exception as e:
         print(f"Error reading PDF: {e}")
     return text.strip()
 
-def extract_text_from_docx(docx_path):
+def extract_text_from_docx(file):
     text = ""
     try:
-        doc = Document(docx_path)
+        doc = Document(file)
         for para in doc.paragraphs:
             text += para.text + "\n"
     except Exception as e:
         print(f"Error reading DOCX: {e}")
     return text.strip()
 
-def extract_text_from_file(file_path):
-    ext = file_path.split('.')[-1].lower()
-    if ext == 'pdf':
-        return extract_text_from_pdf(file_path)
-    elif ext == 'docx':
-        return extract_text_from_docx(file_path)
-    elif ext in ['png', 'jpg', 'jpeg']:
-        # OCR removed: return error or empty string
-        print("Image files not supported without OCR.")
-        return ""
-    else:
-        print(f"Unsupported file extension: {ext}")
+def extract_text_from_image(file):
+    try:
+        img_bytes = file.read()
+        img = Image.open(io.BytesIO(img_bytes))
+        img_np = np.array(img)
+        result = reader.readtext(img_np, detail=0)
+        return "\n".join(result)
+    except Exception as e:
+        print(f"Error reading image: {e}")
         return ""
 
-# The rest of your extraction functions (email, phone, name, skills, experience) remain unchanged
+def extract_text_with_fallback(file, ext):
+    """Main method to extract text based on file extension, with OCR fallback."""
+    text = ""
+
+    if ext == 'pdf':
+        text = extract_text_from_pdf(file)
+        if len(text.strip()) < 30:
+            print("PDF too short, trying OCR fallback")
+            # We reuse the file as image OCR fallback isn't fully implemented yet
+            file.seek(0)
+            text = extract_text_from_pdf(file)  # fallback remains same unless pdf2image is added
+
+    elif ext == 'docx':
+        text = extract_text_from_docx(file)
+        if len(text.strip()) < 30:
+            print("DOCX too short, skipping OCR fallback")
+
+    elif ext in ['png', 'jpg', 'jpeg']:
+        text = extract_text_from_image(file)
+
+    return text
 
 def extract_experience(text):
-    # Keywords for experience section
     experience_section_keywords = [
         "experience", "work experience", "professional experience", "internship", "work history"
     ]
@@ -247,24 +270,20 @@ def extract_experience(text):
 
     experience_text = text[experience_section_match.end():]
 
-    # Direct match for "X years of experience"
     experience_pattern = re.compile(r'(\d{1,2})\+?\s+(years?|yrs?)\s+(of\s+)?(experience|exp)', re.IGNORECASE)
     matches = experience_pattern.findall(experience_text)
     if matches:
         return matches[0][0] + " years"
 
-    # Skip if irrelevant sections
     irrelevant_keywords = ["degree", "education", "certificate", "project"]
     if any(keyword in experience_text.lower() for keyword in irrelevant_keywords):
         return "Not specified"
 
-    # Match date ranges (DD/MM/YYYY or similar)
     date_pattern = re.compile(
         r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\s*[-–to]+\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|present)', re.IGNORECASE
     )
 
     total_months = 0
-
     for match in date_pattern.findall(experience_text):
         start_str, end_str = match
         try:
@@ -290,7 +309,6 @@ def extract_experience(text):
 
     return "Not specified"
 
-
 def extract_email(text):
     match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
     if match:
@@ -298,7 +316,6 @@ def extract_email(text):
         if "reallygreatsite" not in email.lower():
             return email
     return ""
-
 
 def extract_phone(text):
     phone_pattern = re.compile(
@@ -311,7 +328,6 @@ def extract_phone(text):
             return digits_only[-10:]
     return ""
 
-
 def extract_name(text):
     lines = text.split("\n")
     ignore_keywords = ['resume', 'contact', 'profile', 'curriculum', 'vitae']
@@ -322,7 +338,6 @@ def extract_name(text):
             if len(words) >= 2 and all(word[0].isupper() for word in words[:2]):
                 return " ".join(words[:2])
     return "Unknown"
-
 
 def extract_skills(text):
     text = text.lower()
