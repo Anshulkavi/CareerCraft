@@ -10,25 +10,22 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     poppler-utils \
+    build-essential \
     && apt-get clean
 
-
-# Set working directory
 WORKDIR /app
 
-# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy entire app
 COPY . .
 
-# Set Tesseract environment
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 ENV PATH="/usr/bin:$PATH"
 
-# Expose port
+# Optional: collect static files during build (if you use static files)
+RUN python manage.py collectstatic --noinput
+
 EXPOSE 8000
 
-# Run both Gunicorn and Celery using honcho
-CMD ["honcho", "start"]
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]

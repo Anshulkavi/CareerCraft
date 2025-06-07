@@ -14,6 +14,4 @@ services:
         value: "8000"
       - key: MONGODB_URI
         value: mongodb+srv://{John}{JohnDoe256}@resumejobf.hm4jqor.mongodb.net/resumejobf?retryWrites=true&w=majority
-      - key: REDIS_URL
-        value: rediss://default:AXkdAAIjcDFlNWYxNjQ1YWQ3M2M0ZGJmYTMwZThhMDkyZmIwYjg2YnAxMA@free-hyena-31005.upstash.io:6379
 
