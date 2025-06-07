@@ -134,7 +134,7 @@ function ResumeUpload() {
             type="file"
             id="resumeFile"
             name="resume"
-            accept=".pdf,.docx"
+            accept=".pdf,.docx,.jpg,.jpeg,.png"
             required
             ref={resumeFileRef}
             className="absolute left-[-9999px]"
@@ -150,7 +150,7 @@ function ResumeUpload() {
         </div>
 
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          Supported formats: PDF, DOCX (Max 10MB)
+          Supported formats: PDF, DOCX, JPG, PNG (Max 10MB)
         </p>
 
         <button
