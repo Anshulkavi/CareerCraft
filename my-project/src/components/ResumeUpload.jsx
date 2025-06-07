@@ -196,7 +196,6 @@ function ResumeUpload() {
   const [extractedInfo, setExtractedInfo] = useState(null);
   const [jobMatches, setJobMatches] = useState([]);
 
-  // Handle file input change for image preview
   const handleFileChange = () => {
     const file = resumeFileRef.current.files[0];
     setFileName(file ? file.name : "");
@@ -211,43 +210,6 @@ function ResumeUpload() {
     }
   };
 
-  // Poll backend to check parsing task status
-  const checkTaskStatus = async (taskId) => {
-    console.log("⏳ Checking task status for:", taskId);
-    try {
-      const response = await fetch(
-        `https://careercraft-1.onrender.com/api/task_status/${taskId}`
-      );
-      const data = await response.json();
-      console.log("📊 Task status response:", data);
-
-      if (data.state === "SUCCESS") {
-        const { extracted, matches, message } = data.result || {};
-        setExtractedInfo(extracted || null);
-        setJobMatches(Array.isArray(matches) ? matches : []);
-        setUploadStatus(message || "✅ Resume successfully processed.");
-        setLoading(false);
-        setStatusVisible(true);
-        return true; // stop polling
-      } else if (data.state === "FAILURE") {
-        setUploadStatus("❌ Parsing failed. Please try again.");
-        setLoading(false);
-        setStatusVisible(true);
-        return true; // stop polling on failure
-      } else {
-        // Still processing, continue polling
-        return false;
-      }
-    } catch (error) {
-      console.error("❌ Error checking task status:", error);
-      setUploadStatus("❌ Error checking parsing status.");
-      setLoading(false);
-      setStatusVisible(true);
-      return true; // stop polling on error
-    }
-  };
-
-  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const file = resumeFileRef.current.files[0];
@@ -296,28 +258,16 @@ function ResumeUpload() {
 
       console.log("✅ Parsed JSON response:", data);
 
-      if (data.task_id) {
-        setUploadStatus("⏳ Resume received. Parsing in progress...");
-        // Poll every 3 seconds for task status
-        const intervalId = setInterval(async () => {
-          const done = await checkTaskStatus(data.task_id);
-          if (done) {
-            clearInterval(intervalId);
-            // Reset form & preview on completion
-            resumeUploadFormRef.current.reset();
-            setFileName("");
-            setPreviewSrc(null);
-          }
-        }, 3000);
-      } else {
-        // Fallback: immediate response without task_id
-        const { extracted, matches, message } = data;
-        setExtractedInfo(extracted || null);
-        setJobMatches(Array.isArray(matches) ? matches : []);
-        setUploadStatus(message || "✅ Resume successfully processed.");
-        setLoading(false);
-        setStatusVisible(true);
-      }
+      const { extracted, matches, message } = data;
+      setExtractedInfo(extracted || null);
+      setJobMatches(Array.isArray(matches) ? matches : []);
+      setUploadStatus(message || "✅ Resume successfully processed.");
+      setLoading(false);
+      setStatusVisible(true);
+
+      resumeUploadFormRef.current.reset();
+      setFileName("");
+      setPreviewSrc(null);
     } catch (error) {
       console.error("❌ Upload error:", error);
       setUploadStatus(`❌ Upload error: ${error.message}`);
@@ -326,7 +276,6 @@ function ResumeUpload() {
     }
   };
 
-  // Attach file change event listener
   useEffect(() => {
     const fileInput = resumeFileRef.current;
     if (!fileInput) return;
@@ -339,12 +288,9 @@ function ResumeUpload() {
 
   return (
     <section className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-center py-12 px-5">
-      <h2 className="text-2xl font-bold !text-indigo-600 mb-4">
-        Upload Your Resume
-      </h2>
+      <h2 className="text-2xl font-bold !text-indigo-600 mb-4">Upload Your Resume</h2>
       <p className="text-gray-600 dark:text-gray-200 mb-6">
-        Let our AI analyze your resume and match you with the perfect job
-        opportunities.
+        Let our AI analyze your resume and match you with the perfect job opportunities.
       </p>
 
       <form
@@ -424,24 +370,11 @@ function ResumeUpload() {
           <p>{uploadStatus}</p>
           {extractedInfo && (
             <div className="mt-3 text-sm space-y-1">
-              <p>
-                ✅ <strong>Name:</strong> {extractedInfo.name || "N/A"}
-              </p>
-              <p>
-                📧 <strong>Email:</strong> {extractedInfo.email || "N/A"}
-              </p>
-              <p>
-                📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}
-              </p>
-              <p>
-                💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}
-              </p>
-              <p>
-                🛠️ <strong>Skills:</strong>{" "}
-                {Array.isArray(extractedInfo.skills)
-                  ? extractedInfo.skills.join(", ")
-                  : "N/A"}
-              </p>
+              <p>✅ <strong>Name:</strong> {extractedInfo.name || "N/A"}</p>
+              <p>📧 <strong>Email:</strong> {extractedInfo.email || "N/A"}</p>
+              <p>📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}</p>
+              <p>💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}</p>
+              <p>🛠️ <strong>Skills:</strong> {Array.isArray(extractedInfo.skills) ? extractedInfo.skills.join(", ") : "N/A"}</p>
             </div>
           )}
         </div>
@@ -461,15 +394,9 @@ function ResumeUpload() {
                 <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400 mb-1">
                   {job.title}
                 </h4>
-                <p className="text-sm">
-                  <strong>Company:</strong> {job.company_name || "Unknown"}
-                </p>
-                <p className="text-sm">
-                  <strong>Location:</strong> {job.location || "N/A"}
-                </p>
-                <p className="text-sm">
-                  <strong>Salary:</strong> {job.salary || "N/A"}
-                </p>
+                <p className="text-sm"><strong>Company:</strong> {job.company_name || "Unknown"}</p>
+                <p className="text-sm"><strong>Location:</strong> {job.location || "N/A"}</p>
+                <p className="text-sm"><strong>Salary:</strong> {job.salary || "N/A"}</p>
                 <a
                   href={job.url}
                   target="_blank"
