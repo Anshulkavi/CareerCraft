@@ -112,24 +112,11 @@
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import ResumeData
-from django.core.validators import EmailValidator
-from django.core.exceptions import ValidationError
 from celery.result import AsyncResult
 import os
 import tempfile
 
-from .tasks import parse_resume_and_match_jobs  # Celery task you will create
-
-
-# Email validator (unchanged)
-def validate_email(email):
-    validator = EmailValidator()
-    try:
-        validator(email)
-        return True
-    except ValidationError:
-        return False
+from .tasks import parse_resume_and_match_jobs  # Your celery task
 
 
 @csrf_exempt
@@ -163,22 +150,32 @@ def upload_resume(request):
 
 def task_status(request, task_id):
     task = AsyncResult(task_id)
-    if task.state == 'PENDING':
-        response = {'status': 'pending', 'extracted': None, 'matches': None}
-    elif task.state == 'FAILURE':
-        response = {'status': 'failure', 'error': str(task.info), 'extracted': None, 'matches': None}
-    elif task.state == 'SUCCESS':
-        # task.result should be a dict with keys 'extracted' and 'matches'
+    state = task.state
+
+    if state == 'PENDING':
+        response = {'state': 'PENDING', 'result': None}
+    elif state == 'FAILURE':
+        response = {
+            'state': 'FAILURE',
+            'result': None,
+            'error': str(task.info) if task.info else 'Unknown error'
+        }
+    elif state == 'SUCCESS':
+        # Expecting result dict with 'extracted' and 'matches'
         result = task.result if isinstance(task.result, dict) else {}
         response = {
-            'status': 'success',
-            'extracted': result.get('extracted', None),
-            'matches': result.get('matches', [])
+            'state': 'SUCCESS',
+            'result': {
+                'extracted': result.get('extracted'),
+                'matches': result.get('matches', [])
+            }
         }
     else:
-        response = {'status': task.state.lower(), 'extracted': None, 'matches': None}
+        # Other states: STARTED, RETRY, etc.
+        response = {'state': state, 'result': None}
 
     return JsonResponse(response)
+
 
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
