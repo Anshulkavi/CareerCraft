@@ -164,16 +164,21 @@ def upload_resume(request):
 def task_status(request, task_id):
     task = AsyncResult(task_id)
     if task.state == 'PENDING':
-        response = {'state': task.state, 'status': 'Pending...'}
+        response = {'status': 'pending', 'extracted': None, 'matches': None}
     elif task.state == 'FAILURE':
-        response = {'state': task.state, 'status': str(task.info)}
+        response = {'status': 'failure', 'error': str(task.info), 'extracted': None, 'matches': None}
     elif task.state == 'SUCCESS':
-        response = {'state': task.state, 'result': task.result}
+        # task.result should be a dict with keys 'extracted' and 'matches'
+        result = task.result if isinstance(task.result, dict) else {}
+        response = {
+            'status': 'success',
+            'extracted': result.get('extracted', None),
+            'matches': result.get('matches', [])
+        }
     else:
-        response = {'state': task.state, 'status': str(task.info)}
+        response = {'status': task.state.lower(), 'extracted': None, 'matches': None}
 
     return JsonResponse(response)
-
 
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
