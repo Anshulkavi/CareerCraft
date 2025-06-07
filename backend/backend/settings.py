@@ -210,10 +210,9 @@ import ssl
 import os
 
 # Upstash Redis URL (rediss)
-UPSTASH_REDIS_URL = os.getenv('rediss://default:AXkdAAIjcDFlNWYxNjQ1YWQ3M2M0ZGJmYTMwZThhMDkyZmIwYjg2YnAxMA@free-hyena-31005.upstash.io:6379', 'rediss://localhost:6379')
 
-CELERY_BROKER_URL = UPSTASH_REDIS_URL
-CELERY_RESULT_BACKEND = UPSTASH_REDIS_URL
+CELERY_BROKER_URL = 'rediss://default:AXkdAAIjcDFlNWYxNjQ1YWQ3M2M0ZGJmYTMwZThhMDkyZmIwYjg2YnAxMA@free-hyena-31005.upstash.io:6379'
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 # Use SSL settings for rediss (Upstash requires this)
 CELERY_REDIS_BACKEND_USE_SSL = {
