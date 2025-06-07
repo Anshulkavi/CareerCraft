@@ -1,10 +1,10 @@
 # Use official Python base image
 FROM python:3.11-slim
 
-# Install Tesseract + dependencies
+WORKDIR /app
+
+# Install system dependencies needed for your app (adjust if needed)
 RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-eng \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -13,19 +13,14 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && apt-get clean
 
-WORKDIR /app
-
-COPY requirements.txt .
+COPY requirements.txt . 
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
-ENV PATH="/usr/bin:$PATH"
-
-# Optional: collect static files during build (if you use static files)
+# Optional: collect static files if you use them
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000","--timeout", "120"]
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120"]
