@@ -196,7 +196,7 @@ function ResumeUpload() {
   const [extractedInfo, setExtractedInfo] = useState(null);
   const [jobMatches, setJobMatches] = useState([]);
 
-  // Handle file input change
+  // Handle file input change for image preview
   const handleFileChange = () => {
     const file = resumeFileRef.current.files[0];
     setFileName(file ? file.name : "");
@@ -211,7 +211,7 @@ function ResumeUpload() {
     }
   };
 
-  // Polling function to check parsing status
+  // Poll backend to check parsing task status
   const checkTaskStatus = async (taskId) => {
     console.log("⏳ Checking task status for:", taskId);
     try {
@@ -221,21 +221,23 @@ function ResumeUpload() {
       const data = await response.json();
       console.log("📊 Task status response:", data);
 
-      if (data.status === "completed") {
-        setExtractedInfo(data.extracted);
-        setJobMatches(Array.isArray(data.matches) ? data.matches : []);
-        setUploadStatus("✅ Resume successfully processed.");
+      if (data.state === "SUCCESS") {
+        const { extracted, matches, message } = data.result || {};
+        setExtractedInfo(extracted || null);
+        setJobMatches(Array.isArray(matches) ? matches : []);
+        setUploadStatus(message || "✅ Resume successfully processed.");
         setLoading(false);
         setStatusVisible(true);
-        return true; // done polling
-      } else if (data.status === "failed") {
+        return true; // stop polling
+      } else if (data.state === "FAILURE") {
         setUploadStatus("❌ Parsing failed. Please try again.");
         setLoading(false);
         setStatusVisible(true);
-        return true; // done polling with failure
+        return true; // stop polling on failure
+      } else {
+        // Still processing, continue polling
+        return false;
       }
-      // still processing
-      return false;
     } catch (error) {
       console.error("❌ Error checking task status:", error);
       setUploadStatus("❌ Error checking parsing status.");
@@ -245,7 +247,7 @@ function ResumeUpload() {
     }
   };
 
-  // Submit handler
+  // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const file = resumeFileRef.current.files[0];
@@ -296,23 +298,23 @@ function ResumeUpload() {
 
       if (data.task_id) {
         setUploadStatus("⏳ Resume received. Parsing in progress...");
-        // Polling interval every 3 seconds
+        // Poll every 3 seconds for task status
         const intervalId = setInterval(async () => {
           const done = await checkTaskStatus(data.task_id);
           if (done) {
             clearInterval(intervalId);
-            // Reset form & preview after completion
+            // Reset form & preview on completion
             resumeUploadFormRef.current.reset();
             setFileName("");
             setPreviewSrc(null);
           }
         }, 3000);
       } else {
-        // fallback if no task_id (old behavior)
-        const { extracted, matches } = data;
-        setExtractedInfo(extracted);
+        // Fallback: immediate response without task_id
+        const { extracted, matches, message } = data;
+        setExtractedInfo(extracted || null);
         setJobMatches(Array.isArray(matches) ? matches : []);
-        setUploadStatus("✅ Resume successfully processed.");
+        setUploadStatus(message || "✅ Resume successfully processed.");
         setLoading(false);
         setStatusVisible(true);
       }
@@ -324,14 +326,15 @@ function ResumeUpload() {
     }
   };
 
+  // Attach file change event listener
   useEffect(() => {
-    const resumeFile = resumeFileRef.current;
-    if (resumeFile) {
-      resumeFile.addEventListener("change", handleFileChange);
-      return () => {
-        resumeFile.removeEventListener("change", handleFileChange);
-      };
-    }
+    const fileInput = resumeFileRef.current;
+    if (!fileInput) return;
+
+    fileInput.addEventListener("change", handleFileChange);
+    return () => {
+      fileInput.removeEventListener("change", handleFileChange);
+    };
   }, []);
 
   return (
