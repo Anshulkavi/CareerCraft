@@ -140,9 +140,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ALLOWED_HOSTS = ['careercraft-backend-qvn1.onrender.com,careercraft-5kzo.onrender.com', 'localhost', '127.0.0.1']
-CORS_ALLOWED_ORIGINS = [
-    "https://careercraft-frontend-5hab.onrender.com",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://careercraft-frontend-5hab.onrender.com",
+# ]
+CORS_ALLOW_ALL_ORIGINS=True
 
 # CORS_ALLOW_ALL_ORIGINS = True 
 
