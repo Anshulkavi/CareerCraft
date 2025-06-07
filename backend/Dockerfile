@@ -13,19 +13,22 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && apt-get clean
 
+# Set working directory
 WORKDIR /app
 
+# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy entire app
 COPY . .
 
+# Set Tesseract environment
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata
 ENV PATH="/usr/bin:$PATH"
 
-# Optional: collect static files during build (if you use static files)
-RUN python manage.py collectstatic --noinput
-
+# Expose port
 EXPOSE 8000
 
-CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120"]
+# Run both Gunicorn and Celery using honcho
+CMD ["honcho", "start"]
