@@ -193,8 +193,27 @@
 import re
 from datetime import datetime
 from dateutil import parser
+import docx
+from django.core.validators import EmailValidator
+from django.core.exceptions import ValidationError
 
+# ---------------- EMAIL VALIDATOR ----------------
+def validate_email(email):
+    if not email:
+        return False
+    validator = EmailValidator()
+    try:
+        validator(email)
+        return True
+    except ValidationError:
+        return False
 
+# ---------------- TEXT EXTRACTOR ----------------
+def extract_text_from_docx(file):
+    doc = docx.Document(file)
+    return "\n".join(para.text for para in doc.paragraphs)
+
+# ---------------- EMAIL EXTRACTION ----------------
 def extract_email(text):
     match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
     if match and "reallygreatsite" not in match.group(0).lower():
@@ -202,6 +221,7 @@ def extract_email(text):
     return ""
 
 
+# ---------------- PHONE EXTRACTION ----------------
 def extract_phone(text):
     phone_pattern = re.compile(r'(?:\+?\d{1,3}[-\s]?)?(?:0)?(?:\d{2,5}[-\s]?){2,4}\d{2,5}')
     matches = phone_pattern.findall(text)
@@ -211,7 +231,7 @@ def extract_phone(text):
             return digits[-10:]
     return ""
 
-
+# ---------------- NAME EXTRACTION ----------------
 def extract_name(text):
     lines = text.split("\n")
     for line in lines:
@@ -222,6 +242,7 @@ def extract_name(text):
                 return " ".join(words[:2])
     return "Unknown"
 
+# ---------------- EXPERIENCE EXTRACTION ----------------
 def extract_experience(text):
     keywords = r'(?i)(experience|work experience|internship|professional experience)'
     match = re.search(keywords, text)
@@ -270,10 +291,32 @@ def extract_experience(text):
 #     found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
 #     return sorted(found)
 
+# def extract_skills(text):
+#     text = text.lower()
+#     section_pattern = re.compile(
+#         r'(languages|skills|technical skills|tools & platforms|tools|technologies)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
+#         re.IGNORECASE | re.DOTALL
+#     )
+#     matches = section_pattern.findall(text)
+#     section_text = " ".join([m[1] for m in matches]) if matches else text
+#     section_text = re.sub(r'[^\w+#.,/ ]', '', section_text)
+#     section_text = re.sub(r'\s+', ' ', section_text)
+
+#     skills_list = [
+#         'python', 'java', 'html', 'css', 'javascript', 'sql', 'mongodb',
+#         'react', 'react.js', 'node.js', 'django', 'flask', 'c++', 'c#',
+#         'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript', 'r',
+#         'bootstrap', 'tailwind css', 'git', 'github', 'c', 'shell scripting'
+#     ]
+
+#     found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
+#     return sorted(set(found))
+
+# ---------------- SKILLS EXTRACTION ----------------
 def extract_skills(text):
     text = text.lower()
     section_pattern = re.compile(
-        r'(languages|skills|technical skills|tools & platforms|tools|technologies)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
+        r'(languages|skills|technical skills|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
         re.IGNORECASE | re.DOTALL
     )
     matches = section_pattern.findall(text)
@@ -285,8 +328,7 @@ def extract_skills(text):
         'python', 'java', 'html', 'css', 'javascript', 'sql', 'mongodb',
         'react', 'react.js', 'node.js', 'django', 'flask', 'c++', 'c#',
         'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript', 'r',
-        'bootstrap', 'tailwind css', 'git', 'github', 'c', 'shell scripting'
+        'bootstrap', 'tailwind css', 'git', 'github', 'c'
     ]
-
     found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
-    return sorted(set(found))
+    return sorted(found)

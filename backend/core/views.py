@@ -208,57 +208,81 @@
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-import json
-from .utils import extract_skills, extract_name, extract_email, extract_phone, extract_experience
+from .models import ResumeData
+from .utils import (
+    extract_name,
+    extract_email,
+    extract_phone,
+    extract_skills,
+    extract_experience,
+    validate_email,
+    extract_text_from_docx
+)
 from .job_finder import scrape_internshala_jobs, smart_match_jobs
+import PyPDF2
 
-@method_decorator(csrf_exempt, name='dispatch')
-def upload_resume(request):
-    if request.method == 'POST':
-        resume_text = request.POST.get('resume_text', '')
-        if not resume_text:
-            return JsonResponse({'error': 'No resume text provided.'}, status=400)
-
-        # Extract candidate info
-        name = extract_name(resume_text) or "Not specified"
-        email = extract_email(resume_text) or "Not specified"
-        phone = extract_phone(resume_text) or "Not specified"
-        experience = extract_experience(resume_text) or "Not specified"
-
-        # Extract skills and boost priority skills
-        skills = extract_skills(resume_text)
-        priority_skills = ['python', 'django', 'react']
-        # Sort so that priority skills come first (if present)
-        skills_sorted = sorted(skills, key=lambda s: s.lower() not in priority_skills)
-
-        # Use top 5 skills max
-        top_skills = skills_sorted[:5]
-
-        # Scrape all jobs matching top skills
-        all_jobs = scrape_internshala_jobs(top_skills)
-
-        # Smart match jobs using improved logic
-        matched_jobs = smart_match_jobs(all_jobs, top_skills)
-
-        return JsonResponse({
-            'message': 'Resume processed successfully!',
-            'matches': matched_jobs,
-            'extracted': {
-                'name': name,
-                'email': email,
-                'phone': phone,
-                'skills': top_skills,
-                'experience': experience
-            }
-        })
-
-    return JsonResponse({'error': 'Invalid HTTP method.'}, status=405)
 
 @csrf_exempt
-def test_cors(request):
-    return JsonResponse({"status": "ok"})
+def upload_resume(request):
+    if request.method == 'POST' and request.FILES.get('resume'):
+        try:
+            f = request.FILES['resume']
+            ext = f.name.split('.')[-1].lower()
 
+            if f.size > 10 * 1024 * 1024:
+                return JsonResponse({'error': 'File too large. Maximum size is 10MB.'}, status=400)
 
-def health_check(request):
-    return JsonResponse({'status': 'ok'}, status=200)
+            text = ""
+            if ext == 'pdf':
+                reader = PyPDF2.PdfReader(f)
+                for p in reader.pages:
+                    text += p.extract_text() or ""
+            elif ext == 'docx':
+                text = extract_text_from_docx(f)
+            else:
+                return JsonResponse({'error': 'Only PDF or DOCX files are allowed.'}, status=400)
+
+            name = extract_name(text)
+            email = extract_email(text)
+            phone = extract_phone(text)
+            skills = extract_skills(text)
+            experience = extract_experience(text)
+
+            # Use robust email validator
+            if not validate_email(email):
+                email = None
+
+            if not skills:
+                return JsonResponse({'error': 'No skills found in the resume.'}, status=400)
+
+            ResumeData.objects.create(
+                name=name or "Not specified",
+                email=email,
+                phone=phone or "Not specified",
+                skills=skills,
+                experience=experience or "Not specified"
+            )
+
+            priority_skills = ['python', 'django', 'react']
+            skills_sorted = sorted(skills, key=lambda s: s.lower() not in priority_skills)
+            top_skills = skills_sorted[:5]
+
+            all_jobs = scrape_internshala_jobs(top_skills)
+            matched_jobs = smart_match_jobs(all_jobs, top_skills)
+
+            return JsonResponse({
+                'message': 'Resume processed successfully!',
+                'matches': matched_jobs,
+                'extracted': {
+                    'name': name or "Not specified",
+                    'email': email or "Not specified",
+                    'phone': phone or "Not specified",
+                    'skills': top_skills,
+                    'experience': experience or "Not specified"
+                }
+            })
+
+        except Exception as e:
+            return JsonResponse({'error': f'Internal server error: {str(e)}'}, status=500)
+
+    return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
