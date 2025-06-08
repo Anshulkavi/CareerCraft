@@ -8,9 +8,7 @@ requests==2.32.3
 django-cors-headers>=4.0.0,<5.0.0
 djangorestframework==3.14.0
 pymupdf==1.21.0
-easyocr
 gunicorn==20.1.0
 pymongo==4.5.0
 PyPDF2
-numpy
-Pillow
+
