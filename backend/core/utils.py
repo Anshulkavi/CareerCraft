@@ -193,25 +193,7 @@
 import re
 from datetime import datetime
 from dateutil import parser
-import docx
-from django.core.validators import EmailValidator
-from django.core.exceptions import ValidationError
 
-# ---------------- EMAIL VALIDATOR ----------------
-def validate_email(email):
-    if not email:
-        return False
-    validator = EmailValidator()
-    try:
-        validator(email)
-        return True
-    except ValidationError:
-        return False
-
-# ---------------- TEXT EXTRACTOR ----------------
-def extract_text_from_docx(file):
-    doc = docx.Document(file)
-    return "\n".join(para.text for para in doc.paragraphs)
 
 # ---------------- EMAIL EXTRACTION ----------------
 def extract_email(text):
