@@ -1,0 +1,14 @@
+# Create or edit .gitignore in the root of the repo
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore VSCode
+.vscode/
+
+# Ignore personal PDFs or test files
+*.pdf
+
+node_modules
+dist
