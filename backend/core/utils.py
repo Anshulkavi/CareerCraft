@@ -222,28 +222,6 @@ def extract_name(text):
                 return " ".join(words[:2])
     return "Unknown"
 
-
-def extract_skills(text):
-    text = text.lower()
-    section_pattern = re.compile(
-        r'(languages|skills|technical skills|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
-        re.IGNORECASE | re.DOTALL
-    )
-    matches = section_pattern.findall(text)
-    section_text = " ".join([m[1] for m in matches]) if matches else text
-    section_text = re.sub(r'[^\w+#.,/ ]', '', section_text)
-    section_text = re.sub(r'\s+', ' ', section_text)
-
-    skills_list = [
-        'python', 'java', 'html', 'css', 'javascript', 'sql', 'mongodb',
-        'react', 'react.js', 'node.js', 'django', 'flask', 'c++', 'c#',
-        'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript', 'r',
-        'bootstrap', 'tailwind css', 'git', 'github', 'c'
-    ]
-    found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
-    return sorted(found)
-
-
 def extract_experience(text):
     keywords = r'(?i)(experience|work experience|internship|professional experience)'
     match = re.search(keywords, text)
@@ -270,3 +248,45 @@ def extract_experience(text):
         y, m = divmod(total_months, 12)
         return f"{y} years {m} months" if y else f"{m} months"
     return "Not specified"
+
+# 2nd code use when 3rd doesnt work
+# def extract_skills(text):
+#     text = text.lower()
+#     section_pattern = re.compile(
+#         r'(languages|skills|technical skills|tools & platforms)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
+#         re.IGNORECASE | re.DOTALL
+#     )
+#     matches = section_pattern.findall(text)
+#     section_text = " ".join([m[1] for m in matches]) if matches else text
+#     section_text = re.sub(r'[^\w+#.,/ ]', '', section_text)
+#     section_text = re.sub(r'\s+', ' ', section_text)
+
+#     skills_list = [
+#         'python', 'java', 'html', 'css', 'javascript', 'sql', 'mongodb',
+#         'react', 'react.js', 'node.js', 'django', 'flask', 'c++', 'c#',
+#         'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript', 'r',
+#         'bootstrap', 'tailwind css', 'git', 'github', 'c'
+#     ]
+#     found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
+#     return sorted(found)
+
+def extract_skills(text):
+    text = text.lower()
+    section_pattern = re.compile(
+        r'(languages|skills|technical skills|tools & platforms|tools|technologies)\s*[:\-]?\s*(.*?)(?=\n[a-z]{3,}|$)',
+        re.IGNORECASE | re.DOTALL
+    )
+    matches = section_pattern.findall(text)
+    section_text = " ".join([m[1] for m in matches]) if matches else text
+    section_text = re.sub(r'[^\w+#.,/ ]', '', section_text)
+    section_text = re.sub(r'\s+', ' ', section_text)
+
+    skills_list = [
+        'python', 'java', 'html', 'css', 'javascript', 'sql', 'mongodb',
+        'react', 'react.js', 'node.js', 'django', 'flask', 'c++', 'c#',
+        'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript', 'r',
+        'bootstrap', 'tailwind css', 'git', 'github', 'c', 'shell scripting'
+    ]
+
+    found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
+    return sorted(set(found))
