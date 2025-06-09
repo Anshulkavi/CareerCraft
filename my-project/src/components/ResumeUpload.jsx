@@ -182,7 +182,255 @@
 // }
 // export default ResumeUpload;
 
+// import React, { useRef, useState, useEffect } from "react";
+
+// function ResumeUpload() {
+//   const resumeFileRef = useRef(null);
+//   const resumeUploadFormRef = useRef(null);
+
+//   const [uploadStatus, setUploadStatus] = useState("");
+//   const [fileName, setFileName] = useState("");
+//   const [statusVisible, setStatusVisible] = useState(false);
+//   const [previewSrc, setPreviewSrc] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [extractedInfo, setExtractedInfo] = useState(null);
+//   const [jobMatches, setJobMatches] = useState([]);
+
+//   const handleFileChange = () => {
+//     const file = resumeFileRef.current.files[0];
+//     setFileName(file ? file.name : "");
+
+//     if (file && file.type.startsWith("image/")) {
+//       const reader = new FileReader();
+//       reader.onload = () => setPreviewSrc(reader.result);
+//       reader.onerror = () => setPreviewSrc(null);
+//       reader.readAsDataURL(file);
+//     } else {
+//       setPreviewSrc(null);
+//     }
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const file = resumeFileRef.current.files[0];
+
+//     if (!file) {
+//       setUploadStatus("❗ Please select a file to upload.");
+//       setStatusVisible(true);
+//       return;
+//     }
+
+//     if (file.size > 10 * 1024 * 1024) {
+//       setUploadStatus("❗ File size exceeds 10MB limit.");
+//       setStatusVisible(true);
+//       return;
+//     }
+
+//     setLoading(true);
+//     setUploadStatus("⏳ Uploading and analyzing resume...");
+//     setStatusVisible(true);
+//     setExtractedInfo(null);
+//     setJobMatches([]);
+
+//     const formData = new FormData();
+//     formData.append("resume", file);
+
+//     try {
+//       const response = await fetch(
+//         // "https://careercraft-1.onrender.com/api/upload_resume/",
+//          "https://careercraft-5kzo.onrender.com/api/upload_resume/",
+//         {
+//           method: "POST",
+//           body: formData,
+//         }
+//       );
+
+//       const text = await response.text();
+//       let data;
+
+//       try {
+//         data = JSON.parse(text);
+//       } catch {
+//         console.error("❌ HTML Error Response:\n", text);
+//         throw new Error("❌ Server returned HTML instead of JSON. See console.");
+//       }
+
+//       if (!response.ok) throw new Error(data.error || "Something went wrong.");
+
+//       console.log("✅ Parsed JSON response:", data);
+
+//       const { extracted, matches, message } = data;
+//       setExtractedInfo(extracted || null);
+//       setJobMatches(Array.isArray(matches) ? matches : []);
+//       setUploadStatus(message || "✅ Resume successfully processed.");
+//       setStatusVisible(true);
+//       setLoading(false);
+
+//       resumeUploadFormRef.current.reset();
+//       setFileName("");
+//       setPreviewSrc(null);
+//     } catch (error) {
+//       console.error("❌ Upload error:", error);
+//       setUploadStatus(`❌ Upload error: ${error.message}`);
+//       setStatusVisible(true);
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const input = resumeFileRef.current;
+//     if (!input) return;
+//     input.addEventListener("change", handleFileChange);
+//     return () => input.removeEventListener("change", handleFileChange);
+//   }, []);
+
+//   return (
+//     <section className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-center py-12 px-5">
+//       <h2 className="text-3xl font-bold text-indigo-600 mb-4">
+//         Upload Your Resume
+//       </h2>
+//       <p className="text-gray-600 dark:text-gray-300 mb-6">
+//         Let our AI analyze your resume and match you with job opportunities.
+//       </p>
+
+//       <form
+//         ref={resumeUploadFormRef}
+//         onSubmit={handleSubmit}
+//         className="flex flex-col items-center space-y-4"
+//         encType="multipart/form-data"
+//       >
+//         <div className="relative inline-block">
+//           <input
+//             type="file"
+//             id="resumeFile"
+//             name="resume"
+//             accept=".pdf,.docx,.jpeg,.jpg,.png"
+//             required
+//             ref={resumeFileRef}
+//             className="absolute left-[-9999px]"
+//           />
+//           <label
+//             htmlFor="resumeFile"
+//             className="cursor-pointer inline-flex items-center bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition"
+//           >
+//             <i className="fas fa-cloud-upload-alt mr-2"></i>
+//             <span>{fileName || "Choose a file"}</span>
+//           </label>
+//           {previewSrc && (
+//             <img
+//               src={previewSrc}
+//               alt="Resume preview"
+//               className="mt-4 max-h-40 rounded border border-gray-300 mx-auto"
+//             />
+//           )}
+//         </div>
+
+//         <p className="text-sm text-gray-600 dark:text-gray-400">
+//           Supported formats: PDF, DOCX, JPEG, PNG (Max 10MB)
+//         </p>
+
+//         <button
+//           type="submit"
+//           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md transition"
+//           disabled={loading}
+//         >
+//           {loading ? (
+//             <>
+//               <svg
+//                 className="animate-spin h-5 w-5 mr-2 text-white inline-block"
+//                 xmlns="http://www.w3.org/2000/svg"
+//                 fill="none"
+//                 viewBox="0 0 24 24"
+//               >
+//                 <circle
+//                   className="opacity-25"
+//                   cx="12"
+//                   cy="12"
+//                   r="10"
+//                   stroke="currentColor"
+//                   strokeWidth="4"
+//                 ></circle>
+//                 <path
+//                   className="opacity-75"
+//                   fill="currentColor"
+//                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+//                 ></path>
+//               </svg>
+//               Processing...
+//             </>
+//           ) : (
+//             "Upload Resume"
+//           )}
+//         </button>
+//       </form>
+
+//       {statusVisible && (
+//         <div className="mt-6 bg-gray-100 dark:bg-gray-800 p-4 rounded-md text-left max-w-2xl mx-auto">
+//           <p className="font-medium text-gray-800 dark:text-gray-200">{uploadStatus}</p>
+
+//           {extractedInfo?.used_ocr && (
+//             <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
+//               📸 OCR was used to extract text from an image-based resume.
+//             </p>
+//           )}
+
+//           {extractedInfo && (
+//             <div className="mt-3 text-sm space-y-1 text-gray-800 dark:text-gray-200">
+//               <p>✅ <strong>Name:</strong> {extractedInfo.name || "N/A"}</p>
+//               <p>📧 <strong>Email:</strong> {extractedInfo.email || "N/A"}</p>
+//               <p>📞 <strong>Phone:</strong> {extractedInfo.phone || "N/A"}</p>
+//               <p>💼 <strong>Experience:</strong> {extractedInfo.experience || "N/A"}</p>
+//               <p>🛠️ <strong>Skills:</strong> {Array.isArray(extractedInfo.skills) ? extractedInfo.skills.join(", ") : "N/A"}</p>
+//             </div>
+//           )}
+//         </div>
+//       )}
+
+//       {Array.isArray(jobMatches) && jobMatches.length > 0 && (
+//         <div className="mt-10 px-2">
+//           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+//             Matching Job Opportunities
+//           </h3>
+//           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto">
+//             {jobMatches.map((job, index) => (
+//               <div
+//                 key={index}
+//                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md p-4 text-left"
+//               >
+//                 <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+//                   {job.title}
+//                 </h4>
+//                 <p className="text-sm"><strong>Company:</strong> {job.company_name || "Unknown"}</p>
+//                 <p className="text-sm"><strong>Location:</strong> {job.location || "N/A"}</p>
+//                 <p className="text-sm"><strong>Salary:</strong> {job.salary || "N/A"}</p>
+//                 <a
+//                   href={job.url}
+//                   target="_blank"
+//                   rel="noopener noreferrer"
+//                   className="text-blue-600 dark:text-blue-400 hover:underline font-medium text-sm mt-2 inline-block"
+//                 >
+//                   Apply Now
+//                 </a>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+
+//       {!loading && extractedInfo && jobMatches.length === 0 && (
+//         <p className="mt-6 text-gray-600 dark:text-gray-300">
+//           ❌ No matching jobs found based on your resume.
+//         </p>
+//       )}
+//     </section>
+//   );
+// }
+
+// export default ResumeUpload;
+
 import React, { useRef, useState, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 function ResumeUpload() {
   const resumeFileRef = useRef(null);
@@ -191,24 +439,10 @@ function ResumeUpload() {
   const [uploadStatus, setUploadStatus] = useState("");
   const [fileName, setFileName] = useState("");
   const [statusVisible, setStatusVisible] = useState(false);
-  const [previewSrc, setPreviewSrc] = useState(null);
   const [loading, setLoading] = useState(false);
   const [extractedInfo, setExtractedInfo] = useState(null);
   const [jobMatches, setJobMatches] = useState([]);
-
-  const handleFileChange = () => {
-    const file = resumeFileRef.current.files[0];
-    setFileName(file ? file.name : "");
-
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewSrc(reader.result);
-      reader.onerror = () => setPreviewSrc(null);
-      reader.readAsDataURL(file);
-    } else {
-      setPreviewSrc(null);
-    }
-  };
+  const [progressPercent, setProgressPercent] = useState(0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -231,14 +465,24 @@ function ResumeUpload() {
     setStatusVisible(true);
     setExtractedInfo(null);
     setJobMatches([]);
+    setProgressPercent(0);
+
+    const interval = setInterval(() => {
+      setProgressPercent((prev) => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 300);
 
     const formData = new FormData();
     formData.append("resume", file);
 
     try {
       const response = await fetch(
-        // "https://careercraft-1.onrender.com/api/upload_resume/",
-         "https://careercraft-5kzo.onrender.com/api/upload_resume/",
+        "https://careercraft-5kzo.onrender.com/api/upload_resume/",
         {
           method: "POST",
           body: formData,
@@ -257,39 +501,36 @@ function ResumeUpload() {
 
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
 
-      console.log("✅ Parsed JSON response:", data);
-
       const { extracted, matches, message } = data;
       setExtractedInfo(extracted || null);
       setJobMatches(Array.isArray(matches) ? matches : []);
       setUploadStatus(message || "✅ Resume successfully processed.");
       setStatusVisible(true);
-      setLoading(false);
+      setProgressPercent(100);
 
       resumeUploadFormRef.current.reset();
       setFileName("");
-      setPreviewSrc(null);
     } catch (error) {
       console.error("❌ Upload error:", error);
       setUploadStatus(`❌ Upload error: ${error.message}`);
       setStatusVisible(true);
+      setProgressPercent(100);
+    } finally {
       setLoading(false);
+      setTimeout(() => setProgressPercent(0), 2000);
     }
   };
 
   useEffect(() => {
-    const input = resumeFileRef.current;
-    if (!input) return;
-    input.addEventListener("change", handleFileChange);
-    return () => input.removeEventListener("change", handleFileChange);
+    AOS.init({ duration: 1000, once: true, offset: 100 });
   }, []);
 
   return (
     <section className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-center py-12 px-5">
-      <h2 className="text-3xl font-bold text-indigo-600 mb-4">
+      <h2 className="text-3xl font-bold text-indigo-600 mb-4" data-aos="fade-up">
         Upload Your Resume
       </h2>
-      <p className="text-gray-600 dark:text-gray-300 mb-6">
+      <p className="text-gray-600 dark:text-gray-300 mb-6" data-aos="fade-up" data-aos-delay="100">
         Let our AI analyze your resume and match you with job opportunities.
       </p>
 
@@ -298,15 +539,18 @@ function ResumeUpload() {
         onSubmit={handleSubmit}
         className="flex flex-col items-center space-y-4"
         encType="multipart/form-data"
+        data-aos="fade-up"
+        data-aos-delay="200"
       >
         <div className="relative inline-block">
           <input
             type="file"
             id="resumeFile"
             name="resume"
-            accept=".pdf,.docx,.jpeg,.jpg,.png"
+            accept=".pdf,.docx"
             required
             ref={resumeFileRef}
+            onChange={(e) => setFileName(e.target.files[0]?.name || "")}
             className="absolute left-[-9999px]"
           />
           <label
@@ -316,17 +560,10 @@ function ResumeUpload() {
             <i className="fas fa-cloud-upload-alt mr-2"></i>
             <span>{fileName || "Choose a file"}</span>
           </label>
-          {previewSrc && (
-            <img
-              src={previewSrc}
-              alt="Resume preview"
-              className="mt-4 max-h-40 rounded border border-gray-300 mx-auto"
-            />
-          )}
         </div>
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Supported formats: PDF, DOCX, JPEG, PNG (Max 10MB)
+          Supported formats: PDF, DOCX (Max 10MB)
         </p>
 
         <button
@@ -364,15 +601,28 @@ function ResumeUpload() {
         </button>
       </form>
 
-      {statusVisible && (
-        <div className="mt-6 bg-gray-100 dark:bg-gray-800 p-4 rounded-md text-left max-w-2xl mx-auto">
-          <p className="font-medium text-gray-800 dark:text-gray-200">{uploadStatus}</p>
+      {loading && (
+        <div className="max-w-2xl mx-auto mt-4" data-aos="fade-up" data-aos-delay="300">
+          <div className="flex justify-between mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span>Processing:</span>
+            <span>{progressPercent}%</span>
+          </div>
+          <div className="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-2">
+            <div
+              className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+      )}
 
-          {extractedInfo?.used_ocr && (
-            <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-              📸 OCR was used to extract text from an image-based resume.
-            </p>
-          )}
+      {statusVisible && (
+        <div
+          className="mt-6 bg-gray-100 dark:bg-gray-800 p-4 rounded-md text-left max-w-2xl mx-auto"
+          data-aos="fade-up"
+          data-aos-delay="400"
+        >
+          <p className="font-medium text-gray-800 dark:text-gray-200">{uploadStatus}</p>
 
           {extractedInfo && (
             <div className="mt-3 text-sm space-y-1 text-gray-800 dark:text-gray-200">
@@ -387,7 +637,7 @@ function ResumeUpload() {
       )}
 
       {Array.isArray(jobMatches) && jobMatches.length > 0 && (
-        <div className="mt-10 px-2">
+        <div className="mt-10 px-2" data-aos="fade-up" data-aos-delay="500">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
             Matching Job Opportunities
           </h3>
@@ -396,6 +646,8 @@ function ResumeUpload() {
               <div
                 key={index}
                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md p-4 text-left"
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
               >
                 <h4 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
                   {job.title}
@@ -418,7 +670,11 @@ function ResumeUpload() {
       )}
 
       {!loading && extractedInfo && jobMatches.length === 0 && (
-        <p className="mt-6 text-gray-600 dark:text-gray-300">
+        <p
+          className="mt-6 text-gray-600 dark:text-gray-300"
+          data-aos="fade-up"
+          data-aos-delay="600"
+        >
           ❌ No matching jobs found based on your resume.
         </p>
       )}

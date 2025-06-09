@@ -37,15 +37,22 @@ import Pricing from "./pages/Pricing";
 import ForOrganizations from "./pages/ForOrganizations";
 import Signup from "./pages/Signup";
 import ScrollToTop from "./components/ui/ScrollToTop";
-
+import useLenis from "./hooks/useLenis"; // Custom hook for smooth scrolling with Lenis
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 
 function App() {
+
+  useLenis(); // Custom hook for smooth scrolling with Lenis
+
   // Initialize AOS for animations
-  useEffect(() => {
-  AOS.init({ duration: 1000 });
+useEffect(() => {
+  AOS.init({
+    duration: 1000, // animation duration in ms
+    once: false,     
+    offset: 100,    // trigger point from the top (px)
+  });
 }, []);
 
   return (
