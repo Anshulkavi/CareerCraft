@@ -204,10 +204,10 @@ const ResumeBuilder = () => {
                   onClick={() => setSelectedRole(role)}
                   data-aos={index % 2 === 0 ? "fade-right" : "fade-left"}
                   data-aos-delay={index * 80}
-                  className={`w-full flex items-center gap-3 p-4 rounded-lg text-left transition-all duration-200 ${
+                  className={`w-full flex items-center justify-center gap-3 p-4 rounded-lg text-left transition-all duration-200 ${
                       selectedRole.name === role.name
                         ? `${role.color} text-white`
-                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
                     }`}
                   >
                   <div

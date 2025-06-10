@@ -809,7 +809,7 @@ export default function Navbar() {
             {/* Hamburger - Mobile */}
             <button
               onClick={toggleMenu}
-              className="md:hidden flex flex-col space-y-1 focus:outline-none"
+              className="md:hidden flex flex-col space-y-1 focus:outline-none mr-20"
               aria-label="Toggle menu"
             >
               <span
@@ -841,20 +841,9 @@ export default function Navbar() {
                     aria-expanded={activeDropdown === "resume"}
                   >
                     Resume
-                    <svg
-                      className={`h-5 w-5 text-gray-400 transform transition-transform ${
-                        activeDropdown === "resume" ? "rotate-180" : ""
-                      }`}
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                    <span className="ml-2">
+                      {activeDropdown === "coverletter" ? "▲" : "▼"}
+                    </span>
                   </button>
 
                   {activeDropdown === "resume" && (
