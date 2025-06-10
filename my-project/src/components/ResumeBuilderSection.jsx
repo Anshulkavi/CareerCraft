@@ -176,74 +176,71 @@ const ResumeBuilder = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 pt-16 sm:pt-0">
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        {/* Header */}
-        <div className="text-center mb-12" data-aos="zoom-in">
-          <h1 className="text-4xl font-bold mb-4">
-            The resume builder that's right for your job and experience
-          </h1>
-          <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
-            View All Resume Examples →
-          </a>
+  <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 pt-16 sm:pt-0">
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      {/* Header */}
+      <div className="text-center mb-12" data-aos="zoom-in">
+        <h1 className="text-4xl font-bold mb-4">
+          The resume builder that's right for your job and experience
+        </h1>
+        <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">
+          View All Resume Examples →
+        </a>
+      </div>
+
+      <div className="flex flex-col lg:flex-row items-start justify-center gap-8">
+        {/* Icons Panel */}
+        <div
+          className="w-full lg:w-1/4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:flex lg:flex-col gap-3"
+          role="list"
+        >
+          {roles.map((role, index) => {
+            const IconComponent = role.icon;
+            const isSelected = selectedRole.name === role.name;
+
+            return (
+              <button
+                key={role.name}
+                onClick={() => setSelectedRole(role)}
+                data-aos={index % 2 === 0 ? "fade-right" : "fade-left"}
+                data-aos-delay={index * 80}
+                className={`w-full flex items-center justify-center lg:justify-start gap-3 p-4 rounded-lg text-left transition-all duration-200 ${
+                  isSelected
+                    ? `${role.color} text-white`
+                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div
+                  className={`p-2 rounded flex items-center justify-center lg:justify-start ${
+                    isSelected ? "bg-white bg-opacity-20" : "bg-gray-100"
+                  }`}
+                >
+                  <IconComponent
+                    size={20}
+                    className="text-black dark:text-white"
+                  />
+                </div>
+                <span className="hidden lg:inline font-medium">{role.name}</span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="flex flex-col lg:flex-row items-start justify-center gap-8">
-          {/* Icons Panel */}
-          <div
-            className="w-full lg:w-1/4 grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:flex lg:flex-col gap-3"
-            role="list"
-          >
-            {roles.map((role, index) => {
-              const IconComponent = role.icon;
-              const isSelected = selectedRole.name === role.name;
-
-              return (
-                <button
-                  key={role.name}
-                  onClick={() => setSelectedRole(role)}
-                  data-aos={index % 2 === 0 ? "fade-right" : "fade-left"}
-                  data-aos-delay={index * 80}
-                  className={`w-full flex items-center justify-center gap-3 p-4 rounded-lg text-left transition-all duration-200 ${
-                      selectedRole.name === role.name
-                        ? `${role.color} text-white`
-                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                  <div
-                      className={`p-2 rounded ${
-                        selectedRole.name === role.name
-                          ? "bg-white bg-opacity-20"
-                          : "bg-gray-100 "
-                      }`}
-                    >
-                    <IconComponent
-                       size={20}
-                        className={
-                         "text-black dark:white"
-                      }
-                    />
-                  </div>
-                  <span className="hidden lg:inline font-medium">{role.name}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Resume Preview */}
-          <div className="w-full flex justify-center items-start">
-            <img
-              key={selectedRole.name} // important to re-render on role switch
-              src={selectedRole.image}
-              alt={`${selectedRole.name} Resume`}
-              className="rounded-lg shadow-sm border border-gray-300 object-contain max-h-[85vh] lg:w-auto w-[90vw] max-w-[600px]"
-              data-aos="zoom-in-up"
-            />
-          </div>
+        {/* Resume Preview */}
+        <div className="w-full flex justify-center items-start">
+          <img
+            key={selectedRole.name} // important to re-render on role switch
+            src={selectedRole.image}
+            alt={`${selectedRole.name} Resume`}
+            className="rounded-lg shadow-sm border border-gray-300 object-contain max-h-[85vh] lg:w-auto w-[90vw] max-w-[600px]"
+            data-aos="zoom-in-up"
+          />
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default ResumeBuilder;
