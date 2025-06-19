@@ -310,7 +310,7 @@ def extract_skills(text):
         'python', 'java', 'html', 'css', 'javascript', 'sql', 'mongodb',
         'react', 'react.js', 'node.js', 'django', 'flask', 'c++', 'c#',
         'ruby', 'php', 'swift', 'kotlin', 'go', 'typescript', 'r',
-        'bootstrap', 'tailwind css', 'git', 'github', 'c'
+        'bootstrap', 'tailwind css', 'git', 'github', 'c', 'Machine Learning', 'Data analyis'
     ]
     found = [skill for skill in skills_list if re.search(r'\b' + re.escape(skill) + r'\b', section_text)]
     return sorted(found)
