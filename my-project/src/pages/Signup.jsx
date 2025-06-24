@@ -108,6 +108,7 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import GoogleButton from "../components/ui/googleButton";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -133,7 +134,10 @@ function Signup() {
     }
 
     if (password.length < 6) {
-      setMessage({ text: "Password must be at least 6 characters!", color: "red" });
+      setMessage({
+        text: "Password must be at least 6 characters!",
+        color: "red",
+      });
       return;
     }
 
@@ -147,7 +151,7 @@ function Signup() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-[#06070d] to-[#0b06a0] font-[Poppins]">
-      <div className="mt-32 w-[350px] bg-white rounded-lg shadow-lg p-8 flex flex-col items-center text-center">
+      <div className="mt-22 w-[350px] bg-white rounded-lg shadow-lg p-8 flex flex-col items-center text-center">
         <h2 className="text-[#303f9f] text-2xl font-semibold mb-6">Sign Up</h2>
         <form id="signupForm" onSubmit={handleSubmit} className="w-full">
           {["username", "email", "password"].map((field, idx) => (
@@ -176,6 +180,10 @@ function Signup() {
             Sign Up
           </button>
 
+          <div className="mt-4 ml-2.5">
+            <GoogleButton />
+          </div>
+
           <div className="flex items-center my-4 text-gray-500 text-sm">
             <hr className="flex-grow border-t border-gray-300" />
             <span className="mx-2">or</span>
@@ -193,7 +201,11 @@ function Signup() {
         </form>
 
         {message && (
-          <p className={`mt-4 text-sm text-center ${message.color === "green" ? "text-green-600" : "text-red-600"}`}>
+          <p
+            className={`mt-4 text-sm text-center ${
+              message.color === "green" ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {message.text}
           </p>
         )}

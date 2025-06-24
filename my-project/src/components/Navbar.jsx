@@ -532,6 +532,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo"; // Adjust the import path as necessary
+import { useResume } from "../context/ResumeContext";
+// import ResumeDownloadButton from "./ui/ResumeDownloadButton";
 
 export default function Navbar() {
   const location = useLocation();
@@ -588,6 +590,8 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const { onDownload } = useResume();
+
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">
       <nav
@@ -607,10 +611,21 @@ export default function Navbar() {
         {/* Builder Mode Buttons */}
         {isResumeBuilder ? (
           <div className="flex space-x-3">
-            <button className="btn-outline">Settings</button>
-            <button className="btn-outline">Download</button>
-            <button className="btn-outline">Share</button>
-            <button className="btn-primary">Save</button>
+            <button className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition">
+              Settings
+            </button>
+            {/* <button
+  onClick={onDownload}
+  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+>
+  Download
+</button> */}
+            <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+              Share
+            </button>
+            <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+              Save
+            </button>
           </div>
         ) : (
           <>
@@ -1023,7 +1038,7 @@ export default function Navbar() {
                     <button className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
                       Create Resume
                     </button>
-                    </Link>
+                  </Link>
                 </div>
               </div>
             )}
