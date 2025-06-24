@@ -8,7 +8,16 @@ export default defineConfig({
    base: './',
   plugins: [
     tailwindcss(),
-    react()],
+    react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'public/_redirects',
+          dest: '.', // puts _redirects in dist/
+        },
+      ],
+    }),
+  ],
     resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
