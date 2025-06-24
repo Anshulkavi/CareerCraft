@@ -5,7 +5,7 @@ import path from 'path';
 import { viteStaticCopy } from 'vite-plugin-static-copy'; // ✅ this was missing
 
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [
     tailwindcss(),
     react(),
