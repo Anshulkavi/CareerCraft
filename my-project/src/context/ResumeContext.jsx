@@ -1,18 +1,13 @@
-// src/context/ResumeContext.jsx
-import React, { createContext, useContext } from "react";
+import { createContext, useRef } from "react";
 
-const ResumeContext = createContext();
+export const ResumeContext = createContext();
 
-export const useResume = () => useContext(ResumeContext);
+export const ResumeProvider = ({ children }) => {
+  const resumeRef = useRef();
 
-// ✅ Exporting ResumeProvider as named export
-export const ResumeProvider = ({ children, onDownload }) => {
   return (
-    <ResumeContext.Provider value={{ onDownload }}>
+    <ResumeContext.Provider value={{ resumeRef }}>
       {children}
     </ResumeContext.Provider>
   );
 };
-
-// ✅ Also export ResumeContext (optional, for direct use)
-export { ResumeContext };

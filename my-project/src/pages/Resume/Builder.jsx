@@ -395,7 +395,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import ResumePreview from "../../components/DynamicResume/ResumePreview";
-import { useReactToPrint } from "react-to-print";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { ResumeContext } from "../../context/ResumeContext";
 import {
   Send,
@@ -572,11 +573,44 @@ export default function ResumeBuilder() {
 
   const previewRef = useRef();
 
-  const handleDownload = useReactToPrint({
-    content: () => previewRef.current,
-    documentTitle: "Resume",
-    removeAfterPrint: true,
-  });
+const handleDownload = async () => {
+  const canvas = await html2canvas(previewRef.current, { scale: 2, useCORS: true });
+
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pdfWidth = pdf.internal.pageSize.getWidth();
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  pdf.save("My_Resume.pdf");
+};
+
+  // const previewRef = useRef();
+
+  // const handleDownload = async () => {
+  //   if (!previewRef.current) {
+  //     console.error("Resume preview not found");
+  //     return;
+  //   }
+
+  //   const canvas = await html2canvas(previewRef.current, {
+  //     scale: 2,
+  //     useCORS: true,
+  //     allowTaint: true,
+  //     logging: true,
+  //   });
+
+  //   const imgData = canvas.toDataURL("image/png");
+  //   const pdf = new jsPDF("p", "mm", "a4");
+
+  //   const imgProps = pdf.getImageProperties(imgData);
+  //   const pdfWidth = pdf.internal.pageSize.getWidth();
+  //   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+  //   pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  //   pdf.save("My_Resume.pdf");
+  // };
 
   return (
     <ResumeContext.Provider value={{ onDownload: handleDownload }}>
@@ -809,130 +843,154 @@ export default function ResumeBuilder() {
                       )}
 
                       {activeSection === "experience" && (
-  <Section
-    title="Work Experience"
-    actions
-    onAdd={() => {
-      const newExp = {
-        company: "",
-        jobTitle: "",
-        startDate: "",
-        endDate: "",
-        location: "",
-        responsibilities: "",
-      };
-      const prev = Array.isArray(resumeData.experience)
-        ? resumeData.experience
-        : [];
-      setResumeData({
-        ...resumeData,
-        experience: [...prev, newExp],
-      });
-    }}
-    onDelete={() => {
-      const updated = [...resumeData.experience];
-      updated.pop();
-      setResumeData({
-        ...resumeData,
-        experience: updated,
-      });
-    }}
-  >
-    {(resumeData.experience?.length ? resumeData.experience : dummyExperience).map(
-      (exp, index) => (
-        <React.Fragment key={index}>
-          {index > 0 && (
-            <hr className="border-t border-gray-300 my-4" />
-          )}
+                        <Section
+                          title="Work Experience"
+                          actions
+                          onAdd={() => {
+                            const newExp = {
+                              company: "",
+                              jobTitle: "",
+                              startDate: "",
+                              endDate: "",
+                              location: "",
+                              responsibilities: "",
+                            };
+                            const prev = Array.isArray(resumeData.experience)
+                              ? resumeData.experience
+                              : [];
+                            setResumeData({
+                              ...resumeData,
+                              experience: [...prev, newExp],
+                            });
+                          }}
+                          onDelete={() => {
+                            const updated = [...resumeData.experience];
+                            updated.pop();
+                            setResumeData({
+                              ...resumeData,
+                              experience: updated,
+                            });
+                          }}
+                        >
+                          {(resumeData.experience?.length
+                            ? resumeData.experience
+                            : dummyExperience
+                          ).map((exp, index) => (
+                            <React.Fragment key={index}>
+                              {index > 0 && (
+                                <hr className="border-t border-gray-300 my-4" />
+                              )}
 
-          <InputWithLabel
-            label="Company Name"
-            id={`company-${index}`}
-            placeholder="Google"
-            value={exp.company}
-            onChange={(e) => {
-              const updated = [...resumeData.experience];
-              updated[index].company = e.target.value;
-              setResumeData({ ...resumeData, experience: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="Company Name"
+                                id={`company-${index}`}
+                                placeholder="Google"
+                                value={exp.company}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.experience];
+                                  updated[index].company = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    experience: updated,
+                                  });
+                                }}
+                              />
 
-          <InputWithLabel
-            label="Job Title"
-            id={`jobTitle-${index}`}
-            placeholder="Software Engineer"
-            value={exp.jobTitle}
-            onChange={(e) => {
-              const updated = [...resumeData.experience];
-              updated[index].jobTitle = e.target.value;
-              setResumeData({ ...resumeData, experience: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="Job Title"
+                                id={`jobTitle-${index}`}
+                                placeholder="Software Engineer"
+                                value={exp.jobTitle}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.experience];
+                                  updated[index].jobTitle = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    experience: updated,
+                                  });
+                                }}
+                              />
 
-          <InputWithLabel
-            label="Start Date"
-            id={`startDate-${index}`}
-            placeholder="Jan 2020"
-            value={exp.startDate}
-            onChange={(e) => {
-              const updated = [...resumeData.experience];
-              updated[index].startDate = e.target.value;
-              setResumeData({ ...resumeData, experience: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="Start Date"
+                                id={`startDate-${index}`}
+                                placeholder="Jan 2020"
+                                value={exp.startDate}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.experience];
+                                  updated[index].startDate = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    experience: updated,
+                                  });
+                                }}
+                              />
 
-          <InputWithLabel
-            label="End Date"
-            id={`endDate-${index}`}
-            placeholder="Present"
-            value={exp.endDate}
-            onChange={(e) => {
-              const updated = [...resumeData.experience];
-              updated[index].endDate = e.target.value;
-              setResumeData({ ...resumeData, experience: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="End Date"
+                                id={`endDate-${index}`}
+                                placeholder="Present"
+                                value={exp.endDate}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.experience];
+                                  updated[index].endDate = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    experience: updated,
+                                  });
+                                }}
+                              />
 
-          <InputWithLabel
-            label="Location"
-            id={`location-${index}`}
-            placeholder="Bangalore, India"
-            value={exp.location}
-            onChange={(e) => {
-              const updated = [...resumeData.experience];
-              updated[index].location = e.target.value;
-              setResumeData({ ...resumeData, experience: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="Location"
+                                id={`location-${index}`}
+                                placeholder="Bangalore, India"
+                                value={exp.location}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.experience];
+                                  updated[index].location = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    experience: updated,
+                                  });
+                                }}
+                              />
 
-          <TextareaWithLabel
-            label="Responsibilities"
-            id={`responsibilities-${index}`}
-            placeholder="Press Enter after each point. Max 40 words for first section."
-            value={exp.responsibilities}
-            onChange={(e) => {
-              const updated = [...resumeData.experience];
-              updated[index].responsibilities = e.target.value;
-              setResumeData({ ...resumeData, experience: updated });
-            }}
-            rows={6}
-          />
+                              <TextareaWithLabel
+                                label="Responsibilities"
+                                id={`responsibilities-${index}`}
+                                placeholder="Press Enter after each point. Max 40 words for first section."
+                                value={exp.responsibilities}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.experience];
+                                  updated[index].responsibilities =
+                                    e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    experience: updated,
+                                  });
+                                }}
+                                rows={6}
+                              />
 
-          <p className="text-xs text-gray-500 mt-1">
-            {(() => {
-              const wordCount =
-                exp.responsibilities?.split(/\s+/).filter((w) => w).length || 0;
-              const limit = 40;
-              const remaining = Math.max(0, limit - wordCount);
-              return `${remaining}/${limit} words left (only first 40 highlighted)`;
-            })()}
-          </p>
-        </React.Fragment>
-      )
-    )}
-  </Section>
-)}
-
+                              <p className="text-xs text-gray-500 mt-1">
+                                {(() => {
+                                  const wordCount =
+                                    exp.responsibilities
+                                      ?.split(/\s+/)
+                                      .filter((w) => w).length || 0;
+                                  const limit = 40;
+                                  const remaining = Math.max(
+                                    0,
+                                    limit - wordCount
+                                  );
+                                  return `${remaining}/${limit} words left (only first 40 highlighted)`;
+                                })()}
+                              </p>
+                            </React.Fragment>
+                          ))}
+                        </Section>
+                      )}
 
                       {/* {activeSection === "education" && (
                       <Section title="Education" actions>
@@ -1003,123 +1061,121 @@ export default function ResumeBuilder() {
                      )} */}
 
                       {activeSection === "education" && (
-  <Section
-    title="Education"
-    actions
-    onAdd={() => {
-      const newEdu = {
-        degree: "",
-        institution: "",
-        startDate: "",
-        endDate: "",
-        location: "",
-      };
-      setResumeData({
-        ...resumeData,
-        education: [...resumeData.education, newEdu],
-      });
-    }}
-    onDelete={() => {
-      const updated = [...resumeData.education];
-      updated.pop();
-      setResumeData({
-        ...resumeData,
-        education: updated,
-      });
-    }}
-  >
-    {resumeData.education.map((edu, index) => (
-      <div
-        key={index}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2"
-      >
-        <InputWithLabel
-          label="Degree"
-          id={`degree-${index}`}
-          placeholder="B.Tech in Computer Science"
-          value={edu.degree}
-          onChange={(e) => {
-            const updated = [...resumeData.education];
-            updated[index].degree = e.target.value;
-            setResumeData({
-              ...resumeData,
-              education: updated,
-            });
-          }}
-        />
+                        <Section
+                          title="Education"
+                          actions
+                          onAdd={() => {
+                            const newEdu = {
+                              degree: "",
+                              institution: "",
+                              startDate: "",
+                              endDate: "",
+                              location: "",
+                            };
+                            setResumeData({
+                              ...resumeData,
+                              education: [...resumeData.education, newEdu],
+                            });
+                          }}
+                          onDelete={() => {
+                            const updated = [...resumeData.education];
+                            updated.pop();
+                            setResumeData({
+                              ...resumeData,
+                              education: updated,
+                            });
+                          }}
+                        >
+                          {resumeData.education.map((edu, index) => (
+                            <div
+                              key={index}
+                              className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2"
+                            >
+                              <InputWithLabel
+                                label="Degree"
+                                id={`degree-${index}`}
+                                placeholder="B.Tech in Computer Science"
+                                value={edu.degree}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.education];
+                                  updated[index].degree = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    education: updated,
+                                  });
+                                }}
+                              />
 
-        <InputWithLabel
-          label="School / University"
-          id={`institution-${index}`}
-          placeholder="San Francisco State University"
-          value={edu.institution}
-          onChange={(e) => {
-            const updated = [...resumeData.education];
-            updated[index].institution = e.target.value;
-            setResumeData({
-              ...resumeData,
-              education: updated,
-            });
-          }}
-        />
+                              <InputWithLabel
+                                label="School / University"
+                                id={`institution-${index}`}
+                                placeholder="San Francisco State University"
+                                value={edu.institution}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.education];
+                                  updated[index].institution = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    education: updated,
+                                  });
+                                }}
+                              />
 
-        <InputWithLabel
-          label="Start Date"
-          id={`startDate-${index}`}
-          placeholder="01/2019"
-          value={edu.startDate}
-          onChange={(e) => {
-            const updated = [...resumeData.education];
-            updated[index].startDate = e.target.value;
-            setResumeData({
-              ...resumeData,
-              education: updated,
-            });
-          }}
-        />
+                              <InputWithLabel
+                                label="Start Date"
+                                id={`startDate-${index}`}
+                                placeholder="01/2019"
+                                value={edu.startDate}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.education];
+                                  updated[index].startDate = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    education: updated,
+                                  });
+                                }}
+                              />
 
-        <InputWithLabel
-          label="End Date"
-          id={`endDate-${index}`}
-          placeholder="06/2023"
-          value={edu.endDate}
-          onChange={(e) => {
-            const updated = [...resumeData.education];
-            updated[index].endDate = e.target.value;
-            setResumeData({
-              ...resumeData,
-              education: updated,
-            });
-          }}
-        />
+                              <InputWithLabel
+                                label="End Date"
+                                id={`endDate-${index}`}
+                                placeholder="06/2023"
+                                value={edu.endDate}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.education];
+                                  updated[index].endDate = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    education: updated,
+                                  });
+                                }}
+                              />
 
-        <InputWithLabel
-          label="Location"
-          id={`location-${index}`}
-          placeholder="Bangalore, India"
-          value={edu.location}
-          onChange={(e) => {
-            const updated = [...resumeData.education];
-            updated[index].location = e.target.value;
-            setResumeData({
-              ...resumeData,
-              education: updated,
-            });
-          }}
-        />
+                              <InputWithLabel
+                                label="Location"
+                                id={`location-${index}`}
+                                placeholder="Bangalore, India"
+                                value={edu.location}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.education];
+                                  updated[index].location = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    education: updated,
+                                  });
+                                }}
+                              />
 
-        {/* Separator after each education block, except the last */}
-        {index < resumeData.education.length - 1 && (
-          <div className="md:col-span-2">
-            <hr className="border-t border-gray-300 my-6" />
-          </div>
-        )}
-      </div>
-    ))}
-  </Section>
-)}
-
-
+                              {/* Separator after each education block, except the last */}
+                              {index < resumeData.education.length - 1 && (
+                                <div className="md:col-span-2">
+                                  <hr className="border-t border-gray-300 my-6" />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </Section>
+                      )}
 
                       {activeSection === "skills" && (
                         <Section title="Skills">
@@ -1420,205 +1476,231 @@ export default function ResumeBuilder() {
                       )} */}
 
                       {activeSection === "references" && (
-  <Section
-    title="References"
-    actions
-    onAdd={() => {
-      const newRef = {
-        name: "",
-        position: "",
-        contact: "",
-        notes: "",
-      };
-      setResumeData((prev) => ({
-        ...prev,
-        references: [...(prev.references || []), newRef],
-      }));
-    }}
-    onDelete={() => {
-      setResumeData((prev) => ({
-        ...prev,
-        references: prev.references.slice(0, -1),
-      }));
-    }}
-  >
-    {(resumeData.references?.length ? resumeData.references : []).map(
-      (ref, index) => (
-        <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
-          <InputWithLabel
-            label="Name"
-            id={`refName-${index}`}
-            placeholder="Jane Doe"
-            value={ref.name}
-            onChange={(e) => {
-              const updated = [...resumeData.references];
-              updated[index].name = e.target.value;
-              setResumeData({ ...resumeData, references: updated });
-            }}
-          />
+                        <Section
+                          title="References"
+                          actions
+                          onAdd={() => {
+                            const newRef = {
+                              name: "",
+                              position: "",
+                              contact: "",
+                              notes: "",
+                            };
+                            setResumeData((prev) => ({
+                              ...prev,
+                              references: [...(prev.references || []), newRef],
+                            }));
+                          }}
+                          onDelete={() => {
+                            setResumeData((prev) => ({
+                              ...prev,
+                              references: prev.references.slice(0, -1),
+                            }));
+                          }}
+                        >
+                          {(resumeData.references?.length
+                            ? resumeData.references
+                            : []
+                          ).map((ref, index) => (
+                            <div
+                              key={index}
+                              className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2"
+                            >
+                              <InputWithLabel
+                                label="Name"
+                                id={`refName-${index}`}
+                                placeholder="Jane Doe"
+                                value={ref.name}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.references];
+                                  updated[index].name = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    references: updated,
+                                  });
+                                }}
+                              />
 
-          <InputWithLabel
-            label="Position"
-            id={`refPosition-${index}`}
-            placeholder="Manager at XYZ"
-            value={ref.position}
-            onChange={(e) => {
-              const updated = [...resumeData.references];
-              updated[index].position = e.target.value;
-              setResumeData({ ...resumeData, references: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="Position"
+                                id={`refPosition-${index}`}
+                                placeholder="Manager at XYZ"
+                                value={ref.position}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.references];
+                                  updated[index].position = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    references: updated,
+                                  });
+                                }}
+                              />
 
-          <InputWithLabel
-            label="Contact"
-            id={`refContact-${index}`}
-            placeholder="jane@example.com"
-            value={ref.contact}
-            onChange={(e) => {
-              const updated = [...resumeData.references];
-              updated[index].contact = e.target.value;
-              setResumeData({ ...resumeData, references: updated });
-            }}
-          />
+                              <InputWithLabel
+                                label="Contact"
+                                id={`refContact-${index}`}
+                                placeholder="jane@example.com"
+                                value={ref.contact}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.references];
+                                  updated[index].contact = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    references: updated,
+                                  });
+                                }}
+                              />
 
-          <TextareaWithLabel
-            label="Reference Notes"
-            id={`refNotes-${index}`}
-            placeholder="Optional notes..."
-            value={ref.notes}
-            onChange={(e) => {
-              const updated = [...resumeData.references];
-              updated[index].notes = e.target.value;
-              setResumeData({ ...resumeData, references: updated });
-            }}
-          />
+                              <TextareaWithLabel
+                                label="Reference Notes"
+                                id={`refNotes-${index}`}
+                                placeholder="Optional notes..."
+                                value={ref.notes}
+                                onChange={(e) => {
+                                  const updated = [...resumeData.references];
+                                  updated[index].notes = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    references: updated,
+                                  });
+                                }}
+                              />
 
-          {/* Separator */}
-          {index < resumeData.references.length - 1 && (
-            <div className="md:col-span-2">
-              <hr className="border-t border-gray-300 my-6" />
-            </div>
-          )}
-        </div>
-      )
-    )}
-  </Section>
-)}
-
+                              {/* Separator */}
+                              {index < resumeData.references.length - 1 && (
+                                <div className="md:col-span-2">
+                                  <hr className="border-t border-gray-300 my-6" />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </Section>
+                      )}
 
                       {activeSection === "customSection" && (
-  <Section
-    title="Custom Section"
-    actions
-    onAdd={() => {
-      const newEntry = {
-        title: "",
-        description: "",
-        year: "",
-      };
-      setCustomSectionConfig((prev) => ({
-        ...prev,
-        entries: [...prev.entries, newEntry],
-      }));
-    }}
-    onDelete={() => {
-      setCustomSectionConfig((prev) => ({
-        ...prev,
-        entries: prev.entries.slice(0, -1),
-      }));
-    }}
-  >
-    {/* Grid wrapper for layout consistency */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Section Title Input */}
-      <InputWithLabel
-        label="Section Title"
-        placeholder="e.g. Freelance Projects"
-        value={customSectionConfig.title}
-        onChange={(e) =>
-          setCustomSectionConfig((prev) => ({
-            ...prev,
-            title: e.target.value,
-          }))
-        }
-      />
+                        <Section
+                          title="Custom Section"
+                          actions
+                          onAdd={() => {
+                            const newEntry = {
+                              title: "",
+                              description: "",
+                              year: "",
+                            };
+                            setCustomSectionConfig((prev) => ({
+                              ...prev,
+                              entries: [...prev.entries, newEntry],
+                            }));
+                          }}
+                          onDelete={() => {
+                            setCustomSectionConfig((prev) => ({
+                              ...prev,
+                              entries: prev.entries.slice(0, -1),
+                            }));
+                          }}
+                        >
+                          {/* Grid wrapper for layout consistency */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Section Title Input */}
+                            <InputWithLabel
+                              label="Section Title"
+                              placeholder="e.g. Freelance Projects"
+                              value={customSectionConfig.title}
+                              onChange={(e) =>
+                                setCustomSectionConfig((prev) => ({
+                                  ...prev,
+                                  title: e.target.value,
+                                }))
+                              }
+                            />
 
-      {/* Replacement Section Dropdown */}
-      <div className="md:col-span-2">
-        <label className="text-sm font-medium text-gray-700">
-          Replace Section
-        </label>
-        <select
-          className="w-full mt-1 border-gray-300 rounded-md"
-          value={customSectionConfig.replaces}
-          onChange={(e) =>
-            setCustomSectionConfig((prev) => ({
-              ...prev,
-              replaces: e.target.value,
-            }))
-          }
-        >
-          <option value="">(Don't replace)</option>
-          <option value="awards">Awards</option>
-          <option value="achievements">Achievements</option>
-          <option value="certifications">Certifications</option>
-          <option value="interests">Interests</option>
-          <option value="references">References</option>
-          <option value="languages">Languages</option>
-        </select>
-      </div>
-    </div>
+                            {/* Replacement Section Dropdown */}
+                            <div className="md:col-span-2">
+                              <label className="text-sm font-medium text-gray-700">
+                                Replace Section
+                              </label>
+                              <select
+                                className="w-full mt-1 border-gray-300 rounded-md"
+                                value={customSectionConfig.replaces}
+                                onChange={(e) =>
+                                  setCustomSectionConfig((prev) => ({
+                                    ...prev,
+                                    replaces: e.target.value,
+                                  }))
+                                }
+                              >
+                                <option value="">(Don't replace)</option>
+                                <option value="awards">Awards</option>
+                                <option value="achievements">
+                                  Achievements
+                                </option>
+                                <option value="certifications">
+                                  Certifications
+                                </option>
+                                <option value="interests">Interests</option>
+                                <option value="references">References</option>
+                                <option value="languages">Languages</option>
+                              </select>
+                            </div>
+                          </div>
 
-    {/* Entry Fields */}
-    {(customSectionConfig.entries.length === 0
-      ? [{ title: "", description: "", year: "" }]
-      : customSectionConfig.entries
-    ).map((entry, idx) => (
-      <div key={idx} className="md:col-span-2 border-b pb-4 mt-6">
-        <InputWithLabel
-          label="Title"
-          value={entry.title}
-          onChange={(e) => {
-            const updated = [...customSectionConfig.entries];
-            updated[idx].title = e.target.value;
-            setCustomSectionConfig((prev) => ({
-              ...prev,
-              entries: updated,
-            }));
-          }}
-        />
-        <TextareaWithLabel
-          label="Description"
-          value={entry.description}
-          onChange={(e) => {
-            const updated = [...customSectionConfig.entries];
-            updated[idx].description = e.target.value;
-            setCustomSectionConfig((prev) => ({
-              ...prev,
-              entries: updated,
-            }));
-          }}
-        />
-        <InputWithLabel
-          label="Year"
-          placeholder="e.g. 2023"
-          value={entry.year}
-          onChange={(e) => {
-            const updated = [...customSectionConfig.entries];
-            updated[idx].year = e.target.value;
-            setCustomSectionConfig((prev) => ({
-              ...prev,
-              entries: updated,
-            }));
-          }}
-        />
-      </div>
-    ))}
-  </Section>
-)}
-
+                          {/* Entry Fields */}
+                          {(customSectionConfig.entries.length === 0
+                            ? [{ title: "", description: "", year: "" }]
+                            : customSectionConfig.entries
+                          ).map((entry, idx) => (
+                            <div
+                              key={idx}
+                              className="md:col-span-2 border-b pb-4 mt-6"
+                            >
+                              <InputWithLabel
+                                label="Title"
+                                value={entry.title}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...customSectionConfig.entries,
+                                  ];
+                                  updated[idx].title = e.target.value;
+                                  setCustomSectionConfig((prev) => ({
+                                    ...prev,
+                                    entries: updated,
+                                  }));
+                                }}
+                              />
+                              <TextareaWithLabel
+                                label="Description"
+                                value={entry.description}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...customSectionConfig.entries,
+                                  ];
+                                  updated[idx].description = e.target.value;
+                                  setCustomSectionConfig((prev) => ({
+                                    ...prev,
+                                    entries: updated,
+                                  }));
+                                }}
+                              />
+                              <InputWithLabel
+                                label="Year"
+                                placeholder="e.g. 2023"
+                                value={entry.year}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...customSectionConfig.entries,
+                                  ];
+                                  updated[idx].year = e.target.value;
+                                  setCustomSectionConfig((prev) => ({
+                                    ...prev,
+                                    entries: updated,
+                                  }));
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </Section>
+                      )}
                     </div>
-
 
                     <div className="md:col-span-1">
                       <div className="bg-white rounded-lg shadow-sm h-full">
@@ -1684,6 +1766,7 @@ export default function ResumeBuilder() {
                         Download Resume
                       </button>
                     </div>
+
                     <ResumePreview
                       ref={previewRef}
                       resumeData={resumeData}

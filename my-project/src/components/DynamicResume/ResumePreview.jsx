@@ -50,7 +50,15 @@ const ResumePreview = forwardRef(
     };
 
     return (
-      <div ref={ref} className="bg-white text-black shadow-md p-6">
+      // <div ref={ref} className="bg-white text-black shadow-md p-6">
+      //   {getTemplateComponent()}
+      // </div>
+        <div
+        // crucial for html2canvas + jsPDF
+        ref={ref}
+        className="bg-white text-black shadow-md p-6"
+        style={{ minHeight: "100%", width: "100%", overflow: "visible" }}
+      >
         {getTemplateComponent()}
       </div>
     );

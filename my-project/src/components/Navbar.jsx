@@ -532,7 +532,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo"; // Adjust the import path as necessary
-import { useResume } from "../context/ResumeContext";
+// import { useResume } from "../context/ResumeContext";
 // import ResumeDownloadButton from "./ui/ResumeDownloadButton";
 
 export default function Navbar() {
@@ -590,7 +590,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { onDownload } = useResume();
+  // const { onDownload } = useResume();
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">

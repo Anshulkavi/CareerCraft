@@ -187,13 +187,23 @@ const renderCustomSection = () => {
 
         {/* Profile Photo */}
         <div className="ml-8">
-          <img
-            src={personal?.photoUrl || "/placeholder.svg?height=120&width=120"}
+          {/* <img
+            src={personal?.photoUrl || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAABV7bNHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC5UlEQVR4nO3cMQrCMBRE0WvA/8eyNsHxGm3ELK1hRW9Qtftz6LJ+7vBxfHQAAAAAAAAAAALDz05z3BDnuE++cfd5zWJPf7QhTNJpL1qYtNjrVe+0HKlG0sGbZLSzNq2a5l9+Ve/v0B2MbsyLMuwxlGSbpd7Pv8+rUOZbJZ3H9srs0Hy9lE+wzyXMZpmmaZpmmaZpmmaZpmmaZpmmaZpmmaZpnnCHJfxyh6uq3/z8AAAAASUVORK5CYII="}
             alt={`${personal?.firstName || "John"} ${
               personal?.lastName || "Doe"
             }`}
             className="w-28 h-28 rounded-full object-cover border-4 border-gray-100"
-          />
+          /> */}
+          <img
+  src={
+    personal?.photoUrl?.startsWith("data:image")
+      ? personal.photoUrl
+      : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNlMmU0ZWYiLz48dGV4dCB4PSI2MCIgeT0iNjAiIGR5PSIuMzVlbSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBmaWxsPSIjNjY2Ij5QaG90bzwvdGV4dD48L3N2Zz4="
+  }
+  alt={`${personal?.firstName || "John"} ${personal?.lastName || "Doe"}`}
+  className="w-28 h-28 rounded-full object-cover border-4 border-gray-100"
+/>
+
         </div>
       </div>
 
