@@ -559,34 +559,35 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
   const achievementsToShow =
     userAchievements.length > 0 ? userAchievements : dummyAchievements;
 
-  const skills = [
-    "Data Analysis",
-    "Paid Acquisition",
-    "Retargeting",
-    "ROAS Optimization",
-    "Cross-Functional Collaboration",
-    "Google Analytics",
-    "Looker",
-    "Appsflyer",
-    "Meta Advertising",
-    "Google Ads",
-    "TikTok Ads",
-    "Snapchat Ads",
-    "SQL",
-  ];
+const parsedSkills = [
+  ...(resumeData.skills?.technical?.split(",").map(s => s.trim()) || []),
+  ...(resumeData.skills?.soft?.split(",").map(s => s.trim()) || []),
+];
 
-  const certifications = [
-    {
-      title: "Advanced Google Analytics",
-      description:
-        "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
-    },
-    {
-      title: "Effective Creative Testing",
-      description:
-        "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
-    },
-  ];
+const skills = parsedSkills.length > 0
+  ? parsedSkills
+  : [
+      "Data Analysis", "Paid Acquisition", "Retargeting", "ROAS Optimization",
+      "Cross-Functional Collaboration", "Google Analytics", "Looker", "Appsflyer",
+      "Meta Advertising", "Google Ads", "TikTok Ads", "Snapchat Ads", "SQL"
+    ];
+
+
+const certifications = (
+  resumeData.certifications?.length > 0 &&
+  resumeData.certifications.some(cert => cert.title || cert.description)
+)
+  ? resumeData.certifications
+  : [
+      {
+        title: "Advanced Google Analytics",
+        description: "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
+      },
+      {
+        title: "Effective Creative Testing",
+        description: "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
+      },
+    ];
 
   const renderCustomSection = () => {
     const { title, entries } = customSectionConfig || {};
