@@ -394,9 +394,11 @@
 
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 import ResumePreview from "../../components/DynamicResume/ResumePreview";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
+import { PDFViewer } from "@react-pdf/renderer";
 import { ResumeContext } from "../../context/ResumeContext";
 import {
   Send,
@@ -411,6 +413,7 @@ import {
   CheckCircle,
   FileText,
   Puzzle,
+  BadgeCheck,
 } from "lucide-react";
 
 export default function ResumeBuilder() {
@@ -425,6 +428,7 @@ export default function ResumeBuilder() {
   const [activeTab, setActiveTab] = useState("editor");
   const [pendingSection, setPendingSection] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
+  const [hasChanges, setHasChanges] = useState(false);
 
   // Handle pending section changes when tab switches
   useEffect(() => {
@@ -474,6 +478,7 @@ export default function ResumeBuilder() {
     { id: "experience", name: "Experience", icon: Briefcase },
     { id: "education", name: "Education", icon: GraduationCap },
     { id: "skills", name: "Skills", icon: CheckCircle },
+    { id: "certification", name: "Certifications", icon: BadgeCheck },
     { id: "awards", name: "Awards", icon: Award },
     { id: "languages", name: "Languages", icon: Languages },
     { id: "interests", name: "Interests", icon: Heart },
@@ -573,18 +578,29 @@ export default function ResumeBuilder() {
 
   const previewRef = useRef();
 
-const handleDownload = async () => {
-  const canvas = await html2canvas(previewRef.current, { scale: 2, useCORS: true });
+  const isReplaced = (key) => {
+    return customSectionConfig?.replaces === key;
+  };
 
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF("p", "mm", "a4");
+  const handleDownload = async (
+    resumeData,
+    customSectionConfig,
+    isReplaced
+  ) => {
+    if (!hasChanges) {
+      alert("Please edit something before downloading.");
+      return;
+    }
+    const blob = await pdf(
+      <PDFResumeTemplate
+        resumeData={resumeData}
+        customSectionConfig={customSectionConfig}
+        isReplaced={isReplaced}
+      />
+    ).toBlob();
 
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  pdf.save("My_Resume.pdf");
-};
+    saveAs(blob, "My_Resume.pdf");
+  };
 
   // const previewRef = useRef();
 
@@ -700,45 +716,48 @@ const handleDownload = async () => {
                             label="First Name"
                             placeholder="John"
                             value={resumeData.personal.firstName}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   firstName: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                           <InputWithLabel
                             id="lastName"
                             label="Last Name"
                             placeholder="Doe"
                             value={resumeData.personal.lastName}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   lastName: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                           <InputWithLabel
                             id="jobTitle"
                             label="Job Title"
                             placeholder="Software Engineer"
                             value={resumeData.personal.jobTitle}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   jobTitle: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                           <InputWithLabel
                             id="email"
@@ -746,45 +765,48 @@ const handleDownload = async () => {
                             type="email"
                             placeholder="viratKohli@gmail.com"
                             value={resumeData.personal.email}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   email: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                           <InputWithLabel
                             id="phone"
                             label="Phone"
                             placeholder="(123) 456-7890"
                             value={resumeData.personal.phone}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   phone: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                           <InputWithLabel
                             id="location"
                             label="Location"
                             placeholder="San Francisco, CA"
                             value={resumeData.personal.location}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   location: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
 
                           <PhotoUploadWithLabel
@@ -829,15 +851,16 @@ const handleDownload = async () => {
                             label="Professional Summary"
                             placeholder="Briefly introduce yourself"
                             value={resumeData.personal.summary}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 personal: {
                                   ...resumeData.personal,
                                   summary: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                         </Section>
                       )}
@@ -893,6 +916,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     experience: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -908,6 +932,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     experience: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -923,6 +948,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     experience: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -938,6 +964,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     experience: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -953,6 +980,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     experience: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -969,6 +997,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     experience: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                                 rows={6}
                               />
@@ -1103,6 +1132,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     education: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -1118,6 +1148,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     education: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -1133,6 +1164,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     education: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -1148,6 +1180,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     education: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -1163,6 +1196,7 @@ const handleDownload = async () => {
                                     ...resumeData,
                                     education: updated,
                                   });
+                                  setHasChanges(true);
                                 }}
                               />
 
@@ -1177,29 +1211,30 @@ const handleDownload = async () => {
                         </Section>
                       )}
 
-                      {activeSection === "skills" && (
+                      {/* {activeSection === "skills" && (
                         <Section title="Skills">
                           <InputWithLabel
                             label="Technical Skills"
                             id="technicalSkills"
                             placeholder="JavaScript, React, Node.js"
                             value={resumeData.skills.technical}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setResumeData({
                                 ...resumeData,
                                 skills: {
                                   ...resumeData.skills,
                                   technical: e.target.value,
                                 },
-                              })
-                            }
+                              });
+                              setHasChanges(true);
+                            }}
                           />
                           <InputWithLabel
                             label="Soft Skills"
                             id="softSkills"
                             placeholder="Leadership, Communication"
                             value={resumeData.skills.soft}
-                            onChange={(e) =>
+                            onChange={(e) => 
                               setResumeData({
                                 ...resumeData,
                                 skills: {
@@ -1208,6 +1243,42 @@ const handleDownload = async () => {
                                 },
                               })
                             }
+                          />
+                        </Section>
+                      )} */}
+                      {activeSection === "skills" && (
+                        <Section title="Skills">
+                          <InputWithLabel
+                            label="Technical Skills"
+                            id="technicalSkills"
+                            placeholder="JavaScript, React, Node.js"
+                            value={resumeData.skills.technical}
+                            onChange={(e) => {
+                              setResumeData({
+                                ...resumeData,
+                                skills: {
+                                  ...resumeData.skills,
+                                  technical: e.target.value,
+                                },
+                              });
+                              setHasChanges(true);
+                            }}
+                          />
+                          <InputWithLabel
+                            label="Soft Skills"
+                            id="softSkills"
+                            placeholder="Leadership, Communication"
+                            value={resumeData.skills.soft}
+                            onChange={(e) => {
+                              setResumeData({
+                                ...resumeData,
+                                skills: {
+                                  ...resumeData.skills,
+                                  soft: e.target.value,
+                                },
+                              });
+                              setHasChanges(true); // ✅ now this input also sets the flag
+                            }}
                           />
                         </Section>
                       )}
@@ -1348,6 +1419,7 @@ const handleDownload = async () => {
                                         ...resumeData,
                                         languages: updated,
                                       });
+                                      setHasChanges(true);
                                     }}
                                     placeholder="Language"
                                   />
@@ -1361,6 +1433,7 @@ const handleDownload = async () => {
                                         ...resumeData,
                                         languages: updated,
                                       });
+                                      setHasChanges(true);
                                     }}
                                     placeholder="Level"
                                   />
@@ -1378,6 +1451,7 @@ const handleDownload = async () => {
                                           ...resumeData,
                                           languages: updated,
                                         });
+                                        setHasChanges(true);
                                       }}
                                       className={`w-3 h-3 rounded-full cursor-pointer ${
                                         lang.proficiency >= dot
@@ -1577,6 +1651,92 @@ const handleDownload = async () => {
                         </Section>
                       )}
 
+                      {activeSection === "certification" && (
+                        <Section
+                          title="Certifications"
+                          actions
+                          onAdd={() => {
+                            const updated = [
+                              ...resumeData.certifications,
+                              { title: "", issuer: "", description: "" },
+                            ];
+                            setResumeData({
+                              ...resumeData,
+                              certifications: updated,
+                            });
+                            setHasChanges(true);
+                          }}
+                          onDelete={() => {
+                            const updated = [...resumeData.certifications];
+                            updated.pop();
+                            setResumeData({
+                              ...resumeData,
+                              certifications: updated,
+                            });
+                            setHasChanges(true);
+                          }}
+                        >
+                          {resumeData.certifications.map((cert, idx) => (
+                            <React.Fragment key={idx}>
+                              {idx > 0 && (
+                                <hr className="border-t border-gray-300 md:col-span-2 my-4" />
+                              )}
+                              <InputWithLabel
+                                id={`cert-title-${idx}`}
+                                label="Title"
+                                placeholder="Advanced Google Analytics"
+                                value={cert.title}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...resumeData.certifications,
+                                  ];
+                                  updated[idx].title = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    certifications: updated,
+                                  });
+                                  setHasChanges(true);
+                                }}
+                              />
+                              <InputWithLabel
+                                id={`cert-issuer-${idx}`}
+                                label="Issuer"
+                                placeholder="Google / Coursera"
+                                value={cert.issuer}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...resumeData.certifications,
+                                  ];
+                                  updated[idx].issuer = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    certifications: updated,
+                                  });
+                                  setHasChanges(true);
+                                }}
+                              />
+                              <TextareaWithLabel
+                                id={`cert-desc-${idx}`}
+                                label="Description"
+                                placeholder="A course focused on mastering Google Analytics for insights..."
+                                value={cert.description}
+                                onChange={(e) => {
+                                  const updated = [
+                                    ...resumeData.certifications,
+                                  ];
+                                  updated[idx].description = e.target.value;
+                                  setResumeData({
+                                    ...resumeData,
+                                    certifications: updated,
+                                  });
+                                  setHasChanges(true);
+                                }}
+                              />
+                            </React.Fragment>
+                          ))}
+                        </Section>
+                      )}
+
                       {activeSection === "customSection" && (
                         <Section
                           title="Custom Section"
@@ -1760,21 +1920,40 @@ const handleDownload = async () => {
                   <>
                     <div className="flex justify-end mb-4">
                       <button
-                        onClick={handleDownload}
+                        onClick={() =>
+                          handleDownload(
+                            resumeData,
+                            customSectionConfig,
+                            isReplaced
+                          )
+                        }
                         className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
                       >
                         Download Resume
                       </button>
                     </div>
-
-                    <ResumePreview
-                      ref={previewRef}
-                      resumeData={resumeData}
-                      selectedTemplate={selectedTemplate}
-                      customSectionConfig={customSectionConfig}
-                    />
+                    <div
+                      style={{
+                        minHeight: "100vh",
+                        background: "#fff",
+                        padding: "2rem",
+                      }}
+                    >
+                      <ResumePreview
+                        ref={previewRef}
+                        resumeData={resumeData}
+                        selectedTemplate={selectedTemplate}
+                        customSectionConfig={customSectionConfig}
+                      />
+                    </div>
                   </>
                 )}
+
+                {/* OR to visually compare PDF */}
+                {/* <PDFViewer width="100%" height="800px">
+      <PDFResumeTemplate resumeData={resumeData} />
+    </PDFViewer>
+   */}
               </div>
             </div>
           </div>

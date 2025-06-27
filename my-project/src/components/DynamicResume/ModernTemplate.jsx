@@ -1,8 +1,9 @@
-export default function ModernTemplate({ resumeData, customSectionConfig, isReplaced}) {
-
+export default function ModernTemplate({
+  resumeData,
+  customSectionConfig,
+  isReplaced,
+}) {
   const { personal } = resumeData || {};
-  
-  
 
   console.log("ResumeData received:", resumeData);
 
@@ -46,21 +47,20 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
   ];
 
   const hasUserExperience =
-  Array.isArray(resumeData.experience) &&
-  resumeData.experience.some(
-    (exp) =>
-      exp.company?.trim() ||
-      exp.jobTitle?.trim() ||
-      exp.startDate?.trim() ||
-      exp.endDate?.trim() ||
-      exp.location?.trim() ||
-      exp.responsibilities?.trim()
-  );
-
+    Array.isArray(resumeData.experience) &&
+    resumeData.experience.some(
+      (exp) =>
+        exp.company?.trim() ||
+        exp.jobTitle?.trim() ||
+        exp.startDate?.trim() ||
+        exp.endDate?.trim() ||
+        exp.location?.trim() ||
+        exp.responsibilities?.trim()
+    );
 
   const experiences = hasUserExperience
     ? resumeData.experience
-  : dummyExperience;
+    : dummyExperience;
 
   console.log("Rendering experiences:", experiences);
 
@@ -85,59 +85,57 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
           },
         ];
 
-        
-const dummyLanguages = [
-  { name: "English", level: "Native", proficiency: 5 },
-  { name: "Spanish", level: "Advanced", proficiency: 3 },
-];
+  const dummyLanguages = [
+    { name: "English", level: "Native", proficiency: 5 },
+    { name: "Spanish", level: "Advanced", proficiency: 3 },
+  ];
 
-const hasUserLangs =
-  resumeData.languages &&
-  resumeData.languages.some((lang) => lang.name?.trim());
+  const hasUserLangs =
+    resumeData.languages &&
+    resumeData.languages.some((lang) => lang.name?.trim());
 
-const langs = hasUserLangs ? resumeData.languages : dummyLanguages;
+  const langs = hasUserLangs ? resumeData.languages : dummyLanguages;
 
-const renderCustomSection = () => {
-  const { title, entries } = customSectionConfig || {};
+  const renderCustomSection = () => {
+    const { title, entries } = customSectionConfig || {};
 
-  if (!entries || entries.length === 0) return null;
+    if (!entries || entries.length === 0) return null;
 
-  return (
-    <section>
-      <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
-        {title?.toUpperCase() || "Custom Section"}
-      </h2>
+    return (
+      <section>
+        <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
+          {title?.toUpperCase() || "Custom Section"}
+        </h2>
 
-      <div className="space-y-4">
-        {entries.map((entry, idx) => (
-          <div key={idx}>
-            {/* Title */}
-            {entry.title && (
-              <h3 className="font-semibold text-black text-base">
-                {entry.title}
-              </h3>
-            )}
+        <div className="space-y-4">
+          {entries.map((entry, idx) => (
+            <div key={idx}>
+              {/* Title */}
+              {entry.title && (
+                <h3 className="font-semibold text-black text-base">
+                  {entry.title}
+                </h3>
+              )}
 
-            {/* Description */}
-            {entry.description && (
-              <p className="text-gray-700 text-sm mt-1 whitespace-pre-line">
-                {entry.description}
-              </p>
-            )}
+              {/* Description */}
+              {entry.description && (
+                <p className="text-gray-700 text-sm mt-1 whitespace-pre-line">
+                  {entry.description}
+                </p>
+              )}
 
-            {/* Year or extra line */}
-            {entry.year && (
-              <p className="text-sm text-gray-500 mt-1 italic">
-                {entry.year}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-};
-
+              {/* Year or extra line */}
+              {entry.year && (
+                <p className="text-sm text-gray-500 mt-1 italic">
+                  {entry.year}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
 
   return (
     <div className="max-w-5xl mx-auto bg-white p-8 font-sans text-gray-900">
@@ -195,15 +193,16 @@ const renderCustomSection = () => {
             className="w-28 h-28 rounded-full object-cover border-4 border-gray-100"
           /> */}
           <img
-  src={
-    personal?.photoUrl?.startsWith("data:image")
-      ? personal.photoUrl
-      : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNlMmU0ZWYiLz48dGV4dCB4PSI2MCIgeT0iNjAiIGR5PSIuMzVlbSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBmaWxsPSIjNjY2Ij5QaG90bzwvdGV4dD48L3N2Zz4="
-  }
-  alt={`${personal?.firstName || "John"} ${personal?.lastName || "Doe"}`}
-  className="w-28 h-28 rounded-full object-cover border-4 border-gray-100"
-/>
-
+            src={
+              personal?.photoUrl?.startsWith("data:image")
+                ? personal.photoUrl
+                : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIGZpbGw9IiNlMmU0ZWYiLz48dGV4dCB4PSI2MCIgeT0iNjAiIGR5PSIuMzVlbSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNnB4IiBmaWxsPSIjNjY2Ij5QaG90bzwvdGV4dD48L3N2Zz4="
+            }
+            alt={`${personal?.firstName || "John"} ${
+              personal?.lastName || "Doe"
+            }`}
+            className="w-28 h-28 rounded-full object-cover border-4 border-gray-100"
+          />
         </div>
       </div>
 
@@ -225,7 +224,6 @@ const renderCustomSection = () => {
                     {exp.jobTitle || "Job Title"}
                   </h3>
 
-                      
                   {/* Company Name + Date + Location in one row */}
                   <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm mb-2">
                     {/* Company */}
@@ -463,39 +461,44 @@ const renderCustomSection = () => {
           </section> */}
           {/* Languages */}
 
-{isReplaced("languages") ? (
-  renderCustomSection()
-) : (
-  langs.length > 0 && (
-    <section>
-      <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
-        LANGUAGES
-      </h2>
-      <div className="space-y-3">
-        {langs.map((lang, idx) => (
-          <div key={idx} className="flex items-center justify-between">
-            <div>
-              <span className="font-semibold text-black">{lang.name}</span>
-              <span className="text-sm text-gray-600 ml-4">{lang.level}</span>
-            </div>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((dot) => (
-                <div
-                  key={dot}
-                  className={`w-3 h-3 rounded-full ${
-                    lang.proficiency >= dot ? "bg-gray-800" : "bg-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-)}
-
-
+          {isReplaced("languages")
+            ? renderCustomSection()
+            : langs.length > 0 && (
+                <section>
+                  <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
+                    LANGUAGES
+                  </h2>
+                  <div className="space-y-3">
+                    {langs.map((lang, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between"
+                      >
+                        <div>
+                          <span className="font-semibold text-black">
+                            {lang.name}
+                          </span>
+                          <span className="text-sm text-gray-600 ml-4">
+                            {lang.level}
+                          </span>
+                        </div>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((dot) => (
+                            <div
+                              key={dot}
+                              className={`w-3 h-3 rounded-full ${
+                                lang.proficiency >= dot
+                                  ? "bg-gray-800"
+                                  : "bg-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
         </div>
 
         {/* Right Column */}
@@ -624,79 +627,80 @@ const renderCustomSection = () => {
             </div>
           </section> */}
 
-          {isReplaced("achievements") ? (
-  renderCustomSection()
-) : (
-  (() => {
-    const userAchievements =
-      resumeData.achievements?.filter(
-        (ach) => ach.title?.trim() || ach.description?.trim()
-      ) || [];
+          {isReplaced("achievements")
+            ? renderCustomSection()
+            : (() => {
+                const userAchievements =
+                  resumeData.achievements?.filter(
+                    (ach) => ach.title?.trim() || ach.description?.trim()
+                  ) || [];
 
-    const dummyAchievements = [
-      {
-        title: "45% User Acquisition Increase",
-        description:
-          "Spearheaded digital marketing initiatives at Tech Innovate that led to a 45% increase in user acquisition.",
-      },
-      {
-        title: "30% ROAS Improvement",
-        description:
-          "Optimized ad spend across digital platforms at Tech Innovate, resulting in a 30% improvement in ROAS.",
-      },
-      {
-        title: "Market Share Expansion",
-        description:
-          "Identified and captured a new user segment, contributing to a 35% increase in market share.",
-      },
-      {
-        title: "Conversion Rate Optimization",
-        description:
-          "Implemented a successful landing page optimization strategy, lifting conversion rates by 18%.",
-      },
-    ];
+                const dummyAchievements = [
+                  {
+                    title: "45% User Acquisition Increase",
+                    description:
+                      "Spearheaded digital marketing initiatives at Tech Innovate that led to a 45% increase in user acquisition.",
+                  },
+                  {
+                    title: "30% ROAS Improvement",
+                    description:
+                      "Optimized ad spend across digital platforms at Tech Innovate, resulting in a 30% improvement in ROAS.",
+                  },
+                  {
+                    title: "Market Share Expansion",
+                    description:
+                      "Identified and captured a new user segment, contributing to a 35% increase in market share.",
+                  },
+                  {
+                    title: "Conversion Rate Optimization",
+                    description:
+                      "Implemented a successful landing page optimization strategy, lifting conversion rates by 18%.",
+                  },
+                ];
 
-    const achievementsToShow =
-      userAchievements.length > 0 ? userAchievements : dummyAchievements;
+                const achievementsToShow =
+                  userAchievements.length > 0
+                    ? userAchievements
+                    : dummyAchievements;
 
-    return (
-      <section>
-        <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
-          KEY ACHIEVEMENTS
-        </h2>
-        <div className="space-y-4">
-          {achievementsToShow.map((ach, idx) => (
-            <div key={idx} className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg
-                  className="w-4 h-4 text-cyan-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h4 className="font-semibold text-black mb-1">
-                  {ach.title}
-                </h4>
-                <p className="text-gray-700 text-sm">{ach.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  })()
-)}
-
+                return (
+                  <section>
+                    <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
+                      KEY ACHIEVEMENTS
+                    </h2>
+                    <div className="space-y-4">
+                      {achievementsToShow.map((ach, idx) => (
+                        <div key={idx} className="flex items-start gap-3">
+                          <div className="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg
+                              className="w-4 h-4 text-cyan-600"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-black mb-1">
+                              {ach.title}
+                            </h4>
+                            <p className="text-gray-700 text-sm">
+                              {ach.description}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })()}
 
           {/* Skills */}
-          <section>
+          {/* <section>
             <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
               SKILLS
             </h2>
@@ -737,10 +741,43 @@ const renderCustomSection = () => {
               </span>
               <span className="bg-gray-100 px-3 py-1 rounded-full">SQL</span>
             </div>
+          </section> */}
+          <section>
+            <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
+              SKILLS
+            </h2>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {(resumeData.skills?.technical?.trim() ||
+              resumeData.skills?.soft?.trim()
+                ? [
+                    ...(resumeData.skills.technical?.split(",") || []),
+                    ...(resumeData.skills.soft?.split(",") || []),
+                  ]
+                : [
+                    "Data Analysis",
+                    "Paid Acquisition",
+                    "Retargeting",
+                    "ROAS Optimization",
+                    "Cross-Functional Collaboration",
+                    "Google Analytics",
+                    "Looker",
+                    "Appsflyer",
+                    "Meta Advertising",
+                    "Google Ads",
+                    "TikTok Ads",
+                    "Snapchat Ads",
+                    "SQL",
+                  ]
+              ).map((skill, idx) => (
+                <span key={idx} className="bg-gray-100 px-3 py-1 rounded-full">
+                  {skill.trim()}
+                </span>
+              ))}
+            </div>
           </section>
 
           {/* Certification */}
-          <section>
+          {/* <section>
             <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
               CERTIFICATION
             </h2>
@@ -763,6 +800,40 @@ const renderCustomSection = () => {
                   engagement, offered by Coursera.
                 </p>
               </div>
+            </div>
+          </section> */}
+          <section>
+            <h2 className="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-300 uppercase tracking-wide">
+              CERTIFICATION
+            </h2>
+
+            <div className="space-y-4">
+              {(resumeData.certifications?.some(
+                (cert) => cert.title?.trim() || cert.description?.trim()
+              )
+                ? resumeData.certifications
+                : [
+                    {
+                      title: "Advanced Google Analytics",
+                      description:
+                        "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
+                    },
+                    {
+                      title: "Effective Creative Testing",
+                      description:
+                        "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
+                    },
+                  ]
+              ).map((cert, idx) => (
+                <div key={idx}>
+                  <h4 className="font-semibold text-cyan-500 mb-1">
+                    {cert.title || "Certification Title"}
+                  </h4>
+                  <p className="text-gray-700 text-sm">
+                    {cert.description || "Certification description goes here."}
+                  </p>
+                </div>
+              ))}
             </div>
           </section>
         </div>
