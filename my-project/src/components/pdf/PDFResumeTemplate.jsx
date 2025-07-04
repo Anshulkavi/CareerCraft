@@ -382,10 +382,10 @@ const styles = StyleSheet.create({
   },
 
   achievementItem: {
-    flexDirection: "row", 
+    flexDirection: "row",
     gap: 10,
     marginBottom: 12,
-    marginRight:10,
+    marginRight: 10,
   },
   achievementIcon: {
     width: 20,
@@ -432,6 +432,30 @@ const styles = StyleSheet.create({
     color: "#374151",
     lineHeight: 1.3,
   },
+
+  projectItem: {
+  marginBottom: 8,
+},
+projectTitle: {
+  fontSize: 10,
+  fontWeight: "bold",
+  marginBottom: 2,
+},
+projectLink: {
+  fontSize: 9,
+  color: "#1f73b7", // optional: blue-ish link color
+  marginBottom: 2,
+},
+techStack: {
+  fontSize: 9,
+  fontStyle: "italic",
+  marginBottom: 2,
+},
+projectDescription: {
+  fontSize: 9,
+  color: "#333",
+},
+
 });
 
 export default function PDFResumeTemplate({
@@ -559,35 +583,46 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
   const achievementsToShow =
     userAchievements.length > 0 ? userAchievements : dummyAchievements;
 
-const parsedSkills = [
-  ...(resumeData.skills?.technical?.split(",").map(s => s.trim()) || []),
-  ...(resumeData.skills?.soft?.split(",").map(s => s.trim()) || []),
-];
+  const parsedSkills = [
+    ...(resumeData.skills?.technical?.split(",").map((s) => s.trim()) || []),
+    ...(resumeData.skills?.soft?.split(",").map((s) => s.trim()) || []),
+  ];
 
-const skills = parsedSkills.length > 0
-  ? parsedSkills
-  : [
-      "Data Analysis", "Paid Acquisition", "Retargeting", "ROAS Optimization",
-      "Cross-Functional Collaboration", "Google Analytics", "Looker", "Appsflyer",
-      "Meta Advertising", "Google Ads", "TikTok Ads", "Snapchat Ads", "SQL"
-    ];
+  const skills =
+    parsedSkills.length > 0
+      ? parsedSkills
+      : [
+          "Data Analysis",
+          "Paid Acquisition",
+          "Retargeting",
+          "ROAS Optimization",
+          "Cross-Functional Collaboration",
+          "Google Analytics",
+          "Looker",
+          "Appsflyer",
+          "Meta Advertising",
+          "Google Ads",
+          "TikTok Ads",
+          "Snapchat Ads",
+          "SQL",
+        ];
 
-
-const certifications = (
-  resumeData.certifications?.length > 0 &&
-  resumeData.certifications.some(cert => cert.title || cert.description)
-)
-  ? resumeData.certifications
-  : [
-      {
-        title: "Advanced Google Analytics",
-        description: "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
-      },
-      {
-        title: "Effective Creative Testing",
-        description: "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
-      },
-    ];
+  const certifications =
+    resumeData.certifications?.length > 0 &&
+    resumeData.certifications.some((cert) => cert.title || cert.description)
+      ? resumeData.certifications
+      : [
+          {
+            title: "Advanced Google Analytics",
+            description:
+              "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
+          },
+          {
+            title: "Effective Creative Testing",
+            description:
+              "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
+          },
+        ];
 
   const renderCustomSection = () => {
     const { title, entries } = customSectionConfig || {};
@@ -630,7 +665,7 @@ const certifications = (
 
   return (
     <Document>
-      <Page size="A4" style={styles.page} wrap={false}> 
+      <Page size="A4" style={styles.page} wrap={false}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -704,18 +739,22 @@ const certifications = (
           </View>
 
           {/* Profile Photo placeholder - @react-pdf/renderer has limited image support */}
-          <View
-            style={[
-              styles.profilePhoto,
-              {
-                backgroundColor: "#e5e7eb",
-                alignItems: "center",
-                justifyContent: "center",
-              },
-            ]}
-          >
-            <Text style={{ fontSize: 8, color: "#6b7280" }}>Photo</Text>
-          </View>
+          {personal?.photoUrl ? (
+            <Image src={personal.photoUrl} style={styles.profilePhoto} />
+          ) : (
+            <View
+              style={[
+                styles.profilePhoto,
+                {
+                  backgroundColor: "#e5e7eb",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              ]}
+            >
+              <Text style={{ fontSize: 8, color: "#6b7280" }}>Photo</Text>
+            </View>
+          )}
         </View>
 
         {/* Main Content */}
@@ -723,6 +762,7 @@ const certifications = (
           {/* Left Column */}
           <View style={styles.leftColumn}>
             {/* Experience */}
+            
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>EXPERIENCE</Text>
               <View>
@@ -758,6 +798,35 @@ const certifications = (
                 ))}
               </View>
             </View>
+
+            {/* Projects
+            {projects?.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>PROJECTS</Text>
+                <View>
+                  {projects.map((proj, idx) => (
+                    <View key={idx} style={styles.projectItem}>
+                      <Text style={styles.projectTitle}>
+                        {proj.title || "Project Title"}
+                      </Text>
+                      {proj.link && (
+                        <Text style={styles.projectLink}>{proj.link}</Text>
+                      )}
+                      {proj.techStack && (
+                        <Text style={styles.techStack}>
+                          Tech Stack: {proj.techStack}
+                        </Text>
+                      )}
+                      {proj.description && (
+                        <Text style={styles.projectDescription}>
+                          {proj.description}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )} */}
 
             {/* Education */}
             <View style={styles.section}>
