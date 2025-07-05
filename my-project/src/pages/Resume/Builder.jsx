@@ -2267,7 +2267,9 @@ import {
   FileText,
   Puzzle,
   BadgeCheck,
+  Medal
 } from "lucide-react";
+import AchievementsSection from "../../components/ResumeBuilder/AchievementsSection";
 
 export default function ResumeBuilder() {
   const [messages, setMessages] = useState([
@@ -2333,7 +2335,8 @@ export default function ResumeBuilder() {
     { id: "skills", name: "Skills", icon: CheckCircle },
     { id: "certification", name: "Certifications", icon: BadgeCheck },
     { id: "awards", name: "Awards", icon: Award },
-    { id: "languages", name: "Languages", icon: Languages },
+    {id: "achievements", name: "Achievements", icon: Medal},
+    {id: "languages", name: "Languages", icon: Languages },
     { id: "interests", name: "Interests", icon: Heart },
     { id: "references", name: "References", icon: FileText },
     { id: "customSection", name: "Custom Section", icon: Puzzle },
@@ -2543,6 +2546,13 @@ export default function ResumeBuilder() {
                       resumeData={resumeData}
                       setResumeData={setResumeData}
                       selectedTemplate={selectedTemplate}
+                    />
+                  )}
+                  {activeSection == "achievements" && (
+                    <AchievementsSection
+                    resumeData={resumeData}
+                      setResumeData={setResumeData}
+                      setHasChanges={setHasChanges}
                     />
                   )}
                   {activeSection === "languages" && (
