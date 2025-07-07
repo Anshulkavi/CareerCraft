@@ -2253,6 +2253,7 @@ import CertificationsSection from "../../components/ResumeBuilder/Certifications
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
+import PDFSimpleTemplate from "../../components/pdf/PDFSimpleTemplate";
 import {
   Send,
   Plus,
@@ -2267,8 +2268,10 @@ import {
   FileText,
   Puzzle,
   BadgeCheck,
-  Medal
+  Medal,
+  FolderKanban,
 } from "lucide-react";
+import Navbar from "../../components/Navbar";
 import AchievementsSection from "../../components/ResumeBuilder/AchievementsSection";
 
 export default function ResumeBuilder() {
@@ -2332,11 +2335,12 @@ export default function ResumeBuilder() {
     { id: "personal", name: "Personal Info", icon: User },
     { id: "experience", name: "Experience", icon: Briefcase },
     { id: "education", name: "Education", icon: GraduationCap },
+    { id: "projects", name: "Projects", icon: FolderKanban },
     { id: "skills", name: "Skills", icon: CheckCircle },
     { id: "certification", name: "Certifications", icon: BadgeCheck },
     { id: "awards", name: "Awards", icon: Award },
-    {id: "achievements", name: "Achievements", icon: Medal},
-    {id: "languages", name: "Languages", icon: Languages },
+    { id: "achievements", name: "Achievements", icon: Medal },
+    { id: "languages", name: "Languages", icon: Languages },
     { id: "interests", name: "Interests", icon: Heart },
     { id: "references", name: "References", icon: FileText },
     { id: "customSection", name: "Custom Section", icon: Puzzle },
@@ -2438,181 +2442,197 @@ export default function ResumeBuilder() {
     return customSectionConfig?.replaces === key;
   };
 
-  const handleDownload = async (
-    resumeData,
-    customSectionConfig,
-    isReplaced
-  ) => {
-    if (!hasChanges) {
-      alert("Please edit something before downloading.");
-      return;
-    }
-    const blob = await pdf(
-      <PDFResumeTemplate
-        resumeData={resumeData}
-        customSectionConfig={customSectionConfig}
-        isReplaced={isReplaced}
-      />
-    ).toBlob();
+  // const handleDownload = async (
+  //   resumeData,
+  //   customSectionConfig,
+  //   isReplaced,
+  //   selectedTemplate
+  // ) => {
+  //   // Optional validation
+  //   // if (!hasChanges) {
+  //   //   alert("Please edit something before downloading.");
+  //   //   return;
+  //   // }
 
-    saveAs(blob, "My_Resume.pdf");
-  };
+  //   const PDFComponent =
+  //     selectedTemplate === "simple"
+  //       ? PDFSimpleTemplate
+  //       : PDFResumeTemplate;
+
+  //   const blob = await pdf(
+  //     <PDFComponent
+  //       resumeData={resumeData}
+  //       customSectionConfig={customSectionConfig}
+  //       isReplaced={isReplaced}
+  //     />
+  //   ).toBlob();
+
+  //   saveAs(blob, "My_Resume.pdf");
+  // };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <main className="flex flex-grow">
-        {/* Sidebar */}
-        <SectionSidebar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-          sections={sections}
-          handleSectionClick={handleSectionClick}
+      <>
+        <Navbar
+          resumeData={resumeData}
+          customSectionConfig={customSectionConfig}
+          isReplaced={isReplaced}
           selectedTemplate={selectedTemplate}
-          setSelectedTemplate={setSelectedTemplate}
         />
+        <main className="flex flex-grow">
+          {/* Sidebar */}
+          <SectionSidebar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            sections={sections}
+            handleSectionClick={handleSectionClick}
+            selectedTemplate={selectedTemplate}
+            setSelectedTemplate={setSelectedTemplate}
+          />
 
-        {/* Main Content Area */}
-        <div className="flex-grow p-6 overflow-auto">
-          <div className="max-w-6xl mx-auto">
-            {/* Tabs on top center */}
-            <div className="flex justify-center mb-6">
-              <div className="grid grid-cols-2 bg-gray-200 rounded-lg p-1 max-w-md">
-                <button
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === "editor"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                  onClick={() => setActiveTab("editor")}
-                >
-                  Resume Editor
-                </button>
-                <button
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === "preview"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                  onClick={() => setActiveTab("preview")}
-                >
-                  Preview
-                </button>
-              </div>
-            </div>
-
-            {/* Editor + AI Chat */}
-            {activeTab === "editor" && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 space-y-6">
-                  {activeSection === "personal" && (
-                    <PersonalSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "education" && (
-                    <EducationSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "experience" && (
-                    <ExperienceSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "projects" && (
-                    <ProjectsSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "skills" && (
-                    <SkillsSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "awards" && (
-                    <AwardsSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      selectedTemplate={selectedTemplate}
-                    />
-                  )}
-                  {activeSection == "achievements" && (
-                    <AchievementsSection
-                    resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "languages" && (
-                    <LanguagesSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "interests" && (
-                    <InterestsSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                    />
-                  )}
-                  {activeSection === "references" && (
-                    <ReferencesSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                    />
-                  )}
-                  {activeSection === "certification" && (
-                    <CertificationsSection
-                      resumeData={resumeData}
-                      setResumeData={setResumeData}
-                      setHasChanges={setHasChanges}
-                    />
-                  )}
-                  {activeSection === "customSection" && (
-                    <CustomSection
-                      customSectionConfig={customSectionConfig}
-                      setCustomSectionConfig={setCustomSectionConfig}
-                    />
-                  )}
+          {/* Main Content Area */}
+          <div className="flex-grow p-6 overflow-auto">
+            <div className="max-w-6xl mx-auto">
+              {/* Tabs on top center */}
+              <div className="flex justify-center mb-6">
+                <div className="grid grid-cols-2 bg-gray-200 rounded-lg p-1 max-w-md">
+                  <button
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === "editor"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                    onClick={() => setActiveTab("editor")}
+                  >
+                    Resume Editor
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      activeTab === "preview"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                    onClick={() => setActiveTab("preview")}
+                  >
+                    Preview
+                  </button>
                 </div>
-
-                {/* AI Chatbox */}
-                <AIChatBox
-                  messages={messages}
-                  input={input}
-                  setInput={setInput}
-                  handleSendMessage={handleSendMessage}
-                />
               </div>
-            )}
 
-            {/* Resume Preview */}
-            {activeTab === "preview" && (
-              <ResumePreviewSection
-                resumeData={resumeData}
-                customSectionConfig={customSectionConfig}
-                isReplaced={isReplaced}
-                handleDownload={handleDownload}
-                selectedTemplate={selectedTemplate}
-                previewRef={previewRef}
-              />
-            )}
+              {/* Editor + AI Chat */}
+              {activeTab === "editor" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2 space-y-6">
+                    {activeSection === "personal" && (
+                      <PersonalSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "education" && (
+                      <EducationSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "experience" && (
+                      <ExperienceSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "projects" && (
+                      <ProjectsSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "skills" && (
+                      <SkillsSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "awards" && (
+                      <AwardsSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        selectedTemplate={selectedTemplate}
+                      />
+                    )}
+                    {activeSection == "achievements" && (
+                      <AchievementsSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "languages" && (
+                      <LanguagesSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "interests" && (
+                      <InterestsSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                      />
+                    )}
+                    {activeSection === "references" && (
+                      <ReferencesSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                      />
+                    )}
+                    {activeSection === "certification" && (
+                      <CertificationsSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                        setHasChanges={setHasChanges}
+                      />
+                    )}
+                    {activeSection === "customSection" && (
+                      <CustomSection
+                        customSectionConfig={customSectionConfig}
+                        setCustomSectionConfig={setCustomSectionConfig}
+                      />
+                    )}
+                  </div>
+
+                  {/* AI Chatbox */}
+                  <AIChatBox
+                    messages={messages}
+                    input={input}
+                    setInput={setInput}
+                    handleSendMessage={handleSendMessage}
+                  />
+                </div>
+              )}
+
+              {/* Resume Preview */}
+              {activeTab === "preview" && (
+                <ResumePreviewSection
+                  resumeData={resumeData}
+                  customSectionConfig={customSectionConfig}
+                  isReplaced={isReplaced}
+                  // handleDownload={handleDownload}
+                  selectedTemplate={selectedTemplate}
+                  previewRef={previewRef}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </>
     </div>
   );
 }

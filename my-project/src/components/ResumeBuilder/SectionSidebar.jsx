@@ -15,7 +15,7 @@ const SectionSidebar = ({ sections = [], activeSection, handleSectionClick, sele
         >
           <option value="modern">Modern</option>
           <option value="elegant">Elegant</option>
-          <option value="minimal">Minimal</option>
+          <option value="simple">Simple</option>
         </select>
       </div>
 

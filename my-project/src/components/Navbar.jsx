@@ -534,8 +534,11 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo"; // Adjust the import path as necessary
 // import { useResume } from "../context/ResumeContext";
 // import ResumeDownloadButton from "./ui/ResumeDownloadButton";
-
-export default function Navbar() {
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
+import PDFSimpleTemplate from "@/components/pdf/PDFSimpleTemplate";
+export default function Navbar({resumeData,customSectionConfig, isReplaced,selectedTemplate}) {
   const location = useLocation();
   const isResumeBuilder = location.pathname === "/resume/builder";
 
@@ -590,7 +593,38 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const { onDownload } = useResume();
+
+  const [hasChanges, setHasChanges] = useState(false);
+  
+const handleDownload = async (
+  resumeData,
+  customSectionConfig,
+  isReplaced,
+  selectedTemplate
+) => {
+  // Optional validation
+  // if (!hasChanges) {
+  //   alert("Please edit something before downloading.");
+  //   return;
+  // }
+
+  const PDFComponent =
+    selectedTemplate === "simple"
+      ? PDFSimpleTemplate
+      : PDFResumeTemplate;
+
+  const blob = await pdf(
+    <PDFComponent
+      resumeData={resumeData}
+      customSectionConfig={customSectionConfig}
+      isReplaced={isReplaced}
+      selectedTemplate={selectedTemplate}
+    />
+  ).toBlob();
+console.log("Downloading template:", selectedTemplate);
+
+  saveAs(blob, "My_Resume.pdf");
+};
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">
@@ -611,21 +645,23 @@ export default function Navbar() {
         {/* Builder Mode Buttons */}
         {isResumeBuilder ? (
           <div className="flex space-x-3">
-            <button className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition">
+            {/* <button className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition">
               Settings
-            </button>
-            {/* <button
-  onClick={onDownload}
-  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
->
-  Download
-</button> */}
-            <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+            </button> */}
+            <button
+          onClick={() =>
+            handleDownload(resumeData, customSectionConfig, isReplaced,selectedTemplate)
+          }
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+        >
+          Download Resume
+        </button>
+            {/* <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
               Share
-            </button>
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+            </button> */}
+            {/* <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
               Save
-            </button>
+            </button> */}
           </div>
         ) : (
           <>

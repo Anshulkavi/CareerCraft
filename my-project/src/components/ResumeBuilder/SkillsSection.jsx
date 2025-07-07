@@ -18,7 +18,7 @@ const SkillsSection = ({ resumeData, setResumeData, setHasChanges }) => {
               technical: e.target.value,
             },
           });
-          setHasChanges(true);
+          // setHasChanges(true);
         }}
       />
       <InputWithLabel
@@ -34,7 +34,7 @@ const SkillsSection = ({ resumeData, setResumeData, setHasChanges }) => {
               soft: e.target.value,
             },
           });
-          setHasChanges(true);
+          // setHasChanges(true);
         }}
       />
     </Section>

@@ -30,7 +30,7 @@ const LanguagesSection = ({ resumeData, setResumeData, setHasChanges }) => {
                   const updated = [...resumeData.languages];
                   updated[idx].name = e.target.value;
                   setResumeData({ ...resumeData, languages: updated });
-                  setHasChanges(true);
+                  // setHasChanges(true);
                 }}
                 placeholder="Language"
               />
@@ -41,7 +41,7 @@ const LanguagesSection = ({ resumeData, setResumeData, setHasChanges }) => {
                   const updated = [...resumeData.languages];
                   updated[idx].level = e.target.value;
                   setResumeData({ ...resumeData, languages: updated });
-                  setHasChanges(true);
+                  // setHasChanges(true);
                 }}
                 placeholder="Level"
               />
@@ -54,7 +54,7 @@ const LanguagesSection = ({ resumeData, setResumeData, setHasChanges }) => {
                     const updated = [...resumeData.languages];
                     updated[idx].proficiency = dot;
                     setResumeData({ ...resumeData, languages: updated });
-                    setHasChanges(true);
+                    // setHasChanges(true);
                   }}
                   className={`w-3 h-3 rounded-full cursor-pointer ${
                     lang.proficiency >= dot ? "bg-gray-800" : "bg-gray-300"

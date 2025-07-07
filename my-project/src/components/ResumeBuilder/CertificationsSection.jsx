@@ -13,13 +13,13 @@ const CertificationsSection = ({ resumeData, setResumeData, setHasChanges }) => 
         { title: "", issuer: "", description: "" },
       ];
       setResumeData({ ...resumeData, certifications: updated });
-      setHasChanges(true);
+      // setHasChanges(true);
     }}
     onDelete={() => {
       const updated = [...resumeData.certifications];
       updated.pop();
       setResumeData({ ...resumeData, certifications: updated });
-      setHasChanges(true);
+      // setHasChanges(true);
     }}
   >
     {resumeData.certifications.map((cert, idx) => (
@@ -36,7 +36,7 @@ const CertificationsSection = ({ resumeData, setResumeData, setHasChanges }) => 
             const updated = [...resumeData.certifications];
             updated[idx].title = e.target.value;
             setResumeData({ ...resumeData, certifications: updated });
-            setHasChanges(true);
+            // setHasChanges(true);
           }}
         />
         <InputWithLabel
@@ -48,7 +48,7 @@ const CertificationsSection = ({ resumeData, setResumeData, setHasChanges }) => 
             const updated = [...resumeData.certifications];
             updated[idx].issuer = e.target.value;
             setResumeData({ ...resumeData, certifications: updated });
-            setHasChanges(true);
+            // setHasChanges(true);
           }}
         />
         <TextareaWithLabel
@@ -60,7 +60,7 @@ const CertificationsSection = ({ resumeData, setResumeData, setHasChanges }) => 
             const updated = [...resumeData.certifications];
             updated[idx].description = e.target.value;
             setResumeData({ ...resumeData, certifications: updated });
-            setHasChanges(true);
+            // setHasChanges(true);
           }}
         />
       </React.Fragment>

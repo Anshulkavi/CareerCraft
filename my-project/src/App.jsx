@@ -42,9 +42,14 @@ import useLenis from "./hooks/useLenis"; // Custom hook for smooth scrolling wit
 import { exportToPDF } from "./hooks/exportUtils";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useLocation } from "react-router-dom";
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling with Lenis
+  const location = useLocation();
+  // List of paths where you want to hide the navbar
+  const hideNavbarRoutes = ["/resume/builder", "/cover-letter/builder"];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   // Initialize AOS for animations
   useEffect(() => {
@@ -58,7 +63,7 @@ function App() {
   return (
     <>
       <Darkmode />
-      <Navbar />
+      {shouldShowNavbar && <Navbar />} {/* ✅ Only show when route is not in the excluded list */}
       <ScrollToTop />
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
         <Routes>

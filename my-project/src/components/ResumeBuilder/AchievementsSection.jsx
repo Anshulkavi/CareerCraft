@@ -13,13 +13,13 @@ const AchievementsSection = ({ resumeData, setResumeData, setHasChanges }) => (
         { title: "", description: "" },
       ];
       setResumeData({ ...resumeData, achievements: updated });
-      setHasChanges(true);
+      // setHasChanges(true);
     }}
     onDelete={() => {
       const updated = [...resumeData.achievements];
       updated.pop();
       setResumeData({ ...resumeData, achievements: updated });
-      setHasChanges(true);
+      // setHasChanges(true);
     }}
   >
     {resumeData.achievements.map((achievement, idx) => (

@@ -3,14 +3,14 @@ import ResumePreview from "../DynamicResume/ResumePreview";
 function ResumePreviewSection({
   resumeData,
   customSectionConfig,
-  isReplaced,
-  handleDownload,
+  // isReplaced,
+  // handleDownload,
   selectedTemplate,
   previewRef,
 }) {
   return (
     <>
-      <div className="flex justify-end mb-4">
+      {/* <div className="flex justify-end mb-4">
         <button
           onClick={() =>
             handleDownload(resumeData, customSectionConfig, isReplaced)
@@ -19,7 +19,7 @@ function ResumePreviewSection({
         >
           Download Resume
         </button>
-      </div>
+      </div> */}
       <div
         style={{
           minHeight: "100vh",
