@@ -62,7 +62,7 @@ function App() {
 
   return (
     <>
-      <Darkmode />
+      {/* <Darkmode /> */}
       {shouldShowNavbar && <Navbar />} {/* ✅ Only show when route is not in the excluded list */}
       <ScrollToTop />
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
