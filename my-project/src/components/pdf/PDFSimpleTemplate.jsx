@@ -408,8 +408,15 @@ export default function PDFSimpleTemplate({ resumeData }) {
   ];
 
   const hasUserProjects =
-    Array.isArray(resumeData?.projects) &&
-    resumeData.projects.some((proj) => proj.title?.trim());
+  Array.isArray(resumeData.projects) &&
+  resumeData.projects.some(
+    (proj) =>
+      proj.title?.trim() ||
+      proj.description?.trim() ||
+      proj.githubLink?.trim() ||
+      proj.demoLink?.trim() ||
+      proj.link?.trim()
+  );
 
   const projects = hasUserProjects ? resumeData.projects : dummyProjects;
 
