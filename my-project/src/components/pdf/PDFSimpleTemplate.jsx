@@ -9,6 +9,7 @@ import {
   Svg,
   Path,
 } from "@react-pdf/renderer";
+import * as pdfRenderer from "@react-pdf/renderer";
 
 // Define styles using StyleSheet.create()
 const styles = StyleSheet.create({
@@ -70,6 +71,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: "#374151",
     lineHeight: 1.4,
+    flexShrink: 1,
   },
   experienceItem: {
     marginBottom: 16,
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: "#4b5563",
     lineHeight: 1.4,
+    flexShrink: 1,
   },
   languageItem: {
     flexDirection: "row",
@@ -213,6 +216,7 @@ const styles = StyleSheet.create({
 
 export default function PDFSimpleTemplate({ resumeData }) {
   const { personal } = resumeData || {};
+  pdfRenderer.Font.registerHyphenationCallback((word) => [word]);
 
   const firstName = personal?.firstName || "John";
   const lastName = personal?.lastName || "Aarts";
@@ -224,7 +228,7 @@ export default function PDFSimpleTemplate({ resumeData }) {
 
   const summary =
     resumeData?.personal?.summary ||
-    "Enthusiastic Customer Success Managers with seven years of experience coordinating Customer Success staff and analyzing complaints, developing new procedures, and implementing customer retention campaigns. Proven project team leader and problem solver. Focused on building excellent productive client relationships,quickly resolving issues to assure their business needs are met.";
+    "Enthusiastic Customer Success Manager with seven years of experience coordinating Customer Success staff and analyzing complaints, developing new procedures, and implementing customer retention campaigns. Proven project team leader and problem solver. Focused on building excellent productive client relationships,quickly resolving issues to assure their business needs are met.";
 
   const educationData =
     resumeData?.education?.length > 0 &&
@@ -257,7 +261,7 @@ export default function PDFSimpleTemplate({ resumeData }) {
       responsibilities: `Achieved an average 115% Net Retention Rate (NRR) on a target of 102%, for five consecutive quarters.
         Developed an end user training curriculum for Microsoft Office 365.
         Partnered with AE to grow book of business 25% YoY.
-        Managed an EMEA book of business of USD $2-2.5M in ARR - achieved and exceeded renewal and up-sell targets.`,
+        Managed an EMEA book of business of USD $2-2.5M in ARR - achieves and exceeded renewal and up-sell targets.`,
     },
     {
       jobTitle: "Customer Success Manager",
@@ -490,27 +494,27 @@ export default function PDFSimpleTemplate({ resumeData }) {
     </Svg>
   );
 
-  // GitHub Icon Component
-  const GitHubIcon = ({ githubLink, size = 12 }) => {
-    if (!githubLink) return null;
+const GitHubIcon = ({ githubLink, size = 12 }) => {
+  if (!githubLink) return null;
 
-    return (
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}
+  return (
+    <View
+      style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}
+    >
+      <Svg
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        style={{ marginRight: 6 }}
       >
-        <Svg
-          width={size}
-          height={size}
-          viewBox="0 0 20 20"
-          style={{ marginRight: 6 }}
-        >
-          <Path
-            d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
-            fill="#374151"
-          />
-        </Svg>
-        <Link
-          src={githubLink}
+        <Path
+          d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+          fill="#374151"
+        />
+      </Svg>
+
+      <Link src={githubLink}>
+        <Text
           style={{
             fontSize: 10,
             color: "#2563eb",
@@ -518,52 +522,51 @@ export default function PDFSimpleTemplate({ resumeData }) {
           }}
         >
           View Code
-        </Link>
-      </View>
-    );
-  };
+        </Text>
+      </Link>
+    </View>
+  );
+};
+
 
   // Live Demo Icon Component (using globe/world icon)
   const LiveDemoIcon = ({ demoLink, size = 12 }) => {
-    if (!demoLink) return null;
+  if (!demoLink) return null;
 
-    return (
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}
+  return (
+    <View
+      style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}
+    >
+      <Svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        style={{ marginRight: 6 }}
       >
-        <Svg
-          width={size}
-          height={size}
-          viewBox="0 0 24 24"
-          style={{ marginRight: 6 }}
-        >
-          {/* Outer circle */}
-          <Path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
-            fill="none"
-            stroke="#374151"
-            strokeWidth="1.5"
-          />
-          {/* Vertical line */}
-          <Path d="M12 2v20" fill="none" stroke="#374151" strokeWidth="1.5" />
-          {/* Horizontal lines */}
-          <Path d="M2 12h20" fill="none" stroke="#374151" strokeWidth="1.5" />
-          {/* Curved lines for globe effect */}
-          <Path
-            d="M2 12c0-2.5 4.5-4.5 10-4.5s10 2 10 4.5"
-            fill="none"
-            stroke="#374151"
-            strokeWidth="1.5"
-          />
-          <Path
-            d="M2 12c0 2.5 4.5 4.5 10 4.5s10-2 10-4.5"
-            fill="none"
-            stroke="#374151"
-            strokeWidth="1.5"
-          />
-        </Svg>
-        <Link
-          src={demoLink}
+        <Path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"
+          fill="none"
+          stroke="#374151"
+          strokeWidth="1.5"
+        />
+        <Path d="M12 2v20" fill="none" stroke="#374151" strokeWidth="1.5" />
+        <Path d="M2 12h20" fill="none" stroke="#374151" strokeWidth="1.5" />
+        <Path
+          d="M2 12c0-2.5 4.5-4.5 10-4.5s10 2 10 4.5"
+          fill="none"
+          stroke="#374151"
+          strokeWidth="1.5"
+        />
+        <Path
+          d="M2 12c0 2.5 4.5 4.5 10 4.5s10-2 10-4.5"
+          fill="none"
+          stroke="#374151"
+          strokeWidth="1.5"
+        />
+      </Svg>
+
+      <Link src={demoLink}>
+        <Text
           style={{
             fontSize: 10,
             color: "#2563eb",
@@ -571,10 +574,11 @@ export default function PDFSimpleTemplate({ resumeData }) {
           }}
         >
           Live Demo
-        </Link>
-      </View>
-    );
-  };
+        </Text>
+      </Link>
+    </View>
+  );
+};
 
   // Alternative version with a simpler filled circle approach
   const LiveDemoIconSimple = ({ demoLink, size = 12 }) => {
