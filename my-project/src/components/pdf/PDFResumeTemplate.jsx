@@ -8,230 +8,10 @@ import {
   Svg,
   Path,
   StyleSheet,
+  Link,
 } from "@react-pdf/renderer";
+import { normalizeUrl, getDisplayUrl } from "@/utils/urlUtils";
 
-// Create styles
-// const styles = StyleSheet.create({
-//   page: {
-//     flexDirection: 'column',
-//     backgroundColor: '#ffffff',
-//     padding: 32,
-//     fontFamily: 'Helvetica',
-//     fontSize: 10,
-//     color: '#111827',
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'flex-start',
-//     marginBottom: 32,
-//   },
-//   headerLeft: {
-//     flex: 1,
-//   },
-//   name: {
-//     fontSize: 36,
-//     fontWeight: 'bold',
-//     color: '#000000',
-//     marginBottom: 8,
-//     letterSpacing: 1,
-//   },
-//   jobTitle: {
-//     fontSize: 16,
-//     color: '#06b6d4',
-//     marginBottom: 16,
-//     fontWeight: 500,
-//   },
-//   contactInfo: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     gap: 24,
-//     fontSize: 9,
-//     color: '#4b5563',
-//   },
-//   contactItem: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     gap: 4,
-//   },
-//   profilePhoto: {
-//     width: 84,
-//     height: 84,
-//     borderRadius: 42,
-//     marginLeft: 32,
-//   },
-//   mainContent: {
-//     flexDirection: 'row',
-//     gap: 32,
-//   },
-//   leftColumn: {
-//     flex: 2,
-//   },
-//   rightColumn: {
-//     flex: 1,
-//   },
-//   section: {
-//     marginBottom: 32,
-//   },
-//   sectionTitle: {
-//     fontSize: 12,
-//     fontWeight: 'bold',
-//     color: '#374151',
-//     marginBottom: 16,
-//     paddingBottom: 8,
-//     borderBottomWidth: 1,
-//     borderBottomColor: '#d1d5db',
-//     textTransform: 'uppercase',
-//     letterSpacing: 0.5,
-//   },
-//   experienceItem: {
-//     marginBottom: 24,
-//   },
-//   jobTitleText: {
-//     fontSize: 12,
-//     fontWeight: 600,
-//     color: '#000000',
-//     marginBottom: 4,
-//   },
-//   companyRow: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     alignItems: 'center',
-//     gap: 24,
-//     fontSize: 9,
-//     marginBottom: 8,
-//   },
-//   companyName: {
-//     color: '#06b6d4',
-//     fontWeight: 500,
-//   },
-//   dateLocation: {
-//     flexDirection: 'row',
-//     gap: 16,
-//     color: '#4b5563',
-//   },
-//   responsibilities: {
-//     fontSize: 9,
-//     color: '#374151',
-//     lineHeight: 1.4,
-//   },
-//   responsibilityItem: {
-//     marginBottom: 8,
-//     paddingLeft: 12,
-//   },
-//   educationItem: {
-//     marginBottom: 16,
-//   },
-//   degree: {
-//     fontSize: 10,
-//     fontWeight: 600,
-//     color: '#000000',
-//   },
-//   institution: {
-//     fontSize: 9,
-//     color: '#06b6d4',
-//     fontWeight: 500,
-//     marginTop: 2,
-//   },
-//   educationDetails: {
-//     flexDirection: 'row',
-//     gap: 16,
-//     fontSize: 9,
-//     color: '#4b5563',
-//     marginTop: 4,
-//   },
-//   languageItem: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: 12,
-//   },
-//   languageText: {
-//     flexDirection: 'row',
-//     gap: 16,
-//   },
-//   languageName: {
-//     fontWeight: 600,
-//     color: '#000000',
-//   },
-//   languageLevel: {
-//     fontSize: 9,
-//     color: '#4b5563',
-//   },
-//   proficiencyDots: {
-//     flexDirection: 'row',
-//     gap: 4,
-//   },
-//   proficiencyDot: {
-//     width: 8,
-//     height: 8,
-//     borderRadius: 4,
-//   },
-//   proficiencyActive: {
-//     backgroundColor: '#1f2937',
-//   },
-//   proficiencyInactive: {
-//     backgroundColor: '#d1d5db',
-//   },
-//   summary: {
-//     fontSize: 9,
-//     color: '#374151',
-//     lineHeight: 1.5,
-//   },
-//   achievementItem: {
-//     flexDirection: 'row',
-//     gap: 12,
-//     marginBottom: 16,
-//   },
-//   achievementIcon: {
-//     width: 24,
-//     height: 24,
-//     backgroundColor: '#e0f7fa',
-//     borderRadius: 12,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   achievementContent: {
-//     flex: 1,
-//   },
-//   achievementTitle: {
-//     fontSize: 10,
-//     fontWeight: 600,
-//     color: '#000000',
-//     marginBottom: 4,
-//   },
-//   achievementDescription: {
-//     fontSize: 9,
-//     color: '#374151',
-//     lineHeight: 1.4,
-//   },
-//   skillsContainer: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     gap: 8,
-//   },
-//   skillTag: {
-//     backgroundColor: '#f3f4f6',
-//     paddingHorizontal: 12,
-//     paddingVertical: 4,
-//     borderRadius: 12,
-//     fontSize: 8,
-//   },
-//   certificationItem: {
-//     marginBottom: 16,
-//   },
-//   certificationTitle: {
-//     fontSize: 10,
-//     fontWeight: 600,
-//     color: '#06b6d4',
-//     marginBottom: 4,
-//   },
-//   certificationDescription: {
-//     fontSize: 9,
-//     color: '#374151',
-//     lineHeight: 1.4,
-//   },
-// });
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -434,28 +214,27 @@ const styles = StyleSheet.create({
   },
 
   projectItem: {
-  marginBottom: 8,
-},
-projectTitle: {
-  fontSize: 10,
-  fontWeight: "bold",
-  marginBottom: 2,
-},
-projectLink: {
-  fontSize: 9,
-  color: "#1f73b7", // optional: blue-ish link color
-  marginBottom: 2,
-},
-techStack: {
-  fontSize: 9,
-  fontStyle: "italic",
-  marginBottom: 2,
-},
-projectDescription: {
-  fontSize: 9,
-  color: "#333",
-},
-
+    marginBottom: 8,
+  },
+  projectTitle: {
+    fontSize: 10,
+    fontWeight: "bold",
+    marginBottom: 2,
+  },
+  projectLink: {
+    fontSize: 9,
+    color: "#1f73b7", // optional: blue-ish link color
+    marginBottom: 2,
+  },
+  techStack: {
+    fontSize: 9,
+    fontStyle: "italic",
+    marginBottom: 2,
+  },
+  projectDescription: {
+    fontSize: 9,
+    color: "#333",
+  },
 });
 
 export default function PDFResumeTemplate({
@@ -585,48 +364,46 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
 
   const safeSkills = resumeData?.skills || {};
 
-const parsedSkills = [
-  ...(safeSkills.technical?.split(",").map((s) => s.trim()) || []),
-  ...(safeSkills.soft?.split(",").map((s) => s.trim()) || []),
-];
+  const parsedSkills = [
+    ...(safeSkills.technical?.split(",").map((s) => s.trim()) || []),
+    ...(safeSkills.soft?.split(",").map((s) => s.trim()) || []),
+  ];
 
-const skills =
-  parsedSkills.length > 0
-    ? parsedSkills
-    : [
-        "Data Analysis",
-        "Paid Acquisition",
-        "Retargeting",
-        "ROAS Optimization",
-        "Cross-Functional Collaboration",
-        "Google Analytics",
-        "Looker",
-        "Appsflyer",
-        "Meta Advertising",
-        "Google Ads",
-        "TikTok Ads",
-        "Snapchat Ads",
-        "SQL",
-      ];
+  const skills =
+    parsedSkills.length > 0
+      ? parsedSkills
+      : [
+          "Data Analysis",
+          "Paid Acquisition",
+          "Retargeting",
+          "ROAS Optimization",
+          "Cross-Functional Collaboration",
+          "Google Analytics",
+          "Looker",
+          "Appsflyer",
+          "Meta Advertising",
+          "Google Ads",
+          "TikTok Ads",
+          "Snapchat Ads",
+          "SQL",
+        ];
 
-
-const certifications = 
-  resumeData?.certifications?.length > 0 &&
-  resumeData.certifications.some((cert) => cert.title || cert.description)
-    ? resumeData.certifications
-    : [
-        {
-          title: "Advanced Google Analytics",
-          description:
-            "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
-        },
-        {
-          title: "Effective Creative Testing",
-          description:
-            "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
-        },
-      ];
-
+  const certifications =
+    resumeData?.certifications?.length > 0 &&
+    resumeData.certifications.some((cert) => cert.title || cert.description)
+      ? resumeData.certifications
+      : [
+          {
+            title: "Advanced Google Analytics",
+            description:
+              "Focused on mastering Google Analytics for deep insights into user behavior, provided by Google.",
+          },
+          {
+            title: "Effective Creative Testing",
+            description:
+              "Specialized in evaluating ad creative performance to maximize engagement, offered by Coursera.",
+          },
+        ];
 
   const renderCustomSection = () => {
     const { title, entries } = customSectionConfig || {};
@@ -682,17 +459,6 @@ const certifications =
               {personal?.jobTitle ||
                 "Digital Marketing Manager | Growth Hacking | Data Analysis"}
             </Text>
-            {/* <View style={styles.contactInfo}>
-              <View style={styles.contactItem}>
-                <Text>{personal?.email || "Virat@IPL.com"}</Text>
-              </View>
-              <View style={styles.contactItem}>
-                <Text>{personal?.linkedin || "linkedin.com/in/yourprofile"}</Text>
-              </View>
-              <View style={styles.contactItem}>
-                <Text>{personal?.location || "San Francisco, California"}</Text>
-              </View>
-            </View> */}
 
             <View style={styles.contactInfo}>
               {/* Email */}
@@ -707,7 +473,12 @@ const certifications =
                     fill="#0891b2"
                   />
                 </Svg>
-                <Text>{personal?.email || "Virat@IPL.com"}</Text>
+                <Link
+                  src={`mailto:${personal?.email || "ViratIPL@gmail.com"}`}
+                  style={styles.contactText}
+                >
+                  {personal?.email || "ViratIPL@gmail.com"}
+                </Link>
               </View>
 
               {/* LinkedIn */}
@@ -723,9 +494,17 @@ const certifications =
                     fill="#0891b2"
                   />
                 </Svg>
-                <Text>
-                  {personal?.linkedin || "linkedin.com/in/yourprofile"}
-                </Text>
+
+                <Link
+                  src={normalizeUrl(
+                    personal?.linkedin || "linkedin.com/in/yourprofile"
+                  )}
+                  style={styles.contactText}
+                >
+                  {getDisplayUrl(
+                    personal?.linkedin || "linkedin.com/in/yourprofile"
+                  )}
+                </Link>
               </View>
 
               {/* Location */}
@@ -766,7 +545,7 @@ const certifications =
           {/* Left Column */}
           <View style={styles.leftColumn}>
             {/* Experience */}
-            
+
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>EXPERIENCE</Text>
               <View>

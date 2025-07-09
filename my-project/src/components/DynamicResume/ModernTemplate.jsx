@@ -1,3 +1,4 @@
+import { normalizeUrl, getDisplayUrl } from "@/utils/urlUtils";
 export default function ModernTemplate({
   resumeData,
   customSectionConfig,
@@ -153,13 +154,20 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
           </p>
 
           <div className="flex flex-wrap gap-6 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-              <span>{personal?.email || "Virat@IPL.com"}</span>
-            </div>
+            <div className="flex items-center gap-2 text-gray-700">
+  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+  </svg>
+  <a
+    href={`mailto:${personal?.email || "careercraft325@gmail.com"}`}
+    className="text-blue-600 underline hover:text-blue-800"
+  >
+    {personal?.email || "careercraft325@gmail.com"}
+  </a>
+</div>
+
+
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -168,8 +176,21 @@ Assisted in managing a portfolio of digital ads, optimizing for a 10% improvemen
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{personal?.linkedin || "linkedin.com/in/yourprofile"}</span>
+
+              <a
+                href={normalizeUrl(
+                  personal?.linkedin || "linkedin.com/in/Anshulkavi"
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline hover:text-blue-800"
+              >
+                {getDisplayUrl(
+                  personal?.linkedin || "linkedin.com/in/Anshulkavi"
+                )}
+              </a>
             </div>
+
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path

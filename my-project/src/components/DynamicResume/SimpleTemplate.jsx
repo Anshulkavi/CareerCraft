@@ -329,6 +329,7 @@
 //     </div>
 //   )
 // }
+import { normalizeUrl, getDisplayUrl } from "@/utils/urlUtils";
 
 export default function SimpleTemplate({ resumeData }) {
   const { personal } = resumeData || {};
@@ -336,10 +337,10 @@ export default function SimpleTemplate({ resumeData }) {
   const firstName = personal.firstName || "John";
   const lastName = personal.lastName || "Aarts";
   const jobTitle = personal.jobTitle || "Customer Success Manager";
-  const phone = personal.phone || "+1-952-140-6600";
-  const email = personal.email || "john.xander@gmail.com";
-  const linkedin = personal.linkedin || "linkedin.com/@_XanderAarts_";
-  const location = personal.location || "Amsterdam, Netherlands";
+  const phone = personal.phone || "+91-952XX-066XX";
+  const email = personal.email || "careercraft325@gmail.com";
+  const linkedin = personal.linkedin || "linkedin.com/Anshulkavi";
+  const location = personal.location || "Indore, India";
   console.log("ResumeData received:", resumeData);
 
   const summary =
@@ -419,22 +420,23 @@ export default function SimpleTemplate({ resumeData }) {
     ? resumeData.experience
     : dummyExperience;
 
-  const skills = resumeData.skills?.technical || resumeData.skills?.soft
-  ? [
-      ...(resumeData.skills.technical?.split(",").map((s) => s.trim()) || []),
-      ...(resumeData.skills.soft?.split(",").map((s) => s.trim()) || []),
-    ]
-  : [
-      "CRM",
-      "Salesforce",
-      "NetSuite",
-      "MS Excel",
-      "Hubspot",
-      "Mailchimp",
-      "CI Tools",
-      "SimilarWeb",
-    ];
-
+  const skills =
+    resumeData.skills?.technical || resumeData.skills?.soft
+      ? [
+          ...(resumeData.skills.technical?.split(",").map((s) => s.trim()) ||
+            []),
+          ...(resumeData.skills.soft?.split(",").map((s) => s.trim()) || []),
+        ]
+      : [
+          "CRM",
+          "Salesforce",
+          "NetSuite",
+          "MS Excel",
+          "Hubspot",
+          "Mailchimp",
+          "CI Tools",
+          "SimilarWeb",
+        ];
 
   const userAchievements =
     resumeData.achievements?.filter(
@@ -456,7 +458,8 @@ export default function SimpleTemplate({ resumeData }) {
     },
     {
       title: "Conversion Rate Optimization",
-      description: "Implemented a successful landing page optimization strategy, lifting conversion rates by 18%.",
+      description:
+        "Implemented a successful landing page optimization strategy, lifting conversion rates by 18%.",
     },
   ];
 
@@ -496,16 +499,15 @@ export default function SimpleTemplate({ resumeData }) {
   ];
 
   const hasUserProjects =
-  Array.isArray(resumeData.projects) &&
-  resumeData.projects.some(
-    (proj) =>
-      proj.title?.trim() ||
-      proj.description?.trim() ||
-      proj.githubLink?.trim() ||
-      proj.demoLink?.trim() ||
-      proj.link?.trim()
-  );
-
+    Array.isArray(resumeData.projects) &&
+    resumeData.projects.some(
+      (proj) =>
+        proj.title?.trim() ||
+        proj.description?.trim() ||
+        proj.githubLink?.trim() ||
+        proj.demoLink?.trim() ||
+        proj.link?.trim()
+    );
 
   const projects = hasUserProjects ? resumeData.projects : dummyProjects;
 
@@ -543,7 +545,12 @@ export default function SimpleTemplate({ resumeData }) {
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
             </svg>
-            <span>{email}</span>
+            <a
+              href={`mailto:${email}`}
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              {email}
+            </a>
           </div>
           {/* LinkedIn */}
           <div className="flex items-center gap-2 text-gray-700">
@@ -559,8 +566,17 @@ export default function SimpleTemplate({ resumeData }) {
                 clipRule="evenodd"
               />
             </svg>
-            <span>{linkedin}</span>
+
+            <a
+              href={normalizeUrl(linkedin)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              {getDisplayUrl(linkedin)}
+            </a>
           </div>
+
           {/* Location */}
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
