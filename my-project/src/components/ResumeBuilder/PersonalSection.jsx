@@ -122,6 +122,9 @@ const PersonalSection = ({ resumeData, setResumeData, setHasChanges }) => {
         placeholder="Briefly introduce yourself"
         value={resumeData.personal.summary}
         onChange={(e) => {
+          e.target.style.height = "auto";
+          e.target.style.height = `${e.target.scrollHeight}px`;
+
           setResumeData({
             ...resumeData,
             personal: { ...resumeData.personal, summary: e.target.value },

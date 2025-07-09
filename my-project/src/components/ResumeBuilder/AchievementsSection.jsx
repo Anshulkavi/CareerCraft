@@ -45,6 +45,8 @@ const AchievementsSection = ({ resumeData, setResumeData, setHasChanges }) => (
           placeholder="Represented college in SIH 2022 and won first place in national finals..."
           value={achievement.description}
           onChange={(e) => {
+            e.target.style.height = "auto";
+            e.target.style.height = `${e.target.scrollHeight}px`;
             const updated = [...resumeData.achievements];
             updated[idx].description = e.target.value;
             setResumeData({ ...resumeData, achievements: updated });

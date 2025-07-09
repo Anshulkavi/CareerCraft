@@ -9,12 +9,14 @@ const InterestsSection = ({ resumeData, setResumeData }) => (
       id="interests"
       placeholder="Photography, Reading, Chess"
       value={resumeData.interests}
-      onChange={(e) =>
+      onChange={(e) => {
+        e.target.style.height = "auto";
+        e.target.style.height = `${e.target.scrollHeight}px`;
         setResumeData({
           ...resumeData,
           interests: e.target.value,
         })
-      }
+      }}
     />
   </Section>
 );

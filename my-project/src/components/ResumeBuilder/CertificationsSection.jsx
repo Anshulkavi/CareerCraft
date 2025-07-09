@@ -3,7 +3,11 @@ import InputWithLabel from "../ui/InputwithLabel";
 import TextareaWithLabel from "../ui/TextareawithLabel";
 import Section from "../ui/Section";
 
-const CertificationsSection = ({ resumeData, setResumeData, setHasChanges }) => (
+const CertificationsSection = ({
+  resumeData,
+  setResumeData,
+  setHasChanges,
+}) => (
   <Section
     title="Certifications"
     actions
@@ -57,6 +61,9 @@ const CertificationsSection = ({ resumeData, setResumeData, setHasChanges }) => 
           placeholder="A course focused on mastering Google Analytics for insights..."
           value={cert.description}
           onChange={(e) => {
+            e.target.style.height = "auto";
+            e.target.style.height = `${e.target.scrollHeight}px`;
+            
             const updated = [...resumeData.certifications];
             updated[idx].description = e.target.value;
             setResumeData({ ...resumeData, certifications: updated });

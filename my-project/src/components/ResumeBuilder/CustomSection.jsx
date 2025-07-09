@@ -83,6 +83,8 @@ const CustomSection = ({ customSectionConfig, setCustomSectionConfig }) => (
           label="Description"
           value={entry.description}
           onChange={(e) => {
+            e.target.style.height = "auto";
+            e.target.style.height = `${e.target.scrollHeight}px`;
             const updated = [...customSectionConfig.entries];
             updated[idx].description = e.target.value;
             setCustomSectionConfig((prev) => ({

@@ -28,7 +28,10 @@ const ReferencesSection = ({ resumeData, setResumeData }) => (
   >
     {(resumeData.references?.length ? resumeData.references : []).map(
       (ref, index) => (
-        <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
+        <div
+          key={index}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2"
+        >
           <InputWithLabel
             label="Name"
             id={`refName-${index}`}
@@ -71,6 +74,8 @@ const ReferencesSection = ({ resumeData, setResumeData }) => (
             placeholder="Optional notes..."
             value={ref.notes}
             onChange={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = `${e.target.scrollHeight}px`;
               const updated = [...resumeData.references];
               updated[index].notes = e.target.value;
               setResumeData({ ...resumeData, references: updated });
@@ -89,4 +94,3 @@ const ReferencesSection = ({ resumeData, setResumeData }) => (
 );
 
 export default ReferencesSection;
-
