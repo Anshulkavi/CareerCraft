@@ -201,3 +201,4 @@ const AwardsSection = ({ resumeData, setResumeData, selectedTemplate }) => {
 };
 
 export default AwardsSection;
+

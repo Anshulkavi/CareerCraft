@@ -2287,6 +2287,7 @@ export default function ResumeBuilder() {
   const [pendingSection, setPendingSection] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
   const [hasChanges, setHasChanges] = useState(false);
+const [isLoading, setIsLoading] = useState(false);
 
   // Handle pending section changes when tab switches
   useEffect(() => {
@@ -2296,23 +2297,23 @@ export default function ResumeBuilder() {
     }
   }, [activeTab, pendingSection]);
 
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { role: "user", content: input }]);
+const handleSendMessage = async () => {
+  if (!input.trim()) return;
+  const userMessage = { role: "user", content: input };
+  setMessages((prev) => [...prev, userMessage]);
+  setInput("");
+  setIsLoading(true);
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "I can help you improve that section. Based on your experience, I suggest highlighting your achievements with quantifiable results. Would you like me to rewrite it for you?",
-        },
-      ]);
-    }, 1000);
-
-    setInput("");
-  };
+  // Simulate AI reply
+  setTimeout(() => {
+    const aiResponse = {
+      role: "assistant",
+      content: "Thanks for your question! Here's something helpful.",
+    };
+    setMessages((prev) => [...prev, aiResponse]);
+    setIsLoading(false);
+  }, 1200);
+};
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
