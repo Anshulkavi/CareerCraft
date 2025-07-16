@@ -534,6 +534,7 @@ import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo"; // Adjust the import path as necessary
 // import { useResume } from "../context/ResumeContext";
 // import ResumeDownloadButton from "./ui/ResumeDownloadButton";
+import { toast } from "react-toastify";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
@@ -596,22 +597,51 @@ export default function Navbar({resumeData,customSectionConfig, isReplaced,selec
 
   const [hasChanges, setHasChanges] = useState(false);
   
+// const handleDownload = async (
+//   resumeData,
+//   customSectionConfig,
+//   isReplaced,
+//   selectedTemplate
+// ) => {
+//   // Optional validation
+//   // if (!hasChanges) {
+//   //   alert("Please edit something before downloading.");
+//   //   return;
+//   // }
+
+//   const PDFComponent =
+//     selectedTemplate === "simple"
+//       ? PDFSimpleTemplate
+//       : PDFResumeTemplate;
+
+//   const blob = await pdf(
+//     <PDFComponent
+//       resumeData={resumeData}
+//       customSectionConfig={customSectionConfig}
+//       isReplaced={isReplaced}
+//       selectedTemplate={selectedTemplate}
+//     />
+//   ).toBlob();
+// console.log("Downloading template:", selectedTemplate);
+
+//   saveAs(blob, "My_Resume.pdf");
+// };
+
 const handleDownload = async (
   resumeData,
   customSectionConfig,
   isReplaced,
-  selectedTemplate
+  selectedTemplate,
+  navigate // only if you want to redirect to login
 ) => {
-  // Optional validation
-  // if (!hasChanges) {
-  //   alert("Please edit something before downloading.");
-  //   return;
-  // }
+  const token = localStorage.getItem("token");
+  if (!token) {
+    toast.warn("Please login to download your resume");
+    return; // ⛔ Prevent download
+  }
 
   const PDFComponent =
-    selectedTemplate === "simple"
-      ? PDFSimpleTemplate
-      : PDFResumeTemplate;
+    selectedTemplate === "simple" ? PDFSimpleTemplate : PDFResumeTemplate;
 
   const blob = await pdf(
     <PDFComponent
@@ -621,10 +651,11 @@ const handleDownload = async (
       selectedTemplate={selectedTemplate}
     />
   ).toBlob();
-console.log("Downloading template:", selectedTemplate);
 
   saveAs(blob, "My_Resume.pdf");
 };
+
+
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">
