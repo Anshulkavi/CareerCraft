@@ -530,7 +530,7 @@
 // }
 
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo"; // Adjust the import path as necessary
 // import { useResume } from "../context/ResumeContext";
 // import ResumeDownloadButton from "./ui/ResumeDownloadButton";
@@ -539,7 +539,12 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
 import PDFSimpleTemplate from "@/components/pdf/PDFSimpleTemplate";
-export default function Navbar({resumeData,customSectionConfig, isReplaced,selectedTemplate}) {
+export default function Navbar({
+  resumeData,
+  customSectionConfig,
+  isReplaced,
+  selectedTemplate,
+}) {
   const location = useLocation();
   const isResumeBuilder = location.pathname === "/resume/builder";
 
@@ -594,68 +599,93 @@ export default function Navbar({resumeData,customSectionConfig, isReplaced,selec
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
   const [hasChanges, setHasChanges] = useState(false);
-  
-// const handleDownload = async (
-//   resumeData,
-//   customSectionConfig,
-//   isReplaced,
-//   selectedTemplate
-// ) => {
-//   // Optional validation
-//   // if (!hasChanges) {
-//   //   alert("Please edit something before downloading.");
-//   //   return;
-//   // }
 
-//   const PDFComponent =
-//     selectedTemplate === "simple"
-//       ? PDFSimpleTemplate
-//       : PDFResumeTemplate;
+  // const handleDownload = async (
+  //   resumeData,
+  //   customSectionConfig,
+  //   isReplaced,
+  //   selectedTemplate
+  // ) => {
+  //   // Optional validation
+  //   // if (!hasChanges) {
+  //   //   alert("Please edit something before downloading.");
+  //   //   return;
+  //   // }
 
-//   const blob = await pdf(
-//     <PDFComponent
-//       resumeData={resumeData}
-//       customSectionConfig={customSectionConfig}
-//       isReplaced={isReplaced}
-//       selectedTemplate={selectedTemplate}
-//     />
-//   ).toBlob();
-// console.log("Downloading template:", selectedTemplate);
+  //   const PDFComponent =
+  //     selectedTemplate === "simple"
+  //       ? PDFSimpleTemplate
+  //       : PDFResumeTemplate;
 
-//   saveAs(blob, "My_Resume.pdf");
-// };
+  //   const blob = await pdf(
+  //     <PDFComponent
+  //       resumeData={resumeData}
+  //       customSectionConfig={customSectionConfig}
+  //       isReplaced={isReplaced}
+  //       selectedTemplate={selectedTemplate}
+  //     />
+  //   ).toBlob();
+  // console.log("Downloading template:", selectedTemplate);
 
-const handleDownload = async (
-  resumeData,
-  customSectionConfig,
-  isReplaced,
-  selectedTemplate,
-  navigate // only if you want to redirect to login
-) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    toast.warn("Please login to download your resume");
-    return; // ⛔ Prevent download
-  }
+  //   saveAs(blob, "My_Resume.pdf");
+  // };
 
-  const PDFComponent =
-    selectedTemplate === "simple" ? PDFSimpleTemplate : PDFResumeTemplate;
+  const navigate = useNavigate();
 
-  const blob = await pdf(
-    <PDFComponent
-      resumeData={resumeData}
-      customSectionConfig={customSectionConfig}
-      isReplaced={isReplaced}
-      selectedTemplate={selectedTemplate}
-    />
-  ).toBlob();
+  const handleClick = () => {
+    handleDownload( resumeData,
+      customSectionConfig,
+      isReplaced,
+      selectedTemplate,
+      navigate);
+  };
 
-  saveAs(blob, "My_Resume.pdf");
-};
+  const handleDownload = async (
+    resumeData,
+    customSectionConfig,
+    isReplaced,
+    selectedTemplate,
+    navigate
+  ) => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      // 💡 Avoid defining this inline every time
+      const handleLoginRedirect = () => navigate("/login");
 
+      toast.warn(
+        <div>
+          Please login to download your resume.{" "}
+          <button
+            className="ml-2 text-blue-500 underline hover:text-blue-700 transition"
+            onClick={handleLoginRedirect}
+          >
+            Go to Login
+          </button>
+        </div>,
+        {
+          autoClose: 8000,
+          closeOnClick: false,
+        }
+      );
+      return;
+    }
+
+    const PDFComponent =
+      selectedTemplate === "simple" ? PDFSimpleTemplate : PDFResumeTemplate;
+
+    const blob = await pdf(
+      <PDFComponent
+        resumeData={resumeData}
+        customSectionConfig={customSectionConfig}
+        isReplaced={isReplaced}
+        selectedTemplate={selectedTemplate}
+      />
+    ).toBlob();
+
+    saveAs(blob, "My_Resume.pdf");
+  };
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">
@@ -676,23 +706,12 @@ const handleDownload = async (
         {/* Builder Mode Buttons */}
         {isResumeBuilder ? (
           <div className="flex space-x-3">
-            {/* <button className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 transition">
-              Settings
-            </button> */}
             <button
-          onClick={() =>
-            handleDownload(resumeData, customSectionConfig, isReplaced,selectedTemplate)
-          }
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-        >
-          Download Resume
-        </button>
-            {/* <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-              Share
-            </button> */}
-            {/* <button className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
-              Save
-            </button> */}
+              onClick={handleClick}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            >
+              Download Resume
+            </button>
           </div>
         ) : (
           <>
