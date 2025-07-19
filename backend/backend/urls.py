@@ -18,11 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
+from userauth.views import EmailTokenObtainPairView  # instead of default one
+
 
 urlpatterns = [
    
     path('admin/', admin.site.urls),
     path('api/', include('core.urls')),  # your app's URL pattern
+    path('api/userauth/', include('userauth.urls')),  # maps to /api/auth/register
+    path("api/token/", EmailTokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
 ]
 
 # For serving media files
