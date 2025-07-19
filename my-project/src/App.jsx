@@ -35,7 +35,7 @@ import Faqs from "./pages/Blog/FAQs";
 // Other Pages
 import Pricing from "./pages/Pricing";
 import ForOrganizations from "./pages/ForOrganizations";
-import Signup from "./pages/Signup";
+import AuthForm from "./pages/AuthForm";
 import { ResumeProvider } from "./context/ResumeContext";
 import ScrollToTop from "./components/ui/ScrollToTop";
 import useLenis from "./hooks/useLenis"; // Custom hook for smooth scrolling with Lenis
@@ -43,6 +43,9 @@ import { exportToPDF } from "./hooks/exportUtils";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling with Lenis
@@ -63,7 +66,8 @@ function App() {
   return (
     <>
       {/* <Darkmode /> */}
-      {shouldShowNavbar && <Navbar />} {/* ✅ Only show when route is not in the excluded list */}
+      {shouldShowNavbar && <Navbar />}{" "}
+      {/* ✅ Only show when route is not in the excluded list */}
       <ScrollToTop />
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
         <Routes>
@@ -87,7 +91,8 @@ function App() {
           />
 
           {/* Signup Page */}
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/signup" element={<AuthForm />} />
+          <Route path="/login" element={<AuthForm />} />
 
           {/* Resume Pages */}
           <Route
@@ -136,7 +141,10 @@ function App() {
           {/* Other Pages */}
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/for-organizations" element={<ForOrganizations />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+
         </Routes>
+        <ToastContainer position="top-center" autoClose={2000} />
         <Footer />
       </div>
     </>

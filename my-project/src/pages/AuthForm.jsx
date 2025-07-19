@@ -195,6 +195,7 @@ function AuthForm() {
         if (isLogin) {
           localStorage.setItem("access", data.access);
           localStorage.setItem("refresh", data.refresh)
+          window.dispatchEvent(new Event("loginStatusChanged"));
           navigate("/dashboard"); // or "/resume-builder"
         } else {
           setMessage({
