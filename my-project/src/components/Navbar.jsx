@@ -528,6 +528,7 @@
 //     </header>
 //   );
 // }
+import { UserCircle } from "lucide-react";
 
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -634,11 +635,13 @@ export default function Navbar({
   const navigate = useNavigate();
 
   const handleClick = () => {
-    handleDownload( resumeData,
+    handleDownload(
+      resumeData,
       customSectionConfig,
       isReplaced,
       selectedTemplate,
-      navigate);
+      navigate
+    );
   };
 
   const handleDownload = async (
@@ -648,7 +651,7 @@ export default function Navbar({
     selectedTemplate,
     navigate
   ) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access");
 
     if (!token) {
       // 💡 Avoid defining this inline every time
@@ -687,6 +690,23 @@ export default function Navbar({
     saveAs(blob, "My_Resume.pdf");
   };
 
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    Boolean(localStorage.getItem("access"))
+  );
+
+  useEffect(() => {
+    const updateLoginStatus = () => {
+      setIsLoggedIn(Boolean(localStorage.getItem("access")));
+    };
+    window.addEventListener("loginStatusChanged", updateLoginStatus);
+    window.addEventListener("storage", updateLoginStatus);
+
+    return () => {
+      window.removeEventListener("loginStatusChanged", updateLoginStatus);
+      window.removeEventListener("storage", updateLoginStatus);
+    };
+  }, []);
+
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">
       <nav
@@ -705,20 +725,167 @@ export default function Navbar({
 
         {/* Builder Mode Buttons */}
         {isResumeBuilder ? (
-          <div className="flex space-x-3">
+          // <div className="flex space-x-3 relative">
+          //   <button
+          //     onClick={handleClick}
+          //     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          //   >
+          //     Download Resume
+          //   </button>
+          //       <button
+          //         onClick={() => handleDropdownClick("account")}
+          //         className="text-gray-800 dark:text-white focus:outline-none"
+          //       >
+          //         <UserCircle className="w-8 h-8" />
+          //       </button>
+          //       {activeDropdown === "account" && (
+          //         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+          //           <ul>
+          //             {isLoggedIn ? (
+          //               <>
+          //                 <li>
+          //                   <Link
+          //                     to="/dashboard"
+          //                     onClick={closeDropdowns}
+          //                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+          //                   >
+          //                     Dashboard
+          //                   </Link>
+          //                 </li>
+          //                 <li>
+          //                   <Link
+          //                     to="/settings"
+          //                     onClick={closeDropdowns}
+          //                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+          //                   >
+          //                     Settings
+          //                   </Link>
+          //                 </li>
+          //                 <li>
+          //                   <button
+          //                     onClick={() => {
+          //                       localStorage.removeItem("access");
+          //                       localStorage.removeItem("refresh");
+          //                       // If you also used `token` key anywhere:
+          //                       localStorage.removeItem("token");
+
+          //                       // Update local state
+          //                       setIsLoggedIn(false);
+
+          //                       // Notify all components / tabs
+          //                       window.dispatchEvent(
+          //                         new Event("loginStatusChanged")
+          //                       );
+
+          //                       // Navigate to login or homepage
+          //                       navigate("/login");
+
+          //                       // Close the dropdown
+          //                       closeDropdowns();
+          //                     }}
+          //                     className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+          //                   >
+          //                     Logout
+          //                   </button>
+          //                 </li>
+          //               </>
+          //             ) : (
+          //               <li>
+          //                 <Link
+          //                   to="/login"
+          //                   onClick={closeDropdowns}
+          //                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+          //                 >
+          //                   Login
+          //                 </Link>
+          //               </li>
+          //             )}
+          //           </ul>
+          //         </div>
+          //       )}
+          //     </div>
+          <div className="flex space-x-3 items-center relative">
             <button
               onClick={handleClick}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
             >
               Download Resume
             </button>
+
+            {/* Account Icon with dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => handleDropdownClick("account")}
+                className="text-gray-800 dark:text-white focus:outline-none"
+              >
+                <UserCircle className="w-8 h-8" />
+              </button>
+
+              {/* Dropdown */}
+              {activeDropdown === "account" && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+                  <ul>
+                    {isLoggedIn ? (
+                      <>
+                        <li>
+                          <Link
+                            to="/dashboard"
+                            onClick={closeDropdowns}
+                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            Dashboard
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            to="/settings"
+                            onClick={closeDropdowns}
+                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            Settings
+                          </Link>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => {
+                              localStorage.removeItem("access");
+                              localStorage.removeItem("refresh");
+                              localStorage.removeItem("token");
+                              setIsLoggedIn(false);
+                              window.dispatchEvent(
+                                new Event("loginStatusChanged")
+                              );
+                              navigate("/"); // or "/login" if preferred
+                              closeDropdowns();
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            Logout
+                          </button>
+                        </li>
+                      </>
+                    ) : (
+                      <li>
+                        <Link
+                          to="/login"
+                          onClick={closeDropdowns}
+                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          Login
+                        </Link>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <>
             {/* Desktop Menu */}
             <div
               ref={menuRef}
-              className={`hidden md:flex space-x-6 items-center text-gray-700 font-medium`}
+              className={`hidden md:flex space-x-6 items-center text-gray-700 font-medium ml-10`}
             >
               {/* Resume Dropdown */}
               <div
@@ -893,7 +1060,7 @@ export default function Navbar({
               </Link>
             </div>
 
-            {/* Desktop Buttons */}
+            {/* Desktop Buttons
             <div className="hidden md:flex space-x-4 items-center">
               <Link to="/signup">
                 <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
@@ -906,29 +1073,208 @@ export default function Navbar({
                 </button>
               </Link>
             </div>
+            {/* Right side: Account + Hamburger */}
+            {/* <div className="flex items-center space-x-3 ml-auto"> */}
+            {/* Mobile Hamburger */}
+            {/* <button
+                onClick={toggleMenu}
+                className="md:hidden flex flex-col space-y-1 focus:outline-none"
+                aria-label="Toggle menu"
+              >
+                <span
+                  className={`block h-0.5 w-6 bg-gray-700 transform transition duration-300 ease-in-out ${
+                    isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                  }`}
+                />
+                <span
+                  className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ease-in-out ${
+                    isMobileMenuOpen ? "opacity-0" : "opacity-100"
+                  }`}
+                />
+                <span
+                  className={`block h-0.5 w-6 bg-gray-700 transform transition duration-300 ease-in-out ${
+                    isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                  }`}
+                />
+              </button> */}
 
-            {/* Hamburger - Mobile */}
-            <button
-              onClick={toggleMenu}
-              className="md:hidden flex flex-col space-y-1 focus:outline-none mr-20"
-              aria-label="Toggle menu"
-            >
-              <span
-                className={`block h-0.5 w-6 bg-gray-700 transform transition duration-300 ease-in-out ${
-                  isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
-                }`}
-              />
-              <span
-                className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ease-in-out ${
-                  isMobileMenuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`block h-0.5 w-6 bg-gray-700 transform transition duration-300 ease-in-out ${
-                  isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-                }`}
-              />
-            </button>
+            {/* Account Icon */}
+            {/* <div className="relative ml-4">
+                <button
+                  onClick={() => handleDropdownClick("account")}
+                  className="text-gray-800 dark:text-white focus:outline-none"
+                >
+                  <UserCircle className="w-8 h-8" />
+                </button>
+
+                {activeDropdown === "account" && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+                    <ul>
+                      {isLoggedIn ? (
+                        <>
+                          <li>
+                            <Link
+                              to="/dashboard"
+                              onClick={closeDropdowns}
+                              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                            >
+                              Dashboard
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/settings"
+                              onClick={closeDropdowns}
+                              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                            >
+                              Settings
+                            </Link>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => {
+                                localStorage.removeItem("token");
+                                closeDropdowns();
+                                navigate("/login");
+                              }}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                            >
+                              Logout
+                            </button>
+                          </li>
+                        </>
+                      ) : (
+                        <li>
+                          <Link
+                            to="/login"
+                            onClick={closeDropdowns}
+                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            Login
+                          </Link>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div> */}
+            {/* Right-aligned group: Buttons + Account + Hamburger */}
+            <div className="flex items-center ml-auto space-x-4 md:space-x-4">
+              {/* Hamburger Menu (mobile only) */}
+              <div className="flex md:hidden order-1">
+                <button
+                  onClick={toggleMenu}
+                  className="flex flex-col space-y-1 focus:outline-none"
+                  aria-label="Toggle menu"
+                >
+                  <span
+                    className={`block h-0.5 w-6 bg-gray-700 transform transition duration-300 ease-in-out ${
+                      isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 w-6 bg-gray-700 transition-opacity duration-300 ease-in-out ${
+                      isMobileMenuOpen ? "opacity-0" : "opacity-100"
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 w-6 bg-gray-700 transform transition duration-300 ease-in-out ${
+                      isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Desktop Buttons */}
+              <div className="hidden md:flex space-x-4 items-center order-2">
+                <Link to="/signup">
+                  <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                    Login
+                  </button>
+                </Link>
+                <Link to="/resume/builder">
+                  <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                    Create Resume
+                  </button>
+                </Link>
+              </div>
+
+              {/* Account Icon */}
+              <div className="relative order-3">
+                <button
+                  onClick={() => handleDropdownClick("account")}
+                  className="text-gray-800 dark:text-white focus:outline-none"
+                >
+                  <UserCircle className="w-8 h-8" />
+                </button>
+                {activeDropdown === "account" && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
+                    <ul>
+                      {isLoggedIn ? (
+                        <>
+                          <li>
+                            <Link
+                              to="/dashboard"
+                              onClick={closeDropdowns}
+                              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                            >
+                              Dashboard
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/settings"
+                              onClick={closeDropdowns}
+                              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                            >
+                              Settings
+                            </Link>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => {
+                                localStorage.removeItem("access");
+                                localStorage.removeItem("refresh");
+                                // If you also used `token` key anywhere:
+                                localStorage.removeItem("token");
+
+                                // Update local state
+                                setIsLoggedIn(false);
+
+                                // Notify all components / tabs
+                                window.dispatchEvent(
+                                  new Event("loginStatusChanged")
+                                );
+
+                                // Navigate to login or homepage
+                                navigate("/login");
+
+                                // Close the dropdown
+                                closeDropdowns();
+                              }}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                            >
+                              Logout
+                            </button>
+                          </li>
+                        </>
+                      ) : (
+                        <li>
+                          <Link
+                            to="/login"
+                            onClick={closeDropdowns}
+                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
+                          >
+                            Login
+                          </Link>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
