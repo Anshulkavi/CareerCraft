@@ -223,5 +223,6 @@ def test_cors(request):
     return JsonResponse({"status": "ok"})
 
 
+
 def health_check(request):
     return JsonResponse({'status': 'ok'}, status=200)
