@@ -20,15 +20,16 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import SubscriptionForm from "./SubscriptionForm";
+import { isAuthenticated } from "../utils/auth";
 
 export default function Pricing() {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // default to true for SSR
   const location = useLocation();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
+useEffect(() => {
+  setIsLoggedIn(isAuthenticated());
+}, []);
+
 
   if (!isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace />;
