@@ -380,13 +380,19 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import GoogleButton from "../components/ui/googleButton";
+import { Eye, EyeOff } from "lucide-react";
 
 function AuthForm() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const isLogin = location.pathname === "/login";
 
-  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -404,19 +410,23 @@ function AuthForm() {
     }
 
     if (password.length < 6) {
-      setMessage({ text: "Password must be at least 6 characters!", color: "red" });
+      setMessage({
+        text: "Password must be at least 6 characters!",
+        color: "red",
+      });
       return;
     }
 
     try {
       const endpoint = isLogin
-        // ? "http://localhost:8000/api/token/"
-        // : "http://localhost:8000/api/userauth/register/";
-        ? "https://careercraft-5kzo.onrender.com/api/token/"
+        ? // ? "http://localhost:8000/api/token/"
+          // : "http://localhost:8000/api/userauth/register/";
+          "https://careercraft-5kzo.onrender.com/api/token/"
         : "https://careercraft-5kzo.onrender.com/api/userauth/register/";
-        
 
-      const body = isLogin ? { username: email, password } : { username, email, password };
+      const body = isLogin
+        ? { username: email, password }
+        : { username, email, password };
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -433,11 +443,17 @@ function AuthForm() {
           window.dispatchEvent(new Event("loginStatusChanged"));
           navigate("/dashboard");
         } else {
-          setMessage({ text: "Signup successful! Please login.", color: "green" });
+          setMessage({
+            text: "Signup successful! Please login.",
+            color: "green",
+          });
           setTimeout(() => navigate("/login"), 2000);
         }
       } else {
-        setMessage({ text: data.detail || data.error || "Auth failed", color: "red" });
+        setMessage({
+          text: data.detail || data.error || "Auth failed",
+          color: "red",
+        });
       }
     } catch {
       setMessage({ text: "Something went wrong. Try again.", color: "red" });
@@ -448,14 +464,19 @@ function AuthForm() {
     <div className="min-h-screen flex font-[Poppins] flex-col lg:flex-row">
       {/* Left Section (hidden on small screens) */}
       <div className="hidden lg:flex w-full lg:w-1/2 bg-white px-16 py-20 flex-col justify-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Welcome to CareerCraft</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          Welcome to CareerCraft
+        </h1>
         <ul className="space-y-4 text-gray-700 text-lg">
           <li>🚀 Build professional resumes easily</li>
           <li>📊 Get matched to relevant jobs</li>
           <li>🎯 Smart tools to grow your career</li>
         </ul>
         <p className="mt-10 text-sm text-purple-700">
-          Explore <a href="#" className="underline">AI-Powered Tools</a>
+          Explore{" "}
+          <a href="#" className="underline">
+            AI-Powered Tools
+          </a>
         </p>
       </div>
 
@@ -507,7 +528,7 @@ function AuthForm() {
               </label>
             </div>
 
-            <div className="relative mb-6">
+            {/* <div className="relative mb-6">
               <input
                 id="password"
                 type="password"
@@ -524,6 +545,32 @@ function AuthForm() {
               >
                 Password
               </label>
+              
+            </div> */}
+            <div className="relative mb-6">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="peer w-full px-3 py-2 pr-10 border border-gray-300 rounded-md text-sm outline-none focus:border-[#303f9f]"
+              />
+              <label
+                htmlFor="password"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm transition-all
+    peer-focus:top-[-0.4rem] peer-focus:text-xs peer-focus:text-[#303f9f]
+    peer-valid:top-[-0.4rem] peer-valid:text-xs peer-valid:text-[#303f9f] bg-white px-1"
+              >
+                Password
+              </label>
+
+              <div
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 cursor-pointer"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </div>
             </div>
 
             <button
@@ -545,7 +592,10 @@ function AuthForm() {
 
             <p className="text-sm text-gray-600">
               {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-              <Link to={isLogin ? "/signup" : "/login"} className="text-blue-600 underline">
+              <Link
+                to={isLogin ? "/signup" : "/login"}
+                className="text-blue-600 underline"
+              >
                 {isLogin ? "Sign Up" : "Login"}
               </Link>
             </p>
