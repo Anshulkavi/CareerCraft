@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from .models import Subscription
 
 class RegisterView(APIView):
     def post(self, request):
@@ -60,3 +61,23 @@ def profile_view(request):
         "email": user.email,
         "username": user.username
     })    
+
+class SubmitSubscriptionView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request):
+        amount = request.data.get("amount")
+        upi_reference = request.data.get("upi_reference", "")
+        screenshot = request.FILES.get("screenshot")
+
+        if not screenshot:
+            return Response({"error": "Screenshot is required."}, status=400)
+        Subscription.objects.create(
+            user=request.user,
+            amount=amount,
+            upi_reference=upi_reference,
+            screenshot=screenshot,
+            status="pending"
+        )
+        return Response({"message": "Subscription submitted. Awaiting verification."})
+
