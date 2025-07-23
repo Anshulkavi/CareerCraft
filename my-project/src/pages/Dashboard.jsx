@@ -134,6 +134,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
@@ -149,7 +150,7 @@ export default function Dashboard() {
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
-          "http://127.0.0.1:8000/api/userauth/profile/",
+          "https://careercraft-5kzo.onrender.com/api/userauth/profile/",
           {
             headers: { Authorization: `Bearer ${access}` },
           }
@@ -208,12 +209,12 @@ export default function Dashboard() {
                 Expired on Nov 24th, 2024
               </span>
             </p>
-            <a
-              href="#"
+            <Link
+              to="/submit-subscription/"
               className="text-sm text-blue-600 underline mt-2 inline-block"
             >
               Start Subscription
-            </a>
+            </Link>
           </div>
 
           <div className="border rounded p-4">

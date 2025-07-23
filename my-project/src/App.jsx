@@ -46,6 +46,7 @@ import { useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dashboard from "./pages/Dashboard";
+import SubscriptionForm from "./pages/SubscriptionForm";    
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling with Lenis
@@ -142,6 +143,7 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/for-organizations" element={<ForOrganizations />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/submit-subscription" element={<SubscriptionForm />} />
 
         </Routes>
         <ToastContainer position="top-center" autoClose={2000} />

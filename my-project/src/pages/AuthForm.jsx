@@ -410,8 +410,11 @@ function AuthForm() {
 
     try {
       const endpoint = isLogin
-        ? "http://localhost:8000/api/token/"
-        : "http://localhost:8000/api/userauth/register/";
+        // ? "http://localhost:8000/api/token/"
+        // : "http://localhost:8000/api/userauth/register/";
+        ? "https://careercraft-5kzo.onrender.com/api/token/"
+        : "https://careercraft-5kzo.onrender.com/api/userauth/register/";
+        
 
       const body = isLogin ? { username: email, password } : { username, email, password };
 
