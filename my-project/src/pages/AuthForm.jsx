@@ -379,7 +379,7 @@
 
 import React, { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import GoogleButton from "../components/ui/GoogleButton";
+import GoogleButton from "../components/ui/googleButton";
 
 function AuthForm() {
   const location = useLocation();
