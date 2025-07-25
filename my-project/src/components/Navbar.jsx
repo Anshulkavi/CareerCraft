@@ -540,6 +540,10 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
 import PDFSimpleTemplate from "@/components/pdf/PDFSimpleTemplate";
+import { saveResume } from "@/api/resumeAPI";
+import { useContext } from "react";
+import { ResumeContext } from "../context/ResumeContext";
+
 export default function Navbar({
   resumeData,
   customSectionConfig,
@@ -602,37 +606,31 @@ export default function Navbar({
 
   const [hasChanges, setHasChanges] = useState(false);
 
-  // const handleDownload = async (
-  //   resumeData,
-  //   customSectionConfig,
-  //   isReplaced,
-  //   selectedTemplate
-  // ) => {
-  //   // Optional validation
-  //   // if (!hasChanges) {
-  //   //   alert("Please edit something before downloading.");
-  //   //   return;
-  //   // }
+const { resumeRef } = useContext(ResumeContext);
 
-  //   const PDFComponent =
-  //     selectedTemplate === "simple"
-  //       ? PDFSimpleTemplate
-  //       : PDFResumeTemplate;
+const handleSaveResume = async () => {
+  const dataToSave = resumeRef.current;
+  console.log(dataToSave); // ✅ Logging actual data you're saving
 
-  //   const blob = await pdf(
-  //     <PDFComponent
-  //       resumeData={resumeData}
-  //       customSectionConfig={customSectionConfig}
-  //       isReplaced={isReplaced}
-  //       selectedTemplate={selectedTemplate}
-  //     />
-  //   ).toBlob();
-  // console.log("Downloading template:", selectedTemplate);
+  if (!dataToSave) {
+    toast.error("No resume data to save");
+    return;
+  }
 
-  //   saveAs(blob, "My_Resume.pdf");
-  // };
+  const token = localStorage.getItem("access");
 
-  const navigate = useNavigate();
+  try {
+    await saveResume(dataToSave, token);
+    toast.success("Resume saved successfully!");
+  } catch (err) {
+    toast.error("Failed to save resume");
+    console.error("Save failed:", err);
+  }
+};
+
+
+
+const navigate = useNavigate();
 
   const handleClick = () => {
     handleDownload(
@@ -675,6 +673,8 @@ export default function Navbar({
       return;
     }
 
+    console.log("Resume Ref Data:", resumeRef?.current);
+
     const PDFComponent =
       selectedTemplate === "simple" ? PDFSimpleTemplate : PDFResumeTemplate;
 
@@ -707,6 +707,7 @@ export default function Navbar({
     };
   }, []);
 
+
   return (
     <header className="bg-white dark:bg-gray-900 shadow sticky top-0 z-50">
       <nav
@@ -725,86 +726,13 @@ export default function Navbar({
 
         {/* Builder Mode Buttons */}
         {isResumeBuilder ? (
-          // <div className="flex space-x-3 relative">
-          //   <button
-          //     onClick={handleClick}
-          //     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-          //   >
-          //     Download Resume
-          //   </button>
-          //       <button
-          //         onClick={() => handleDropdownClick("account")}
-          //         className="text-gray-800 dark:text-white focus:outline-none"
-          //       >
-          //         <UserCircle className="w-8 h-8" />
-          //       </button>
-          //       {activeDropdown === "account" && (
-          //         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-50">
-          //           <ul>
-          //             {isLoggedIn ? (
-          //               <>
-          //                 <li>
-          //                   <Link
-          //                     to="/dashboard"
-          //                     onClick={closeDropdowns}
-          //                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
-          //                   >
-          //                     Dashboard
-          //                   </Link>
-          //                 </li>
-          //                 <li>
-          //                   <Link
-          //                     to="/settings"
-          //                     onClick={closeDropdowns}
-          //                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
-          //                   >
-          //                     Settings
-          //                   </Link>
-          //                 </li>
-          //                 <li>
-          //                   <button
-          //                     onClick={() => {
-          //                       localStorage.removeItem("access");
-          //                       localStorage.removeItem("refresh");
-          //                       // If you also used `token` key anywhere:
-          //                       localStorage.removeItem("token");
-
-          //                       // Update local state
-          //                       setIsLoggedIn(false);
-
-          //                       // Notify all components / tabs
-          //                       window.dispatchEvent(
-          //                         new Event("loginStatusChanged")
-          //                       );
-
-          //                       // Navigate to login or homepage
-          //                       navigate("/login");
-
-          //                       // Close the dropdown
-          //                       closeDropdowns();
-          //                     }}
-          //                     className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
-          //                   >
-          //                     Logout
-          //                   </button>
-          //                 </li>
-          //               </>
-          //             ) : (
-          //               <li>
-          //                 <Link
-          //                   to="/login"
-          //                   onClick={closeDropdowns}
-          //                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
-          //                 >
-          //                   Login
-          //                 </Link>
-          //               </li>
-          //             )}
-          //           </ul>
-          //         </div>
-          //       )}
-          //     </div>
           <div className="flex space-x-3 items-center relative">
+            <button
+              onClick={handleSaveResume}
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full shadow-lg"
+            >
+              Save Resume
+            </button>
             <button
               onClick={handleClick}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"

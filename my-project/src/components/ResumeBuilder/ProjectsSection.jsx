@@ -314,7 +314,7 @@ const ProjectsSection = ({ resumeData, setResumeData, setHasChanges }) => {
               const updated = [...resumeData.projects];
               updated[index].description = e.target.value;
               setResumeData({ ...resumeData, projects: updated });
-              setHasChanges(true);
+              // setHasChanges(true);
             }}
             rows={1}
             className="md:col-span-2"

@@ -125,7 +125,12 @@ import PyPDF2
 import docx
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
-
+from .models import Resume
+from .serializers import ResumeSerializer
+# from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 # ---------------- EMAIL VALIDATOR ----------------
 def validate_email(email):
@@ -217,7 +222,26 @@ def upload_resume(request):
 
     return JsonResponse({'error': 'Invalid request. POST with resume file required.'}, status=400)
 
+class SaveResumeView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        user_id = str(request.user.id)
+        data = request.data.get('data', {})  # ✅ default to empty dict
+
+        if not data:
+            return Response({"error": "No resume data to save"}, status=400)
+
+        # Overwrite if resume exists
+        existing = Resume.objects(user_id=user_id).first()
+        if existing:
+            existing.data = data
+            existing.save()
+        else:
+            Resume(user_id=user_id, data=data).save()
+
+        return Response({"message": "Resume saved successfully"})
+    
 @csrf_exempt
 def test_cors(request):
     return JsonResponse({"status": "ok"})

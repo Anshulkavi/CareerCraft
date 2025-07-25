@@ -2233,7 +2233,7 @@
 //   </div>
 // );
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import SectionSidebar from "../../components/ResumeBuilder/SectionSidebar";
 import SectionEditorPanel from "../../components/ResumeBuilder/SectionEditorPanel";
 import ResumePreviewSection from "../../components/ResumeBuilder/ResumePreviewSection";
@@ -2250,10 +2250,9 @@ import LanguagesSection from "../../components/ResumeBuilder/LanguagesSection";
 import InterestsSection from "../../components/ResumeBuilder/InterestsSection";
 import ReferencesSection from "../../components/ResumeBuilder/ReferencesSection";
 import CertificationsSection from "../../components/ResumeBuilder/CertificationsSection";
-import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver";
-import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
-import PDFSimpleTemplate from "../../components/pdf/PDFSimpleTemplate";
+import { ResumeContext } from "../../context/ResumeContext";
+
+
 import {
   Send,
   Plus,
@@ -2281,6 +2280,7 @@ export default function ResumeBuilder() {
       content: "Hello! I'm your AI resume assistant. How can I help you today?",
     },
   ]);
+
   const [input, setInput] = useState("");
   const [activeSection, setActiveSection] = useState("personal");
   const [activeTab, setActiveTab] = useState("editor");
@@ -2331,6 +2331,7 @@ const handleSendMessage = async () => {
       reader.readAsDataURL(file); // converts to base64
     }
   };
+
 
   const sections = [
     { id: "personal", name: "Personal Info", icon: User },
@@ -2419,6 +2420,16 @@ const handleSendMessage = async () => {
     ],
   });
 
+  const { resumeRef } = useContext(ResumeContext);
+  resumeRef.current = resumeData;
+
+  useEffect(() => {
+  if (resumeRef?.current !== undefined) {
+  resumeRef.current = resumeData;
+}
+}, [resumeData, resumeRef]);
+
+
   const [customSectionConfig, setCustomSectionConfig] = useState({
     replaces: "", // which section it replaces
     title: "", // section title (e.g. "Freelance Projects")
@@ -2442,34 +2453,6 @@ const handleSendMessage = async () => {
   const isReplaced = (key) => {
     return customSectionConfig?.replaces === key;
   };
-
-  // const handleDownload = async (
-  //   resumeData,
-  //   customSectionConfig,
-  //   isReplaced,
-  //   selectedTemplate
-  // ) => {
-  //   // Optional validation
-  //   // if (!hasChanges) {
-  //   //   alert("Please edit something before downloading.");
-  //   //   return;
-  //   // }
-
-  //   const PDFComponent =
-  //     selectedTemplate === "simple"
-  //       ? PDFSimpleTemplate
-  //       : PDFResumeTemplate;
-
-  //   const blob = await pdf(
-  //     <PDFComponent
-  //       resumeData={resumeData}
-  //       customSectionConfig={customSectionConfig}
-  //       isReplaced={isReplaced}
-  //     />
-  //   ).toBlob();
-
-  //   saveAs(blob, "My_Resume.pdf");
-  // };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

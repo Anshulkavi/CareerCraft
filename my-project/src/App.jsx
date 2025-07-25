@@ -100,12 +100,12 @@ function App() {
             path="/resume/builder"
             element={
               <ResumeProvider
-                onDownload={() => {
-                  const element = document.getElementById("resume-preview");
-                  if (element) {
-                    exportToPDF(element, "MyResume.pdf");
-                  }
-                }}
+                // onDownload={() => {
+                //   const element = document.getElementById("resume-preview");
+                //   if (element) {
+                //     exportToPDF(element, "MyResume.pdf");
+                //   }
+                // }}
               >
                 <Builder />
               </ResumeProvider>

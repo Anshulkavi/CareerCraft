@@ -5,5 +5,4 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('profile/', profile_view, name='profile'),
     path('submit-subcription/', SubmitSubscriptionView.as_view()),
-
 ]

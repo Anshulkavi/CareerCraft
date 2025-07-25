@@ -122,8 +122,8 @@
 // export default Hero;
 
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import modernTemplate from "../assets/modern.png";
-
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -135,6 +135,8 @@ const Hero = () => {
       once: false,
     });
   }, []);
+
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 pt-16 pb-24 relative overflow-hidden">
@@ -159,11 +161,15 @@ const Hero = () => {
               data-aos="fade-up"
               data-aos-delay="100"
             >
-              <button className="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-md font-medium transition-colors">
+              <button className="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-md font-medium transition-colors"
+              onClick={() => navigate("/resume/builder")}>
                 Build Your Resume
               </button>
-              <button className="border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 py-3 px-8 rounded-md font-medium transition-colors">
-                Get Your Resume Score
+              <button
+                onClick={() => navigate("/login")}
+                className="border border-gray-300 bg-white hover:bg-gray-100 text-gray-800 py-3 px-8 rounded-md font-semibold shadow-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Get Started
               </button>
             </div>
 
@@ -202,7 +208,11 @@ const Hero = () => {
           </div>
 
           {/* Right side - Resume Preview */}
-          <div className="w-full md:w-1/2 mt-12 md:mt-0 relative" data-aos="fade-up" data-aos-delay="300">
+          <div
+            className="w-full md:w-1/2 mt-12 md:mt-0 relative"
+            data-aos="fade-up"
+            data-aos-delay="300"
+          >
             <div className="relative ml-auto w-4/5">
               {/* Main resume */}
               <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-100 transform rotate-3">
@@ -234,7 +244,9 @@ const Hero = () => {
                   </div>
                 </div>
                 <div>
-                  <p className="text-gray-500 text-xs mb-1">SECTION SPACING: 3</p>
+                  <p className="text-gray-500 text-xs mb-1">
+                    SECTION SPACING: 3
+                  </p>
                   <div className="relative h-2 bg-gray-200 rounded-full">
                     <div className="w-2/3 h-full bg-green-500 rounded-full"></div>
                     <div className="absolute -top-1 left-2/3 w-4 h-4 rounded-full bg-white border-2 border-green-500"></div>
