@@ -540,7 +540,7 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFResumeTemplate from "@/components/pdf/PDFResumeTemplate";
 import PDFSimpleTemplate from "@/components/pdf/PDFSimpleTemplate";
-import { saveResume } from "@/api/resumeAPI";
+import { saveResume } from "../api/resumeApi";
 import { useContext } from "react";
 import { ResumeContext } from "../context/ResumeContext";
 
