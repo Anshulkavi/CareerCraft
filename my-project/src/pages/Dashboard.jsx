@@ -135,35 +135,59 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import API from "../utils/axios";
+// import SavedResumes from "@/pages/SavedResumes"; // adjust path if different
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   const access = localStorage.getItem("access");
+  //   if (!access) {
+  //     navigate("/login");
+  //     return;
+  //   }
+
+  //   const fetchProfile = async () => {
+  //     try {
+  //       const res = await API.get(
+  //         "https://careercraft-5kzo.onrender.com/api/userauth/profile/",
+  //         {
+  //           headers: { Authorization: `Bearer ${access}` },
+  //         }
+  //       );
+  //       setProfile(res.data);
+  //     } catch (err) {
+  //       console.error("Failed to fetch profile:", err);
+  //       navigate("/login");
+  //     }
+  //   };
+  
+
+  //   fetchProfile();
+  // }, [navigate]);
+
   useEffect(() => {
-    const access = localStorage.getItem("access");
-    if (!access) {
+  const token = localStorage.getItem("access");
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  const fetchProfile = async () => {
+    try {
+      const res = await API.get("/userauth/profile/");
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Failed to fetch profile:", err);
       navigate("/login");
-      return;
     }
+  };
 
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get(
-          "https://careercraft-5kzo.onrender.com/api/userauth/profile/",
-          {
-            headers: { Authorization: `Bearer ${access}` },
-          }
-        );
-        setProfile(res.data);
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
-        navigate("/login");
-      }
-    };
+  fetchProfile();
+}, [navigate]);
 
-    fetchProfile();
-  }, [navigate]);
 
   if (!profile) {
     return (
@@ -194,6 +218,12 @@ export default function Dashboard() {
               <input type="checkbox" className="accent-green-600" />
               <span>Get inspiring resume examples and advice</span>
             </label>
+            <button
+              onClick={() => navigate("/saved-resumes")}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              View Saved Resumes
+            </button>
           </div>
         </div>
 

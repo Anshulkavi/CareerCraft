@@ -419,10 +419,8 @@ function AuthForm() {
 
     try {
       const endpoint = isLogin
-        ? // ? "http://localhost:8000/api/token/"
-          // : "http://localhost:8000/api/userauth/register/";
-          "https://careercraft-5kzo.onrender.com/api/token/"
-        : "https://careercraft-5kzo.onrender.com/api/userauth/register/";
+        ? `${import.meta.env.VITE_API_BASE_URL}/token/`
+        : `${import.meta.env.VITE_API_BASE_URL}/userauth/register/`;
 
       const body = isLogin
         ? { username: email, password }

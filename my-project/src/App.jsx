@@ -20,7 +20,7 @@ import Templates from "./pages/Resume/Templates";
 import Guides from "./pages/Resume/Guides";
 import GuideDetails from "./pages/Resume/GuideDetails";
 import Examples from "./pages/Resume/Examples";
-
+import SavedResumes from "./pages/Resume/SavedResumes";
 // Cover Letter Pages
 import CoverLetterBuilder from "./pages/CoverLetter/Builder";
 import CoverLetterTemplates from "./pages/CoverLetter/Templates";
@@ -52,8 +52,18 @@ function App() {
   useLenis(); // Custom hook for smooth scrolling with Lenis
   const location = useLocation();
   // List of paths where you want to hide the navbar
-  const hideNavbarRoutes = ["/resume/builder", "/cover-letter/builder"];
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+  const hideNavbarRoutes = [
+  /^\/resume\/builder$/,
+  /^\/resume\/[^/]+$/, // Matches /resume/:id
+  /^\/cover-letter\/builder$/,
+];
+
+const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
+  typeof pattern === "string"
+    ? location.pathname === pattern
+    : pattern.test(location.pathname)
+);
+
 
   // Initialize AOS for animations
   useEffect(() => {
@@ -115,6 +125,15 @@ function App() {
           <Route path="/resume/guides" element={<Guides />} />
           <Route path="/resume/guides/:guideSlug" element={<GuideDetails />} />
           <Route path="/resume/examples" element={<Examples />} />
+          <Route
+  path="/resume/:id"
+  element={
+    <ResumeProvider>
+      <Builder />
+    </ResumeProvider>
+  }
+/>
+
 
           {/* Cover Letter Pages */}
           <Route
@@ -144,6 +163,7 @@ function App() {
           <Route path="/for-organizations" element={<ForOrganizations />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/submit-subscription" element={<SubscriptionForm />} />
+          <Route path="/saved-resumes" element={<SavedResumes />} />
 
         </Routes>
         <ToastContainer position="top-center" autoClose={2000} />

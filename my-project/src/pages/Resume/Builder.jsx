@@ -2251,7 +2251,8 @@ import InterestsSection from "../../components/ResumeBuilder/InterestsSection";
 import ReferencesSection from "../../components/ResumeBuilder/ReferencesSection";
 import CertificationsSection from "../../components/ResumeBuilder/CertificationsSection";
 import { ResumeContext } from "../../context/ResumeContext";
-
+import { getResumes, getSingleResume } from "../../api/resumeApi";  
+import { useParams } from "react-router-dom";
 
 import {
   Send,
@@ -2428,6 +2429,30 @@ const handleSendMessage = async () => {
   resumeRef.current = resumeData;
 }
 }, [resumeData, resumeRef]);
+
+const { id } = useParams();
+const [resume, setResume] = useState(null);
+
+useEffect(() => {
+  if (!id) return;
+
+  const token = localStorage.getItem("access");
+  if (!token) return;
+
+  getSingleResume(id, token)
+    .then((res) => {
+      console.log("Fetched Resume ✅:", res.data);
+      setResume(res.data);
+      // You can also load this into your builder context/state
+      // 👇 Load saved data into form
+      if (res.data?.data) {
+        setResumeData(res.data.data); // 🧠 Autofill!
+      }
+    })
+    .catch((err) => {
+      console.error("Failed to fetch resume ❌:", err);
+    });
+}, [id]);
 
 
   const [customSectionConfig, setCustomSectionConfig] = useState({

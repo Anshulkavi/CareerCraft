@@ -1,6 +1,8 @@
 from mongoengine import Document, StringField,ListField, EmailField,DictField, ReferenceField ,connect,disconnect
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from mongoengine import DateTimeField
+from datetime import datetime, timezone
 
 from mongoengine import connect
 from urllib.parse import quote_plus
@@ -28,5 +30,14 @@ User = get_user_model()
 
 class Resume(Document):
     user_id = StringField(required=True)
-    data = DictField() # This will store entire resume as JSON
+    title = StringField(required=True)  # ✅ this must exist
+    data = DictField()
+    created_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
+    updated_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
     meta = {'collection': 'resumes'}
+
+    def save(self, *args, **kwargs):
+        self.updated_at = datetime.utcnow()
+        if not self.created_at:
+            self.created_at = datetime.utcnow()
+        return super().save(*args, **kwargs)

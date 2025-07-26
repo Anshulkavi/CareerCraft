@@ -610,24 +610,28 @@ const { resumeRef } = useContext(ResumeContext);
 
 const handleSaveResume = async () => {
   const dataToSave = resumeRef.current;
-  console.log(dataToSave); // ✅ Logging actual data you're saving
 
   if (!dataToSave) {
     toast.error("No resume data to save");
     return;
   }
 
+  const title = prompt("Enter a title for your resume:");
+  if (!title) {
+    toast.error("Resume title is required");
+    return;
+  }
+
   const token = localStorage.getItem("access");
 
   try {
-    await saveResume(dataToSave, token);
+    await saveResume(dataToSave, title, token);  // ✅ Pass title here
     toast.success("Resume saved successfully!");
   } catch (err) {
     toast.error("Failed to save resume");
     console.error("Save failed:", err);
   }
 };
-
 
 
 const navigate = useNavigate();

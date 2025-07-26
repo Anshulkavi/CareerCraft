@@ -127,7 +127,7 @@ from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 from .models import Resume
 from .serializers import ResumeSerializer
-# from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -227,20 +227,54 @@ class SaveResumeView(APIView):
 
     def post(self, request):
         user_id = str(request.user.id)
+        title = request.data.get("title")
         data = request.data.get('data', {})  # ✅ default to empty dict
 
-        if not data:
-            return Response({"error": "No resume data to save"}, status=400)
+        if not title or not data:
+            return Response({"error": "Missing title or data"}, status=400)
 
-        # Overwrite if resume exists
-        existing = Resume.objects(user_id=user_id).first()
+        # Overwrite if same user + title exists
+        existing = Resume.objects(user_id=user_id, title=title).first()
         if existing:
             existing.data = data
             existing.save()
         else:
-            Resume(user_id=user_id, data=data).save()
+            Resume(user_id=user_id, title=title, data=data).save()
 
         return Response({"message": "Resume saved successfully"})
+
+
+class GetResumeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_id = str(request.user.id)
+
+        # Fetch all resumes for this user, sorted by latest updated
+        resumes = Resume.objects(user_id=user_id).order_by("-updated_at")
+
+        resume_list = [
+            {
+                "id": str(resume.id),
+                "title": resume.title,
+                "created_at": resume.created_at.strftime("%Y-%m-%d %H:%M"),
+                "updated_at": resume.updated_at.strftime("%Y-%m-%d %H:%M"),
+            }
+            for resume in resumes
+        ]
+
+        return Response(resume_list)
+    
+@api_view(['GET'])
+def get_resume_by_id(request, resume_id):
+    try:
+        resume = Resume.objects.get(id=resume_id)
+        serializer = ResumeSerializer(resume)
+        return Response(serializer.data, status=200)
+    except Resume.DoesNotExist:
+        return Response({"error": "Resume not found"}, status=404)
+
+
     
 @csrf_exempt
 def test_cors(request):
