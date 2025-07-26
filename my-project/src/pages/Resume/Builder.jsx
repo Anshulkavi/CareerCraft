@@ -2251,7 +2251,7 @@ import InterestsSection from "../../components/ResumeBuilder/InterestsSection";
 import ReferencesSection from "../../components/ResumeBuilder/ReferencesSection";
 import CertificationsSection from "../../components/ResumeBuilder/CertificationsSection";
 import { ResumeContext } from "../../context/ResumeContext";
-import { getResumes, getSingleResume } from "../../api/resumeApi";  
+import { getResumes, getSingleResume } from "../../api/resumeApi";
 import { useParams } from "react-router-dom";
 
 import {
@@ -2288,7 +2288,19 @@ export default function ResumeBuilder() {
   const [pendingSection, setPendingSection] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
   const [hasChanges, setHasChanges] = useState(false);
-const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  
+  const [personal, setPersonal] = useState({});
+  const [experience, setExperience] = useState([]);
+  const [education, setEducation] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [awards, setAwards] = useState([]);
+  const [achievements, setAchievements] = useState([]);
+  const [certifications, setCertifications] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [interests, setInterests] = useState([]);
+  const [references, setReferences] = useState([]);
 
   // Handle pending section changes when tab switches
   useEffect(() => {
@@ -2298,23 +2310,23 @@ const [isLoading, setIsLoading] = useState(false);
     }
   }, [activeTab, pendingSection]);
 
-const handleSendMessage = async () => {
-  if (!input.trim()) return;
-  const userMessage = { role: "user", content: input };
-  setMessages((prev) => [...prev, userMessage]);
-  setInput("");
-  setIsLoading(true);
+  const handleSendMessage = async () => {
+    if (!input.trim()) return;
+    const userMessage = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
 
-  // Simulate AI reply
-  setTimeout(() => {
-    const aiResponse = {
-      role: "assistant",
-      content: "Thanks for your question! Here's something helpful.",
-    };
-    setMessages((prev) => [...prev, aiResponse]);
-    setIsLoading(false);
-  }, 1200);
-};
+    // Simulate AI reply
+    setTimeout(() => {
+      const aiResponse = {
+        role: "assistant",
+        content: "Thanks for your question! Here's something helpful.",
+      };
+      setMessages((prev) => [...prev, aiResponse]);
+      setIsLoading(false);
+    }, 1200);
+  };
 
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
@@ -2332,7 +2344,6 @@ const handleSendMessage = async () => {
       reader.readAsDataURL(file); // converts to base64
     }
   };
-
 
   const sections = [
     { id: "personal", name: "Personal Info", icon: User },
@@ -2425,34 +2436,61 @@ const handleSendMessage = async () => {
   resumeRef.current = resumeData;
 
   useEffect(() => {
-  if (resumeRef?.current !== undefined) {
-  resumeRef.current = resumeData;
-}
-}, [resumeData, resumeRef]);
+    if (resumeRef?.current !== undefined) {
+      resumeRef.current = resumeData;
+    }
+  }, [resumeData, resumeRef]);
 
-const { id } = useParams();
-const [resume, setResume] = useState(null);
+  const { id } = useParams();
+  const [resume, setResume] = useState(null);
 
-useEffect(() => {
-  if (!id) return;
+  useEffect(() => {
+    if (!id) return;
 
-  const token = localStorage.getItem("access");
-  if (!token) return;
+    const token = localStorage.getItem("access");
+    if (!token) return;
 
-  getSingleResume(id, token)
-    .then((res) => {
-      console.log("Fetched Resume ✅:", res.data);
-      setResume(res.data);
-      // You can also load this into your builder context/state
-      // 👇 Load saved data into form
-      if (res.data?.data) {
-        setResumeData(res.data.data); // 🧠 Autofill!
-      }
-    })
-    .catch((err) => {
-      console.error("Failed to fetch resume ❌:", err);
-    });
-}, [id]);
+    getSingleResume(id, token)
+      .then((res) => {
+        console.log("Fetched Resume ✅:", res.data);
+        setResume(res.data);
+        // You can also load this into your builder context/state
+        // 👇 Load saved data into form
+        if (res.data?.data) {
+          setResumeData(res.data.data); // 🧠 Autofill!
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch resume ❌:", err);
+      });
+  }, [id]);
+
+// useEffect(() => {
+//   if (!id) return;
+
+//   const token = localStorage.getItem("access");
+//   if (!token) return;
+
+//   getSingleResume(id, token)
+//     .then((res) => {
+//       console.log("Fetched Resume ✅:", res.data);
+//       const data = res.data.data; // ✅ fix here
+
+//       setPersonal(data.personal || {});
+//       setExperience(data.experience || []);
+//       setEducation(data.education || []);
+//       setSkills(data.skills || []);
+//       setAwards(data.Awards || []);
+//       setAchievements(data.achievements || []);
+//       setCertifications(data.certifications || []);
+//       setLanguages(data.languages || []);
+//       setInterests(data.interests || []);
+//       setReferences(data.references || []);
+//     })
+//     .catch((err) => {
+//       console.error("Failed to fetch resume ❌:", err);
+//     });
+// }, [id]);
 
 
   const [customSectionConfig, setCustomSectionConfig] = useState({

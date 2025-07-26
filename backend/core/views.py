@@ -115,7 +115,7 @@
 
 
 # 2nd code use when 3rd doesnt work
-
+from bson import ObjectId
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import ResumeData
@@ -131,6 +131,7 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 # ---------------- EMAIL VALIDATOR ----------------
 def validate_email(email):
@@ -274,8 +275,21 @@ def get_resume_by_id(request, resume_id):
     except Resume.DoesNotExist:
         return Response({"error": "Resume not found"}, status=404)
 
+class DeleteResumeView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    
+    def delete(self, request, resume_id):
+        try:
+            resume = Resume.objects.get(id=ObjectId(resume_id), user_id=str(request.user.id))
+            resume.delete()
+            return Response({"message": "Resume deleted ✅"}, status=200)
+        except Resume.DoesNotExist:
+            return Response({"error": "Resume not found"}, status=404)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=500)
+         
 @csrf_exempt
 def test_cors(request):
     return JsonResponse({"status": "ok"})

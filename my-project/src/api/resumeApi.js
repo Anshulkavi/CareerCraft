@@ -41,3 +41,19 @@ export const getSingleResume = (id, token) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+export const deleteResume = async (id, token) => {
+  try {
+    const response = await API.delete(
+      `${import.meta.env.VITE_API_BASE_URL}/delete-resume/${id}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
