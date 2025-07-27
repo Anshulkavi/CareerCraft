@@ -2290,17 +2290,11 @@ export default function ResumeBuilder() {
   const [hasChanges, setHasChanges] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  
-  const [personal, setPersonal] = useState({});
-  const [experience, setExperience] = useState([]);
-  const [education, setEducation] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [awards, setAwards] = useState([]);
-  const [achievements, setAchievements] = useState([]);
-  const [certifications, setCertifications] = useState([]);
-  const [languages, setLanguages] = useState([]);
-  const [interests, setInterests] = useState([]);
-  const [references, setReferences] = useState([]);
+
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
 
   // Handle pending section changes when tab switches
   useEffect(() => {

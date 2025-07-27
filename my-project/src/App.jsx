@@ -37,7 +37,7 @@ import Pricing from "./pages/Pricing";
 import ForOrganizations from "./pages/ForOrganizations";
 import AuthForm from "./pages/AuthForm";
 import { ResumeProvider } from "./context/ResumeContext";
-import ScrollToTop from "./components/ui/ScrollToTop";
+// import ScrollToTop from "./components/ui/ScrollToTop";
 import useLenis from "./hooks/useLenis"; // Custom hook for smooth scrolling with Lenis
 import { exportToPDF } from "./hooks/exportUtils";
 import AOS from "aos";
@@ -51,6 +51,11 @@ import SubscriptionForm from "./pages/SubscriptionForm";
 function App() {
   useLenis(); // Custom hook for smooth scrolling with Lenis
   const location = useLocation();
+
+const shouldEnableLenis = !location.pathname.startsWith("/resume");
+useLenis(shouldEnableLenis);
+
+
   // List of paths where you want to hide the navbar
   const hideNavbarRoutes = [
   /^\/resume\/builder$/,
@@ -64,22 +69,12 @@ const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
     : pattern.test(location.pathname)
 );
 
-
-  // Initialize AOS for animations
-  useEffect(() => {
-    AOS.init({
-      duration: 1000, // animation duration in ms
-      once: false,
-      offset: 100, // trigger point from the top (px)
-    });
-  }, []);
-
   return (
     <>
       {/* <Darkmode /> */}
       {shouldShowNavbar && <Navbar />}{" "}
       {/* ✅ Only show when route is not in the excluded list */}
-      <ScrollToTop />
+      {/* <ScrollToTop /> */}
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
         <Routes>
           {/* Home Page */}
