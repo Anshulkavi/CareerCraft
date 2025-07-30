@@ -7,18 +7,44 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependency directories
+node_modules/
+venv/
+.env
+.env.*  # optional: if using multiple env files like .env.dev
+
+# Build output
+dist/
+dist-ssr/
+build/
 *.local
 
-# Editor directories and files
+# System
+.DS_Store
+Thumbs.db
+
+# Editor files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Python (if you're using Django or Flask in backend)
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+*.db
+
+# Misc
+coverage/
+*.bak
+*.tmp
+.cache/

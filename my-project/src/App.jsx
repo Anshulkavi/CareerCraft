@@ -46,28 +46,29 @@ import { useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dashboard from "./pages/Dashboard";
-import SubscriptionForm from "./pages/SubscriptionForm";    
+import SubscriptionForm from "./pages/SubscriptionForm";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   useLenis(); // Custom hook for smooth scrolling with Lenis
   const location = useLocation();
 
-const shouldEnableLenis = !location.pathname.startsWith("/resume");
-useLenis(shouldEnableLenis);
-
+  const shouldEnableLenis = !location.pathname.startsWith("/resume");
+  useLenis(shouldEnableLenis);
 
   // List of paths where you want to hide the navbar
   const hideNavbarRoutes = [
-  /^\/resume\/builder$/,
-  /^\/resume\/[^/]+$/, // Matches /resume/:id
-  /^\/cover-letter\/builder$/,
-];
+    /^\/resume\/builder$/,
+    /^\/resume\/[^/]+$/, // Matches /resume/:id
+    /^\/cover-letter\/builder$/,
+  ];
 
-const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
-  typeof pattern === "string"
-    ? location.pathname === pattern
-    : pattern.test(location.pathname)
-);
+  const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
+    typeof pattern === "string"
+      ? location.pathname === pattern
+      : pattern.test(location.pathname)
+  );
 
   return (
     <>
@@ -99,18 +100,23 @@ const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
           {/* Signup Page */}
           <Route path="/signup" element={<AuthForm />} />
           <Route path="/login" element={<AuthForm />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/reset-password/:uidb64/:token"
+            element={<ResetPassword />}
+          />
 
           {/* Resume Pages */}
           <Route
             path="/resume/builder"
             element={
               <ResumeProvider
-                // onDownload={() => {
-                //   const element = document.getElementById("resume-preview");
-                //   if (element) {
-                //     exportToPDF(element, "MyResume.pdf");
-                //   }
-                // }}
+              // onDownload={() => {
+              //   const element = document.getElementById("resume-preview");
+              //   if (element) {
+              //     exportToPDF(element, "MyResume.pdf");
+              //   }
+              // }}
               >
                 <Builder />
               </ResumeProvider>
@@ -121,14 +127,13 @@ const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
           <Route path="/resume/guides/:guideSlug" element={<GuideDetails />} />
           <Route path="/resume/examples" element={<Examples />} />
           <Route
-  path="/resume/:id"
-  element={
-    <ResumeProvider>
-      <Builder />
-    </ResumeProvider>
-  }
-/>
-
+            path="/resume/:id"
+            element={
+              <ResumeProvider>
+                <Builder />
+              </ResumeProvider>
+            }
+          />
 
           {/* Cover Letter Pages */}
           <Route
@@ -159,7 +164,6 @@ const shouldShowNavbar = !hideNavbarRoutes.some((pattern) =>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/submit-subscription" element={<SubscriptionForm />} />
           <Route path="/saved-resumes" element={<SavedResumes />} />
-
         </Routes>
         <ToastContainer position="top-center" autoClose={2000} />
         <Footer />

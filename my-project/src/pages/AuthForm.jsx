@@ -571,6 +571,15 @@ function AuthForm() {
               </div>
             </div>
 
+            <div className="text-right text-sm mb-4">
+              <Link
+                to="/forgot-password"
+                className="text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
             <button
               type="submit"
               className="w-full bg-[#303f9f] hover:bg-[#283593] text-white py-2 px-4 rounded-md transition"
