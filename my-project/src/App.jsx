@@ -105,6 +105,8 @@ function App() {
             path="/reset-password/:uidb64/:token"
             element={<ResetPassword />}
           />
+          <Route path="*" element={<div>404 Not Found</div>} />
+
 
           {/* Resume Pages */}
           <Route

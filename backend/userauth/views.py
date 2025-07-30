@@ -119,8 +119,9 @@ class RequestPasswordResetLinkView(APIView):
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
 
-        FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5173")
+        FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5173").rstrip("/")
         reset_link = f"{FRONTEND_BASE_URL}/reset-password/{uidb64}/{token}"
+
 
         send_html_email(
             subject="Reset Your Password",
