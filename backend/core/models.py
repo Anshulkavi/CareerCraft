@@ -59,8 +59,8 @@ connect(
 
 # ---------------- ResumeData (Parsed Resume Store) ----------------
 class ResumeData(Document):
-    name = StringField(required=True)
-    email = EmailField(required=True)
+    name = StringField()
+    email = EmailField()
     phone = StringField()
     # ✅ Skills ko DictField se ListField me convert kiya for simplicity
     # flat list ["python","django","flask"] etc.
