@@ -261,6 +261,7 @@
 
 import traceback
 from bson import ObjectId
+from bson.errors import InvalidId
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
@@ -392,12 +393,19 @@ class GetResumeView(APIView):
 @api_view(['GET'])
 def get_resume_by_id(request, resume_id):
     try:
+        # Validate ObjectId
+        if not ObjectId.is_valid(resume_id):
+            return Response({"error": "Invalid resume ID"}, status=400)
+
         resume = Resume.objects.get(id=resume_id)
         serializer = ResumeSerializer(resume)
         return Response(serializer.data, status=200)
     except Resume.DoesNotExist:
         return Response({"error": "Resume not found"}, status=404)
-
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
+    
 class DeleteResumeView(APIView):
     permission_classes = [IsAuthenticated]
 
