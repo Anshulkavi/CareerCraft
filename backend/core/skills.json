@@ -1,0 +1,8 @@
+[
+    "python", "c/c++", "javascript", "django", "flask", "react", "fastapi",
+    "mongodb", "sql", "aws", "ec2", "s3", "iam", "cloudwatch", "docker", 
+    "github actions", "ci/cd", "rest apis", "microservices", "agile", 
+    "distributed systems", "system design", "machine learning", "ml", "unix/linux", 
+    "dsa", "oop", "os", "dbms", "networking", "git", "postman", "pytest", "vs code", 
+    "nlp", "gunicorn", "firebase", "jwt", "cloudinary", "render", "tf-idf", "gemini api"
+]

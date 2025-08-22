@@ -480,9 +480,12 @@ function ResumeUpload() {
     const formData = new FormData();
     formData.append("resume", file);
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
     try {
-      const response = await fetch(
-        "https://careercraft-5kzo.onrender.com/api/upload_resume/",
+       const response = await fetch(
+    `${API_BASE_URL}/upload_resume/`,
         {
           method: "POST",
           body: formData,
