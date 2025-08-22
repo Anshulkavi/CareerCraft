@@ -357,13 +357,13 @@ class SaveResumeView(APIView):
         if not title or not data:
             return Response({"error": "Missing title or data"}, status=400)
 
-        Resume.objects.update_one(
-            {"user_id": user_id, "title": title},
-            {"$set": {"data": data}},
+        # Correct MongoEngine update_one usage
+        Resume.objects(user_id=user_id, title=title).update_one(
+            set__data=data,
             upsert=True
         )
-        return Response({"message": "Resume saved successfully ✅"})
 
+        return Response({"message": "Resume saved successfully ✅"})
 
 # ---------------- GET RESUMES ----------------
 class GetResumeView(APIView):
