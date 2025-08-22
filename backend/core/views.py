@@ -352,56 +352,67 @@ class SaveResumeView(APIView):
     def post(self, request):
         user_id = str(request.user.id)
         title = request.data.get("title")
-        data = request.data.get('data', {})
+        data = request.data.get('data', {})  # ✅ default to empty dict
 
         if not title or not data:
             return Response({"error": "Missing title or data"}, status=400)
 
-        # Correct MongoEngine update_one usage
-        Resume.objects(user_id=user_id, title=title).update_one(
-            set__data=data,
-            upsert=True
-        )
+        # Overwrite if same user + title exists
+        existing = Resume.objects(user_id=user_id, title=title).first()
+        if existing:
+            existing.data = data
+            existing.save()
+        else:
+            Resume(user_id=user_id, title=title, data=data).save()
 
-        return Response({"message": "Resume saved successfully ✅"})
+        return Response({"message": "Resume saved successfully"})
 
-# ---------------- GET RESUMES ----------------
+
 class GetResumeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user_id = str(request.user.id)
+
+        # Fetch all resumes for this user, sorted by latest updated
         resumes = Resume.objects(user_id=user_id).order_by("-updated_at")
-        serializer = ResumeSerializer(resumes, many=True)
-        return Response(serializer.data)
 
+        resume_list = [
+            {
+                "id": str(resume.id),
+                "title": resume.title,
+                "created_at": resume.created_at.strftime("%Y-%m-%d %H:%M"),
+                "updated_at": resume.updated_at.strftime("%Y-%m-%d %H:%M"),
+            }
+            for resume in resumes
+        ]
 
-# ---------------- GET RESUME BY ID ----------------
+        return Response(resume_list)
+    
 @api_view(['GET'])
 def get_resume_by_id(request, resume_id):
     try:
         resume = Resume.objects.get(id=resume_id)
         serializer = ResumeSerializer(resume)
-        return Response(serializer.data)
+        return Response(serializer.data, status=200)
     except Resume.DoesNotExist:
         return Response({"error": "Resume not found"}, status=404)
 
-
-# ---------------- DELETE RESUME ----------------
 class DeleteResumeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, resume_id):
         try:
-            resume_to_delete = Resume.objects.get(id=ObjectId(resume_id), user_id=str(request.user.id))
-            resume_to_delete.delete()
+            resume = Resume.objects.get(id=ObjectId(resume_id), user_id=str(request.user.id))
+            resume.delete()
             return Response({"message": "Resume deleted ✅"}, status=200)
         except Resume.DoesNotExist:
-            return Response({"error": "Resume not found or you do not have permission to delete it."}, status=404)
+            return Response({"error": "Resume not found"}, status=404)
         except Exception as e:
+            import traceback
             traceback.print_exc()
             return Response({"error": str(e)}, status=500)
-        
+         
 @csrf_exempt
 def test_cors(request):
     return JsonResponse({"status": "ok"})

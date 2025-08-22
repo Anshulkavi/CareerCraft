@@ -81,8 +81,8 @@ User = get_user_model()
 
 class Resume(Document):
     user_id = StringField(required=True)
-    title = StringField(required=True)  # user-applied title
-    data = DictField()                  # resume structured JSON
+    title = StringField(required=True)  # ✅ this must exist
+    data = DictField()
     created_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
     updated_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
     meta = {'collection': 'resumes'}
